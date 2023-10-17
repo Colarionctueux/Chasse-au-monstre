@@ -1,0 +1,6 @@
+bin/
+.vscode/
+.intellij/
+.eclipse/
+lib/
+.DS_Store

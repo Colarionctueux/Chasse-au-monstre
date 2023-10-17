@@ -1,0 +1,1 @@
+javac -d bin src/main/java/fr/univlille/*.java && java -cp bin fr.univlille.Main
