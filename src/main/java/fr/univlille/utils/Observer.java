@@ -1,0 +1,8 @@
+package main.java.fr.univlille.iutinfo.utils;
+
+public interface Observer {
+
+  public void update(Subject subj);
+  public void update(Subject subj, Object data);
+
+}
