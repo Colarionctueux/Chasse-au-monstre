@@ -2,6 +2,15 @@ package fr.univlille;
 
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
+/**
+ * <strong> </strong>
+ * @author Gysemans Thomas
+ * @author Leclercq Manon
+ * @author Eckman Nicolas
+ * @author Tourneur Aymeri
+ * @author Belguebli Rayane
+ */
+
 public class Vector2i implements ICoordinate {
     private int x;
     private int y;

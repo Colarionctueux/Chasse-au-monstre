@@ -4,6 +4,15 @@ import fr.univlille.iutinfo.cam.player.IStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
+/**
+ * <strong> </strong>
+ * @author Gysemans Thomas
+ * @author Leclercq Manon
+ * @author Eckman Nicolas
+ * @author Tourneur Aymeri
+ * @author Belguebli Rayane
+ */
+
 public class HunterModel implements IStrategy{
 
     @Override
