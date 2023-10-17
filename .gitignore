@@ -3,4 +3,5 @@ bin/
 .intellij/
 .eclipse/
 lib/
+doc/
 .DS_Store
