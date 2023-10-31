@@ -1,4 +1,4 @@
-package fr.univlille;
+package fr.univlille.ihm.views;
 
 /**
  * <strong> </strong>

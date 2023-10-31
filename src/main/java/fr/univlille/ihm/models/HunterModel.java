@@ -1,10 +1,11 @@
-package fr.univlille;
+package fr.univlille.ihm.models;
 import java.util.Scanner;
 
-import fr.univlille.iutinfo.cam.player.monster.IMonsterStrategy;
+import fr.univlille.Vector2i;
+import fr.univlille.iutinfo.cam.player.hunter.IHunterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
-import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
 /**
  * <strong> </strong>
@@ -15,9 +16,17 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
  * @author Belguebli Rayane
  */
 
-public class MonsterModel implements IMonsterStrategy{
+public class HunterModel implements IHunterStrategy{
 
     Vector2i position;
+
+    public HunterModel(Vector2i startPosition) {
+        position = startPosition;
+    }
+
+    public Vector2i getPosition() {
+        return position;
+    }
 
     @Override
     public ICoordinate play() {
@@ -56,8 +65,9 @@ public class MonsterModel implements IMonsterStrategy{
     }
 
     @Override
-    public void initialize(boolean[][] arg0) {
+    public void initialize(int arg0, int arg1) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'initialize'");
     }
+    
 }
