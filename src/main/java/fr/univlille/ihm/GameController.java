@@ -15,15 +15,9 @@ public class GameController {
     @FXML
     public Button stopGameButton;
 
-    @FXML
-    public Button playButton;
 
     @FXML
     public VBox mainVBox;
-
-    @FXML
-    public TextField playTextField;
-
     @FXML
     public AnchorPane switchPane;
 
@@ -36,15 +30,13 @@ public class GameController {
     private GameView gameView;
     private Game game;
 
-    private boolean isHunterTurn = false;
-
     @FXML
     public void initialize() {
         game = new Game();
         game.generateMaze(11, 11);
         gameView = new GameView(game);
         mainVBox.getChildren().add(2, gameView);
-        gameView.update(isHunterTurn);
+        gameView.update();
     }
 
     public static void delay(long millis, Runnable continuation) {
@@ -62,20 +54,18 @@ public class GameController {
 
     @FXML
     public void playButtonPressed() throws InterruptedException {
-        String text = playTextField.getText().substring(0, 1);
-        // if(!text.equals("L") || !text.equals("R") || !text.equals("U") || !text.equals("D")) {
-        //     errorLabel.setText("Mouvement illégal!");
-        //     return;
-        // }
-        System.out.println(text);
-        game.getMonster().play(text);
-        errorLabel.setText("");
+        if(gameView.playMove()) {
+            errorLabel.setText("");
+        } else {
+            errorLabel.setText("Movment invalide!");
+            return;
+        }
         switchPane.setVisible(true);
         switchPaneCountdown.setText("Dans 3...");
         delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
         delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
         delay(3000, () -> switchPane.setVisible(false));
-        // isHunterTurn = !isHunterTurn;
-        gameView.update(isHunterTurn);
+        // gameView.isHunterTurn = !gameView.isHunterTurn;
+        gameView.update();
     }
 }

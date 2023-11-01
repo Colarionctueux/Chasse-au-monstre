@@ -33,6 +33,10 @@ public class Game{
     public boolean isWallAt(int x, int y) {
         return maze[y][x];
     }
+    
+    public boolean isWallAt(Vector2i vector2i) {
+        return maze[vector2i.getRow()][vector2i.getCol()];
+    }
 
     public Vector2i getMazeDimensions() {
         return new Vector2i(mazeWidth, mazeHeight);

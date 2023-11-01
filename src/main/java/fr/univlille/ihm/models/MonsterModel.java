@@ -29,23 +29,9 @@ public class MonsterModel implements IMonsterStrategy{
     }
 
 
-    public ICoordinate play(String direction) {
-        switch (direction) {
-            case "L":
-                position.setX(position.getCol() - 1);
-                break;
-            case "R":
-                position.setX(position.getCol() + 1);
-                break;
-            case "U":
-                position.setY(position.getRow() - 1);
-                break;
-            case "D":
-                position.setY(position.getRow() + 1);
-                break;
-            default:
-                break;
-        }
+    public ICoordinate play(Vector2i movement) {
+        position.setX(movement.getCol());
+        position.setY(movement.getRow());
         return position;
     }
 
