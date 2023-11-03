@@ -1,10 +1,8 @@
 package fr.univlille.ihm;
 
-import java.net.URL;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 
 public class MenuController {
     private App app;

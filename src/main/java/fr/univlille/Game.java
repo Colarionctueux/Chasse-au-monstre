@@ -1,10 +1,13 @@
 package fr.univlille;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 
 import fr.univlille.ihm.models.HunterModel;
 import fr.univlille.ihm.models.MonsterModel;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
+import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 
 /**
  * <strong> </strong>
@@ -17,14 +20,30 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 
 public class Game{
 
+    private int turn;
     private int mazeWidth;
     private int mazeHeight;
     private boolean[][] maze;
     private Vector2i exit;
     private HunterModel hunter;
+
+    public HunterModel getHunter() {
+        return hunter;
+    }
+
     private MonsterModel monster;
     private ArrayList<ICellEvent> history;
 
+    public boolean gameEnded;
+
+
+    public boolean isGameEnded() {
+        return gameEnded;
+    }
+
+    public void setGameEnded(boolean gameEnded) {
+        this.gameEnded = gameEnded;
+    }
 
     public MonsterModel getMonster() {
         return monster;
@@ -32,6 +51,10 @@ public class Game{
 
     public boolean isWallAt(int x, int y) {
         return maze[y][x];
+    }
+
+    public boolean monsterWon() {
+        return getMonster().getPosition().equals(exit);
     }
     
     public boolean isWallAt(Vector2i vector2i) {
@@ -46,16 +69,25 @@ public class Game{
         return exit;
     }
 
+    public Vector2i randomPosition() {
+        Random random = new Random();
+        return new Vector2i(Math.floor(random.nextInt(mazeWidth / 2)) * 2 + 1, Math.floor(random.nextInt(mazeHeight / 2)) * 2 + 1);
+    }
+
     public void generateMaze(int width, int height){
-
-        this.hunter = new HunterModel(new Vector2i(1, 1));
-        this.monster = new MonsterModel(new Vector2i(1, 1));
-        this.history = new ArrayList<>();
-
         this.mazeWidth = width;
         this.mazeHeight = height;
 
-        exit = new Vector2i(this.mazeWidth - 2, this.mazeHeight - 2);
+        this.hunter = new HunterModel();
+        this.monster = new MonsterModel(randomPosition());
+
+        this.turn = 1;
+        this.history = new ArrayList<>();
+
+        exit = randomPosition();
+        while(exit.equals(getMonster().getPosition())) {
+            exit = randomPosition();
+        }
 
         maze = new boolean[mazeHeight][mazeWidth];
         for (int y = 0; y < mazeHeight; y++) {
@@ -65,5 +97,44 @@ public class Game{
                 }
             }
         }
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void incrementTurn() {
+        this.turn += 1;
+    }
+
+    public ICellEvent play(Vector2i shootPosition) {
+        CellInfo state = CellInfo.EMPTY;
+        if(isWallAt(shootPosition)) {
+            state = CellInfo.WALL;
+        }
+        for (ICellEvent cellEvent : history) {
+            if(cellEvent.getCoord().equals(shootPosition)) {
+                getHunter().shootsHistory.add(cellEvent);
+                return cellEvent;
+            }
+        }
+        CellEvent cellEvent = new CellEvent(shootPosition, state, turn);
+
+        // remove other shoots history with the same position
+        for (int i = getHunter().shootsHistory.size() - 1; i > 0; i--) {
+            if(getHunter().shootsHistory.get(i).getCoord().equals(shootPosition)) {
+                getHunter().shootsHistory.remove(i);
+            }
+        }
+        getHunter().shootsHistory.add(cellEvent);
+        return cellEvent;
+    }
+
+    public ArrayList<ICellEvent> getHistory() {
+        return history;
+    }
+
+    public void addToHistory(ICellEvent cellEvent) {
+        history.add(cellEvent);
     }
 }

@@ -1,4 +1,5 @@
 package fr.univlille.ihm.models;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import fr.univlille.Vector2i;
@@ -18,15 +19,13 @@ import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
 public class HunterModel implements IHunterStrategy{
 
-    Vector2i position;
+    public ArrayList<ICellEvent> shootsHistory;
 
-    public HunterModel(Vector2i startPosition) {
-        position = startPosition;
+
+    public HunterModel() {
+        shootsHistory = new ArrayList<>();
     }
 
-    public Vector2i getPosition() {
-        return position;
-    }
 
     @Override
     public ICoordinate play() {

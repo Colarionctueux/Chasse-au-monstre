@@ -2,9 +2,7 @@ package fr.univlille.ihm;
  
 import java.io.IOException;
 
-import fr.univlille.Game;
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,7 +40,6 @@ public class App extends Application {
         // gameView.update();
         // stage.show();
         Parent parent = loadFXML("game");
-        
         Scene scene = new Scene(parent, 800, 510);
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");

@@ -19,6 +19,11 @@ public class Vector2i implements ICoordinate {
         this.x = x;
         this.y = y;
     }
+    
+    public Vector2i(double x, double y) {
+        this.x = (int) x;
+        this.y = (int) y;
+    }
 
 
     public void setX(int x) {
@@ -41,20 +46,22 @@ public class Vector2i implements ICoordinate {
         return this.y;
     }
 
-    /**
-     * @return La longueur du Vector2 (magnitude)
-     */
-    public double magnitude() {
-        return Math.sqrt(Math.pow(getCol(), 2) - Math.pow(getRow(), 2));
-    }
-
-
-    public Vector2i subtract(Vector2i other){
-        return new Vector2i(getCol() - other.getCol(), getRow() - other.getRow());
-    }
 
     public double distance(Vector2i other) {
         return Math.sqrt(Math.pow((getCol() - other.getCol()), 2) + Math.pow((getRow() - other.getRow()), 2));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+        Vector2i other = (Vector2i) obj;
+        return other.getCol() == getCol() && other.getRow() == getRow();
+    }
     
+    @Override
+    public String toString() {
+        return "(" + getCol() + ", " + getRow() + ")";
+    }
 }
