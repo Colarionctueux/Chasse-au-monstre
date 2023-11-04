@@ -3,7 +3,7 @@ package fr.univlille.ihm;
 import fr.univlille.CellEvent;
 import fr.univlille.Game;
 import fr.univlille.Theme;
-import fr.univlille.Vector2i;
+import fr.univlille.Coordinate;
 import fr.univlille.ihm.views.GameView;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import javafx.concurrent.Task;
@@ -54,14 +54,14 @@ public class GameController {
         }
         gameView = new GameView(game);
         mainVBox.getChildren().add(2, gameView);
-        gameView.update();
+        gameView.draw();
         gameView.mainPage = this;
 
         currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
 
-        Vector2i monsterPosition = game.getMonster().getPosition();
-        game.addToHistory(new CellEvent(new Vector2i(monsterPosition.getCol(), monsterPosition.getRow()), CellInfo.MONSTER, game.getTurn()));
+        Coordinate monsterPosition = game.getMonster().getPosition();
+        game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()), CellInfo.MONSTER, game.getTurn()));
         
         if(halloweenButton.isSelected()) {
             gameView.setTheme(Theme.HALLOWEEN);
@@ -93,7 +93,7 @@ public class GameController {
             return;
         }
         if(gameView.isHunterTurn) {
-            gameView.hunterShooted = false;
+            gameView.hunterView.hunterShooted = false;
         } else {
             if(gameView.playMove()) {
                 errorLabel.setText("");
@@ -107,7 +107,7 @@ public class GameController {
         
         if(game.monsterWon()) {
             game.setGameEnded(true);
-            gameView.update();
+            gameView.draw();
             errorLabel.setText("Le monstre a gagné!");
             return;
         }
@@ -122,7 +122,7 @@ public class GameController {
         } else {
             currentPlayerLabel.setText("C'est le tour du monstre.");
         }
-        gameView.update();
+        gameView.draw();
     }
 
     @FXML

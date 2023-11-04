@@ -1,7 +1,7 @@
 package fr.univlille.ihm.models;
 import java.util.Scanner;
 
-import fr.univlille.Vector2i;
+import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.monster.IMonsterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
@@ -9,18 +9,18 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 
 public class MonsterModel implements IMonsterStrategy{
 
-    Vector2i position;
+    Coordinate position;
 
-    public MonsterModel(Vector2i startPosition) {
+    public MonsterModel(Coordinate startPosition) {
         position = startPosition;
     }
 
-    public Vector2i getPosition() {
+    public Coordinate getPosition() {
         return position;
     }
 
 
-    public ICoordinate play(Vector2i movement) {
+    public ICoordinate play(Coordinate movement) {
         position.setX(movement.getCol());
         position.setY(movement.getRow());
         return position;
@@ -40,7 +40,7 @@ public class MonsterModel implements IMonsterStrategy{
         }
         x = ((int) coordo.charAt(0)) - 'A';
         y = ((int) coordo.charAt(1));
-        return (ICoordinate) new Vector2i(x, y);
+        return (ICoordinate) new Coordinate(x, y);
     }
 
     @Override

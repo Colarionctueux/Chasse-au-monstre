@@ -52,7 +52,7 @@ public class TestGame {
     
     @Test
     public void testRandomPositionIsWithinBounds() {
-        Vector2i randomPos = game.randomPosition();
+        Coordinate randomPos = game.randomPosition();
         assertTrue(randomPos.getCol()>=0 && randomPos.getCol()<=game.getMazeDimensions().getCol());
         assertTrue(randomPos.getRow()>=0 && randomPos.getRow()<=game.getMazeDimensions().getRow());
     }
@@ -65,7 +65,7 @@ public class TestGame {
 
     @Test
     public void testGetsAddedToHistory() {
-        CellEvent event = new CellEvent(new Vector2i(0,0), CellInfo.WALL,2);
+        CellEvent event = new CellEvent(new Coordinate(0,0), CellInfo.WALL,2);
         game.addToHistory(event);
         assertEquals(1,game.getHistory().size());
     }

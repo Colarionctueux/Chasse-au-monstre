@@ -1,25 +1,17 @@
 package fr.univlille.ihm.views;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import fr.univlille.CellEvent;
 import fr.univlille.Game;
 import fr.univlille.Theme;
-import fr.univlille.Vector2i;
+import fr.univlille.Coordinate;
 import fr.univlille.ihm.GameController;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
-import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import javafx.event.EventHandler;
-import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 
 public class GameView extends Canvas {
     /**
@@ -39,28 +31,21 @@ public class GameView extends Canvas {
     public static final int TILE_SIZE = 32;
 
     public boolean isHunterTurn = false;
-    public boolean hunterShooted = false;
 
-    /**
-     * This array contains the index of decorations within the spritesheet.
-     * It has the same dimensions of the maze, and the first element in this 2D-array is the decoration of the first cell within the maze.
-     * 
-     * 0 would be the first 32x32 image from the spritesheet of the selected theme.
-     * Some cells don't have a decoration, and as such the index is "-1".
-     */
-    private int[][] decorations;
-
-    private Vector2i cursorPosition;
-    public Vector2i movePosition;
+    private Coordinate cursorPosition;
+    public Coordinate movePosition;
 
     public GameController mainPage;
+
+    public HunterView hunterView;
+    public MonsterView monsterView;
     
     /**
      * Each image in the game is contained in a spritesheet.
      * A spritesheet is a set of fixed-size images, and each image is a "decoration".
      * Each decoration has a unique index, just like an array.
      */
-    private Image spritesheet = new Image(getClass().getResourceAsStream("/images/spritesheet.png"));
+    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
 
     /**
      * The game allows the player to choose a custom theme.
@@ -72,262 +57,77 @@ public class GameView extends Canvas {
         this.model = model;
         this.gc = getGraphicsContext2D();
 
-        Vector2i mazeDimensions = model.getMazeDimensions(); 
+        hunterView = new HunterView(gc, this, model);
+        monsterView = new MonsterView(gc, this, model);
+
+        Coordinate mazeDimensions = model.getMazeDimensions(); 
         setWidth(TILE_SIZE * mazeDimensions.getCol());
         setHeight(TILE_SIZE * mazeDimensions.getRow());
 
-        addDecorations(mazeDimensions);
-
-        cursorPosition = new Vector2i(0, 0);
-        movePosition = new Vector2i(-1, -1);
+        cursorPosition = new Coordinate(0, 0);
+        movePosition = new Coordinate(-1, -1);
         setOnMouseMoved((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(model.isGameEnded() || hunterShooted) {
+                if(model.isGameEnded() || hunterView.hunterShooted) {
                     return;
                 }
-                Vector2i relativeMousePosition = new Vector2i(
+                Coordinate relativeMousePosition = new Coordinate(
                     (int) (event.getSceneX() - getLayoutX() - (TILE_SIZE * 0.5)),
                     (int) (event.getSceneY() - getLayoutY() - (TILE_SIZE * 0.5))
                 );
-                cursorPosition = new Vector2i((int) (relativeMousePosition.getCol() / TILE_SIZE), (int) (relativeMousePosition.getRow() / TILE_SIZE));
-                update();
+                cursorPosition = new Coordinate((int) (relativeMousePosition.getCol() / TILE_SIZE), (int) (relativeMousePosition.getRow() / TILE_SIZE));
+                draw();
             }
         });
         
         setOnMousePressed((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(model.isGameEnded() || hunterShooted) {
+                if(model.isGameEnded() || hunterView.hunterShooted) {
                     return;
                 }
-                if(isHunterTurn && isHunterShootValid(cursorPosition)) {
+                if(isHunterTurn && hunterView.isHunterShootValid(cursorPosition)) {
                     playMove();
-                    update();
-                } else if(isMonsterMovementValid(cursorPosition)) {
+                    draw();
+                } else if(monsterView.isMonsterMovementValid(cursorPosition)) {
                     movePosition = cursorPosition;
-                    update();
+                    draw();
                 }
             }
         });
     }
 
-    /**
-     * Initializes the set of decorations randomly.
-     * @param mazeDimensions The dimensions of the maze as an instance of `Vector2i`.
-     */
-    public void addDecorations(Vector2i mazeDimensions) {
-        Random random = new Random();
-        decorations = new int[mazeDimensions.getRow()][mazeDimensions.getRow()];
-        for (int y = 0; y < mazeDimensions.getRow(); y++) {
-            for (int x = 0; x < mazeDimensions.getCol(); x++) {
-                if(!model.isWallAt(x, y)) {
-                    if(random.nextDouble() > 0.85) {
-                        decorations[y][x] = random.nextInt(3);
-                    } else {
-                        decorations[y][x] = -1;
-                    }
-                }
-            }   
-        }
+    public Coordinate getCursorPosition() {
+        return cursorPosition;
     }
 
-    /**
-     * Makes sure that the given movement is valid for the monster.
-     * The monster cannot move outside of the maze.
-     * It cannot move into a wall.
-     * It cannot jump cells.
-     * @param movement The desired movement of the monster.
-     * @return `true` if the movement is valid, `false` otherwise.
-     */
-    public boolean isMonsterMovementValid(Vector2i movement) {
-        Vector2i mazeDimensions = model.getMazeDimensions();
-
-        // On vérifie déjà si le déplacement est dans la grille du jeu
-        if(movement.getCol() < 0 || movement.getCol() > mazeDimensions.getCol() || movement.getRow() < 0 || movement.getRow() > mazeDimensions.getRow()) {
-            return false;
-        }
-        
-        double distance = model.getMonster().getPosition().distance(movement);
-        if(distance > 1.0 || distance < 1.0) {
-            return false;
-        }
-
-        // Et si le déplacement n'est pas dans un obstacle
-        if(model.isWallAt(movement.getCol(), movement.getRow())) {
-            return false;
-        }
-        return true;
+    public void setCursorPosition(Coordinate cursorPosition) {
+        this.cursorPosition = cursorPosition;
     }
 
-    /**
-     * Makes sure that the given hunter's target is valid.
-     * The hunter cannot shoot outside of the maze and cannot shoot the borders.
-     * @param shoot The target's position.
-     * @return `true` if the target's position is valid, `false` otherwise.
-     */
-    public boolean isHunterShootValid(Vector2i shoot) {
-        Vector2i mazeDimensions = model.getMazeDimensions();
-        return shoot.getCol() > 0 && shoot.getCol() < mazeDimensions.getCol() - 1 && shoot.getRow() > 0 && shoot.getRow() < mazeDimensions.getRow() - 1;
+    public Coordinate getMovePosition() {
+        return movePosition;
     }
 
-    public void drawSimpleTexture(Vector2i spritesheetPosition, Vector2i gamePosition) {
-        gc.drawImage(
-            spritesheet, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
-            gamePosition.getCol() * TILE_SIZE,
-            gamePosition.getRow() * TILE_SIZE,
-            TILE_SIZE, TILE_SIZE
-        );
+    public void setMovePosition(Coordinate movePosition) {
+        this.movePosition = movePosition;
     }
 
-    public void drawSimpleTexture(int x, int y, Vector2i gamePosition) {
-        gc.drawImage(
-            spritesheet, x, y, 64, 64,
-            gamePosition.getCol() * TILE_SIZE,
-            gamePosition.getRow() * TILE_SIZE,
-            TILE_SIZE, TILE_SIZE
-        );
-    }
-    
-    public void drawSimpleTexture(Vector2i spritesheetPosition, int x, int y) {
-        gc.drawImage(
-            spritesheet, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
-            x * TILE_SIZE,
-            y * TILE_SIZE,
-            TILE_SIZE, TILE_SIZE
-        );
-    }
-
-    public void drawSimpleTexture(int sx, int sy, int gx, int gy) {
-        gc.drawImage(
-            spritesheet, sx, sy, 64, 64,
-            gx * TILE_SIZE,
-            gy * TILE_SIZE,
-            TILE_SIZE, TILE_SIZE
-        );
-    }
-
-    private void drawMonsterView() {
-
-        // On dessine d'abord le sol
-        gc.fillRect(0, 0, getWidth(), getHeight());
-        Vector2i dimensions = model.getMazeDimensions();
-        for (int y = 0; y < dimensions.getRow(); y++) {
-            for (int x = 0; x < dimensions.getCol(); x++) {
-                if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
-                    drawSimpleTexture(192, 0, x, y);
-                } else {
-                    drawSimpleTexture(192, 64, x, y);
-                }
-                if(model.isWallAt(x, y)) {
-                    drawSimpleTexture(0, 64, x, y); // Arbre
-                } else {
-                    // Décorations
-                    switch (decorations[y][x]) {
-                        case 0:
-                            drawSimpleTexture(0, 128, x, y);
-                            break;
-                        case 1:
-                            drawSimpleTexture(64, 128, x, y);
-                            break;
-                        case 2:
-                            drawSimpleTexture(128, 128, x, y);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-
-        Vector2i monsterPosition = model.getMonster().getPosition();
-        ICoordinate exitPosition = model.getExit();
-
-        gc.drawImage(
-            spritesheet, 128, 0, 64, 128,
-            exitPosition.getCol() * TILE_SIZE,
-            exitPosition.getRow() * TILE_SIZE - TILE_SIZE,
-            TILE_SIZE, TILE_SIZE * 2
-        );
-        
-        if(!hunterShooted) {
-            if(!isMonsterMovementValid(cursorPosition)) {
-                drawSimpleTexture(128, 192, cursorPosition); // Position souris (si mouvement impossible)
-            } else {
-                drawSimpleTexture(0, 192, cursorPosition); // Position souris (si mouvement possible)
-            }
-            drawSimpleTexture(64, 192, movePosition); // Le mouvement
-        }
-
-        ArrayList<ICellEvent> shoots = model.getHunter().shootsHistory;
-        if(shoots.size() > 0) {
-            Vector2i coord = (Vector2i) shoots.get(shoots.size() - 1).getCoord();
-            drawSimpleTexture(64, 256, coord);
-        }
-        drawSimpleTexture(0, 0, monsterPosition); // Joueur
-    }
-
-    private void drawHunterView() {
-        gc.fillRect(0, 0, getWidth(), getHeight());
-        Vector2i dimensions = model.getMazeDimensions();
-        for (int y = 0; y < dimensions.getRow(); y++) {
-            for (int x = 0; x < dimensions.getCol(); x++) {
-                if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
-                    drawSimpleTexture(192, 128, x, y);
-                } else {
-                    drawSimpleTexture(192, 192, x, y);
-                }
-                if(x == 0 || y == 0 || x == dimensions.getCol() - 1 || y == dimensions.getRow() - 1) {
-                    drawSimpleTexture(0, 64, x, y); // Arbre
-                }
-            }
-        }
-
-        gc.setFill(Color.BLACK);
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setFont(new Font("Comic Sans MS", 16));
-        for (ICellEvent cellEvent : model.getHunter().shootsHistory) {
-            Vector2i coord = (Vector2i) cellEvent.getCoord();
-            if(cellEvent.getState() == CellInfo.WALL) {
-                drawSimpleTexture(0, 64, coord.getCol(), coord.getRow());
-            }
-            if(cellEvent.getState() == CellInfo.EMPTY) {
-                drawSimpleTexture(192, 256, coord.getCol(), coord.getRow());
-            }
-            if(cellEvent.getState() == CellInfo.MONSTER) {
-                if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur la case (en gros il est mort)
-                    drawSimpleTexture(64, 0, coord.getCol(), coord.getRow()); // Tombe
-                } else {
-                    if(cellEvent.getState() == CellInfo.MONSTER) {
-                        gc.fillText(String.valueOf(cellEvent.getTurn()), coord.getCol() * TILE_SIZE + TILE_SIZE / 2, coord.getRow() * TILE_SIZE + TILE_SIZE / 2);
-                    }
-                }
-            }
-        }
-
-        if(!isHunterShootValid(cursorPosition)) {
-            drawSimpleTexture(new Vector2i(128, 256), cursorPosition); // Position souris (si mouvement impossible)
-        } else {
-            drawSimpleTexture(new Vector2i(0, 256), cursorPosition); // Position souris (si mouvement possible)
-        }
-        drawSimpleTexture(new Vector2i(64, 256), movePosition); // Le mouvement
-    }
-
-    public void update() {
+    public void draw() {
         if(isHunterTurn) {
-            drawHunterView();
+            hunterView.draw();
         } else {
-            drawMonsterView();
+            monsterView.draw();
         }
     }
 
     public boolean playMove() {
         if(isHunterTurn) {
-            if(hunterShooted) {
+            if(hunterView.hunterShooted) {
                 return false;
             } else {
-                hunterShooted = true;
+                hunterView.hunterShooted = true;
                 ICellEvent cellEvent = model.play(cursorPosition);
                 if(cellEvent.getState() == CellInfo.WALL) {
                     mainPage.errorLabel.setText("Vous avez touché un arbre.");
@@ -341,19 +141,19 @@ public class GameView extends Canvas {
                 } else {
                     mainPage.errorLabel.setText("Vous n'avez rien touché...");
                 }
-                update();
+                draw();
             }
         } else {
-            if(isMonsterMovementValid(movePosition)) {
+            if(monsterView.isMonsterMovementValid(movePosition)) {
                 model.incrementTurn();
                 model.getMonster().play(movePosition);
-                model.addToHistory(new CellEvent(new Vector2i(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
+                model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
             } else {
                 return false;
             }
         }
-        cursorPosition = new Vector2i(-1, -1);
-        movePosition = new Vector2i(-1, -1);
+        cursorPosition = new Coordinate(-1, -1);
+        movePosition = new Coordinate(-1, -1);
         return true;
     }
 
@@ -374,6 +174,6 @@ public class GameView extends Canvas {
                 return;
         }
         this.theme = theme;
-        update();
+        draw();
     }
 }

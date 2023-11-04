@@ -50,22 +50,30 @@ public class Game {
      */
     public boolean gameEnded;
 
+    public HunterModel getHunter() {
+        return hunter;
+    }
+
+    public MonsterModel getMonster() {
+        return monster;
+    }
 
     public boolean isGameEnded() {
         return gameEnded;
-    }
-
-    public HunterModel getHunter() {
-        return hunter;
     }
 
     public void setGameEnded(boolean gameEnded) {
         this.gameEnded = gameEnded;
     }
 
-    public MonsterModel getMonster() {
-        return monster;
+    public int getTurn() {
+        return turn;
     }
+
+    public void incrementTurn() {
+        this.turn += 1;
+    }
+
 
     /**
      * Checks if a particular cell is a wall or empty.
@@ -79,11 +87,11 @@ public class Game {
 
     /**
      * Checks if a particular cell is a wall or empty.
-     * @param vector2i The coordinates of the given cell.
+     * @param coordinate The coordinates of the given cell.
      * @return `true` if this cell is a wall, `false` if it's empty.
      */
-    public boolean isWallAt(Vector2i vector2i) {
-        return isWallAt(vector2i.getRow(), vector2i.getCol());
+    public boolean isWallAt(Coordinate coordinate) {
+        return isWallAt(coordinate.getRow(), coordinate.getCol());
     }
 
     /**
@@ -95,11 +103,11 @@ public class Game {
     }
     
     /**
-     * Gets the width and height of the maze as an instance of `Vector2i`.
-     * @return An instance of `Vector2i` where `x` is the width of the maze and `y` the height.
+     * Gets the width and height of the maze as an instance of `Coordinate`.
+     * @return An instance of `Coordinate` where `x` is the width of the maze and `y` the height.
      */
-    public Vector2i getMazeDimensions() {
-        return new Vector2i(mazeWidth, mazeHeight);
+    public Coordinate getMazeDimensions() {
+        return new Coordinate(mazeWidth, mazeHeight);
     }
 
     /**
@@ -115,9 +123,9 @@ public class Game {
      * For now, it gives a random position that is not a wall.
      * @return A random position in the maze.
      */
-    public Vector2i randomPosition() {
+    public Coordinate randomPosition() {
         Random random = new Random();
-        return new Vector2i(random.nextInt(mazeWidth / 2) * 2 + 1, random.nextInt(mazeHeight / 2) * 2 + 1);
+        return new Coordinate(random.nextInt(mazeWidth / 2) * 2 + 1, random.nextInt(mazeHeight / 2) * 2 + 1);
     }
 
     /**
@@ -156,21 +164,13 @@ public class Game {
             }
         }
     }
-
-    public int getTurn() {
-        return turn;
-    }
-
-    public void incrementTurn() {
-        this.turn += 1;
-    }
-
+    
     /**
      * Gets information about the cell that the hunter is targeting.
      * @param shootPosition The coordinates of the hunter's target.
      * @return The type of cell that the hunter has shot.
      */
-    public ICellEvent play(Vector2i shootPosition) {
+    public ICellEvent play(Coordinate shootPosition) {
         CellInfo state = CellInfo.EMPTY;
         if (isWallAt(shootPosition)) {
             state = CellInfo.WALL;

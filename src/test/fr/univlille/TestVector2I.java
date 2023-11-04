@@ -5,20 +5,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestVector2I {
-    Vector2i vector1;
-    Vector2i vector2;
-    Vector2i vector3;
-    Vector2i vector4;
-    Vector2i vector5;
+public class TestCoordinate {
+    Coordinate vector1;
+    Coordinate vector2;
+    Coordinate vector3;
+    Coordinate vector4;
+    Coordinate vector5;
     
     @BeforeEach
     public void setup(){
-        vector1 = new Vector2i(2, 3);
-        vector2 = new Vector2i(4, 6);
-        vector3 = new Vector2i(2,3);
-        vector4 = new Vector2i(0, 0);
-        vector5 = new Vector2i(0, 5);
+        vector1 = new Coordinate(2, 3);
+        vector2 = new Coordinate(4, 6);
+        vector3 = new Coordinate(2,3);
+        vector4 = new Coordinate(0, 0);
+        vector5 = new Coordinate(0, 5);
     }
 
     @Test

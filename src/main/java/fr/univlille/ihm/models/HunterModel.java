@@ -2,7 +2,7 @@ package fr.univlille.ihm.models;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import fr.univlille.Vector2i;
+import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.hunter.IHunterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
@@ -29,7 +29,7 @@ public class HunterModel implements IHunterStrategy{
         }
         x = ((int) coordo.charAt(0)) - 'A';
         y = ((int) coordo.charAt(1));
-        return (ICoordinate) new Vector2i(x, y);
+        return (ICoordinate) new Coordinate(x, y);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class TestCellEvent {
 
     @BeforeEach
     public void setup(){
-        ce1 = new CellEvent(new Vector2i(1,2), CellInfo.WALL, 2);
+        ce1 = new CellEvent(new Coordinate(1,2), CellInfo.WALL, 2);
     }
 
     @Test
