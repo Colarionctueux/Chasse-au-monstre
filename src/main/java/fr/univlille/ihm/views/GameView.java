@@ -9,6 +9,7 @@ import fr.univlille.Theme;
 import fr.univlille.Vector2i;
 import fr.univlille.ihm.GameController;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
@@ -21,23 +22,50 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 public class GameView extends Canvas {
-    public Game model;
-    public GraphicsContext gc;
+    /**
+     * A reference to the instance of "Game" containing the hunter and monster models, as well as the maze itself.
+     */
+    public final Game model;
 
-    public static int TILE_SIZE = 32;
+    /**
+     * The context that allows us to draw stuff into.
+     */
+    public final GraphicsContext gc;
+
+    /**
+     * A tile is one image from the tileset (spritesheet).
+     * Each tile is 32 pixels wide.
+     */
+    public static final int TILE_SIZE = 32;
 
     public boolean isHunterTurn = false;
     public boolean hunterShooted = false;
 
-    public Vector2i movePosition;
-
+    /**
+     * This array contains the index of decorations within the spritesheet.
+     * It has the same dimensions of the maze, and the first element in this 2D-array is the decoration of the first cell within the maze.
+     * 
+     * 0 would be the first 32x32 image from the spritesheet of the selected theme.
+     * Some cells don't have a decoration, and as such the index is "-1".
+     */
     private int[][] decorations;
 
     private Vector2i cursorPosition;
+    public Vector2i movePosition;
 
     public GameController mainPage;
     
-    private Image image = new Image(getClass().getResourceAsStream("/images/spritesheet.png"));
+    /**
+     * Each image in the game is contained in a spritesheet.
+     * A spritesheet is a set of fixed-size images, and each image is a "decoration".
+     * Each decoration has a unique index, just like an array.
+     */
+    private Image spritesheet = new Image(getClass().getResourceAsStream("/images/spritesheet.png"));
+
+    /**
+     * The game allows the player to choose a custom theme.
+     * Each theme has its own set of graphics.
+     */
     public Theme theme;
 
     public GameView(Game model) {
@@ -76,7 +104,7 @@ public class GameView extends Canvas {
                 if(isHunterTurn && isHunterShootValid(cursorPosition)) {
                     playMove();
                     update();
-                } else if(isMonterMovementValid(cursorPosition)) {
+                } else if(isMonsterMovementValid(cursorPosition)) {
                     movePosition = cursorPosition;
                     update();
                 }
@@ -84,6 +112,10 @@ public class GameView extends Canvas {
         });
     }
 
+    /**
+     * Initializes the set of decorations randomly.
+     * @param mazeDimensions The dimensions of the maze as an instance of `Vector2i`.
+     */
     public void addDecorations(Vector2i mazeDimensions) {
         Random random = new Random();
         decorations = new int[mazeDimensions.getRow()][mazeDimensions.getRow()];
@@ -100,7 +132,15 @@ public class GameView extends Canvas {
         }
     }
 
-    public boolean isMonterMovementValid(Vector2i movement) {
+    /**
+     * Makes sure that the given movement is valid for the monster.
+     * The monster cannot move outside of the maze.
+     * It cannot move into a wall.
+     * It cannot jump cells.
+     * @param movement The desired movement of the monster.
+     * @return `true` if the movement is valid, `false` otherwise.
+     */
+    public boolean isMonsterMovementValid(Vector2i movement) {
         Vector2i mazeDimensions = model.getMazeDimensions();
 
         // On vérifie déjà si le déplacement est dans la grille du jeu
@@ -120,6 +160,12 @@ public class GameView extends Canvas {
         return true;
     }
 
+    /**
+     * Makes sure that the given hunter's target is valid.
+     * The hunter cannot shoot outside of the maze and cannot shoot the borders.
+     * @param shoot The target's position.
+     * @return `true` if the target's position is valid, `false` otherwise.
+     */
     public boolean isHunterShootValid(Vector2i shoot) {
         Vector2i mazeDimensions = model.getMazeDimensions();
         return shoot.getCol() > 0 && shoot.getCol() < mazeDimensions.getCol() - 1 && shoot.getRow() > 0 && shoot.getRow() < mazeDimensions.getRow() - 1;
@@ -127,7 +173,7 @@ public class GameView extends Canvas {
 
     public void drawSimpleTexture(Vector2i spritesheetPosition, Vector2i gamePosition) {
         gc.drawImage(
-            image, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
+            spritesheet, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
             gamePosition.getCol() * TILE_SIZE,
             gamePosition.getRow() * TILE_SIZE,
             TILE_SIZE, TILE_SIZE
@@ -136,7 +182,7 @@ public class GameView extends Canvas {
 
     public void drawSimpleTexture(int x, int y, Vector2i gamePosition) {
         gc.drawImage(
-            image, x, y, 64, 64,
+            spritesheet, x, y, 64, 64,
             gamePosition.getCol() * TILE_SIZE,
             gamePosition.getRow() * TILE_SIZE,
             TILE_SIZE, TILE_SIZE
@@ -145,7 +191,7 @@ public class GameView extends Canvas {
     
     public void drawSimpleTexture(Vector2i spritesheetPosition, int x, int y) {
         gc.drawImage(
-            image, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
+            spritesheet, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
             x * TILE_SIZE,
             y * TILE_SIZE,
             TILE_SIZE, TILE_SIZE
@@ -154,7 +200,7 @@ public class GameView extends Canvas {
 
     public void drawSimpleTexture(int sx, int sy, int gx, int gy) {
         gc.drawImage(
-            image, sx, sy, 64, 64,
+            spritesheet, sx, sy, 64, 64,
             gx * TILE_SIZE,
             gy * TILE_SIZE,
             TILE_SIZE, TILE_SIZE
@@ -195,17 +241,17 @@ public class GameView extends Canvas {
         }
 
         Vector2i monsterPosition = model.getMonster().getPosition();
-        Vector2i exitPosition = model.getExit();
+        ICoordinate exitPosition = model.getExit();
 
         gc.drawImage(
-            image, 128, 0, 64, 128,
+            spritesheet, 128, 0, 64, 128,
             exitPosition.getCol() * TILE_SIZE,
             exitPosition.getRow() * TILE_SIZE - TILE_SIZE,
             TILE_SIZE, TILE_SIZE * 2
         );
         
         if(!hunterShooted) {
-            if(!isMonterMovementValid(cursorPosition)) {
+            if(!isMonsterMovementValid(cursorPosition)) {
                 drawSimpleTexture(128, 192, cursorPosition); // Position souris (si mouvement impossible)
             } else {
                 drawSimpleTexture(0, 192, cursorPosition); // Position souris (si mouvement possible)
@@ -236,7 +282,6 @@ public class GameView extends Canvas {
                 }
             }
         }
-
 
         gc.setFill(Color.BLACK);
         gc.setTextAlign(TextAlignment.CENTER);
@@ -299,7 +344,7 @@ public class GameView extends Canvas {
                 update();
             }
         } else {
-            if(isMonterMovementValid(movePosition)) {
+            if(isMonsterMovementValid(movePosition)) {
                 model.incrementTurn();
                 model.getMonster().play(movePosition);
                 model.addToHistory(new CellEvent(new Vector2i(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
@@ -312,19 +357,23 @@ public class GameView extends Canvas {
         return true;
     }
 
+    /**
+     * Sets the selected theme and re-draws the UI accordingly.
+     * If the theme isn't valid, nothing happens.
+     * @param theme The theme to be applied to the game.
+     */
     public void setTheme(Theme theme) {
-        this.theme = theme;
         switch (theme) {
             case DEFAULT:
-                image = new Image(getClass().getResourceAsStream("/images/spritesheet.png"));
+                spritesheet = new Image(getClass().getResourceAsStream("/images/spritesheet.png"));
                 break;
             case HALLOWEEN:
-                image = new Image(getClass().getResourceAsStream("/images/spritesheet_halloween.png"));
+                spritesheet = new Image(getClass().getResourceAsStream("/images/spritesheet_halloween.png"));
                 break;
             default:
-                break;
+                return;
         }
+        this.theme = theme;
         update();
     }
-
 }

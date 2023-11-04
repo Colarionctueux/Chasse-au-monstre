@@ -3,42 +3,60 @@ package fr.univlille;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 import fr.univlille.ihm.models.HunterModel;
 import fr.univlille.ihm.models.MonsterModel;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 
-/**
- * <strong> </strong>
- * @author Gysemans Thomas
- * @author Leclercq Manon
- * @author Eckman Nicolas
- * @author Tourneur Aymeri
- * @author Belguebli Rayane
- */
-
-public class Game{
-
+public class Game {
+    /**
+     * The current turn of the game.
+     * Initialized at 1 when creating the maze.
+     */
     private int turn;
+
+    /**
+     * The dimensions of the maze.
+     * It defines the "maze" array.
+     */
     private int mazeWidth;
     private int mazeHeight;
+
+    /**
+     * 1 represents a wall,
+     * 0 represents an empty cell.
+     * There is no need for other types of cells as they're contained in other variables or in "history".
+     */
     private boolean[][] maze;
-    private Vector2i exit;
+
+    /**
+     * The coordinates of the exit.
+     */
+    private ICoordinate exit;
+
     private HunterModel hunter;
-
-    public HunterModel getHunter() {
-        return hunter;
-    }
-
     private MonsterModel monster;
-    private ArrayList<ICellEvent> history;
 
+    /**
+     * A list containing all the moves of the hunter and the monster.
+     * As it stores instances of `ICellEvent` it remembers at which turn one particular move was done,
+     * so it's thanks to this variable that we can know at which turn the monster was on a particular cell.
+     */
+    private ArrayList<ICellEvent> history = new ArrayList<>();
+
+    /**
+     * A boolean that stores whether or not the game has finished.
+     */
     public boolean gameEnded;
 
 
     public boolean isGameEnded() {
         return gameEnded;
+    }
+
+    public HunterModel getHunter() {
+        return hunter;
     }
 
     public void setGameEnded(boolean gameEnded) {
@@ -49,32 +67,69 @@ public class Game{
         return monster;
     }
 
+    /**
+     * Checks if a particular cell is a wall or empty.
+     * @param x The X coordinate of the given cell.
+     * @param y The Y coordinate of the given cell.
+     * @return `true` if this cell is a wall, `false` if it's empty.
+     */
     public boolean isWallAt(int x, int y) {
         return maze[y][x];
     }
 
-    public boolean monsterWon() {
-        return getMonster().getPosition().equals(exit);
-    }
-    
+    /**
+     * Checks if a particular cell is a wall or empty.
+     * @param vector2i The coordinates of the given cell.
+     * @return `true` if this cell is a wall, `false` if it's empty.
+     */
     public boolean isWallAt(Vector2i vector2i) {
-        return maze[vector2i.getRow()][vector2i.getCol()];
+        return isWallAt(vector2i.getRow(), vector2i.getCol());
     }
 
+    /**
+     * Checks if the position of the monster matches the position of the exit.
+     * @return `true` if the monster has reached the exit, `false` otherwise.
+     */
+    public boolean monsterWon() {
+        return monster.getPosition().equals(exit);
+    }
+    
+    /**
+     * Gets the width and height of the maze as an instance of `Vector2i`.
+     * @return An instance of `Vector2i` where `x` is the width of the maze and `y` the height.
+     */
     public Vector2i getMazeDimensions() {
         return new Vector2i(mazeWidth, mazeHeight);
     }
 
-    public Vector2i getExit() {
+    /**
+     * Gets the position of the exit.
+     * @return The exact coordinates of the exit.
+     */
+    public ICoordinate getExit() {
         return exit;
     }
 
+    /**
+     * Gets a random position within the maze.
+     * For now, it gives a random position that is not a wall.
+     * @return A random position in the maze.
+     */
     public Vector2i randomPosition() {
         Random random = new Random();
-        return new Vector2i(Math.floor(random.nextInt(mazeWidth / 2)) * 2 + 1, Math.floor(random.nextInt(mazeHeight / 2)) * 2 + 1);
+        return new Vector2i(random.nextInt(mazeWidth / 2) * 2 + 1, random.nextInt(mazeHeight / 2) * 2 + 1);
     }
 
-    public void generateMaze(int width, int height){
+    /**
+     * Generates the maze.
+     * It initializes the hunter and monster models.
+     * It gives a random position to the monster.
+     * The turns start at 1 and the history is cleared.
+     * The exit is also randomized.
+     * @param width The desired width of the maze.
+     * @param height The desired height of the maze.
+     */
+    public void generateMaze(int width, int height) {
         this.mazeWidth = width;
         this.mazeHeight = height;
 
@@ -82,7 +137,7 @@ public class Game{
         this.monster = new MonsterModel(randomPosition());
 
         this.turn = 1;
-        this.history = new ArrayList<>();
+        this.history.clear();
 
         exit = randomPosition();
         while(exit.equals(getMonster().getPosition())) {
@@ -92,6 +147,9 @@ public class Game{
         maze = new boolean[mazeHeight][mazeWidth];
         for (int y = 0; y < mazeHeight; y++) {
             for (int x = 0; x < mazeWidth; x++) {
+                // THIS IS SCARY BUT TEMPORARY
+                // for now we want the borders of the maze to be walls
+                // and we also want every other square to be a wall (exluding the borders).
                 if(x % 2 == 0 && y % 2 == 0 || x == 0 || x == mazeWidth - 1 || y == 0 || y == mazeHeight - 1) {
                     maze[y][x] = true;
                 }
@@ -107,26 +165,32 @@ public class Game{
         this.turn += 1;
     }
 
+    /**
+     * Gets information about the cell that the hunter is targeting.
+     * @param shootPosition The coordinates of the hunter's target.
+     * @return The type of cell that the hunter has shot.
+     */
     public ICellEvent play(Vector2i shootPosition) {
         CellInfo state = CellInfo.EMPTY;
-        if(isWallAt(shootPosition)) {
+        if (isWallAt(shootPosition)) {
             state = CellInfo.WALL;
         }
+
         for (ICellEvent cellEvent : history) {
-            if(cellEvent.getCoord().equals(shootPosition)) {
-                getHunter().shootsHistory.add(cellEvent);
+            if (cellEvent.getCoord().equals(shootPosition)) {
+                hunter.shootsHistory.add(cellEvent);
                 return cellEvent;
             }
         }
         CellEvent cellEvent = new CellEvent(shootPosition, state, turn);
 
         // remove other shoots history with the same position
-        for (int i = getHunter().shootsHistory.size() - 1; i > 0; i--) {
-            if(getHunter().shootsHistory.get(i).getCoord().equals(shootPosition)) {
-                getHunter().shootsHistory.remove(i);
+        for (int i = hunter.shootsHistory.size() - 1; i > 0; i--) {
+            if (hunter.shootsHistory.get(i).getCoord().equals(shootPosition)) {
+                hunter.shootsHistory.remove(i);
             }
         }
-        getHunter().shootsHistory.add(cellEvent);
+        hunter.shootsHistory.add(cellEvent);
         return cellEvent;
     }
 
