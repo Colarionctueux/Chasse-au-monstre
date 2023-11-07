@@ -1,28 +1,18 @@
-package fr.univlille;
+package fr.univlille.models;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import fr.univlille.ihm.models.HunterModel;
-import fr.univlille.ihm.models.MonsterModel;
+import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
-import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 
-public class Game {
+public class GameModel {
     /**
      * The current turn of the game.
      * Initialized at 1 when creating the maze.
      */
     private int turn;
-
-    /**
-     * The dimensions of the maze.
-     * It defines the "maze" array.
-     */
-    private int mazeWidth;
-    private int mazeHeight;
-
     /**
      * 1 represents a wall,
      * 0 represents an empty cell.
@@ -49,6 +39,14 @@ public class Game {
      * A boolean that stores whether or not the game has finished.
      */
     public boolean gameEnded;
+
+    public int getHeight() {
+        return maze.length;
+    }
+
+    public int getWidth() {
+        return maze[0].length;
+    }
 
     public HunterModel getHunter() {
         return hunter;
@@ -107,7 +105,7 @@ public class Game {
      * @return An instance of `Coordinate` where `x` is the width of the maze and `y` the height.
      */
     public Coordinate getMazeDimensions() {
-        return new Coordinate(mazeWidth, mazeHeight);
+        return new Coordinate(getWidth(), getHeight());
     }
 
     /**
@@ -125,7 +123,7 @@ public class Game {
      */
     public Coordinate randomPosition() {
         Random random = new Random();
-        return new Coordinate(random.nextInt(mazeWidth / 2) * 2 + 1, random.nextInt(mazeHeight / 2) * 2 + 1);
+        return new Coordinate(random.nextInt(getWidth() / 2) * 2 + 1, random.nextInt(getHeight() / 2) * 2 + 1);
     }
 
     /**
@@ -138,11 +136,21 @@ public class Game {
      * @param height The desired height of the maze.
      */
     public void generateMaze(int width, int height) {
-        this.mazeWidth = width;
-        this.mazeHeight = height;
+        
+        maze = new boolean[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // THIS IS SCARY BUT TEMPORARY
+                // for now we want the borders of the maze to be walls
+                // and we also want every other square to be a wall (exluding the borders).
+                if(x % 2 == 0 && y % 2 == 0 || x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+                    maze[y][x] = true;
+                }
+            }
+        }
 
-        this.hunter = new HunterModel();
-        this.monster = new MonsterModel(randomPosition());
+        this.hunter = new HunterModel(this);
+        this.monster = new MonsterModel(this, randomPosition());
 
         this.turn = 1;
         this.history.clear();
@@ -152,46 +160,6 @@ public class Game {
             exit = randomPosition();
         }
 
-        maze = new boolean[mazeHeight][mazeWidth];
-        for (int y = 0; y < mazeHeight; y++) {
-            for (int x = 0; x < mazeWidth; x++) {
-                // THIS IS SCARY BUT TEMPORARY
-                // for now we want the borders of the maze to be walls
-                // and we also want every other square to be a wall (exluding the borders).
-                if(x % 2 == 0 && y % 2 == 0 || x == 0 || x == mazeWidth - 1 || y == 0 || y == mazeHeight - 1) {
-                    maze[y][x] = true;
-                }
-            }
-        }
-    }
-    
-    /**
-     * Gets information about the cell that the hunter is targeting.
-     * @param shootPosition The coordinates of the hunter's target.
-     * @return The type of cell that the hunter has shot.
-     */
-    public ICellEvent play(Coordinate shootPosition) {
-        CellInfo state = CellInfo.EMPTY;
-        if (isWallAt(shootPosition)) {
-            state = CellInfo.WALL;
-        }
-
-        for (ICellEvent cellEvent : history) {
-            if (cellEvent.getCoord().equals(shootPosition)) {
-                hunter.shootsHistory.add(cellEvent);
-                return cellEvent;
-            }
-        }
-        CellEvent cellEvent = new CellEvent(shootPosition, state, turn);
-
-        // remove other shoots history with the same position
-        for (int i = hunter.shootsHistory.size() - 1; i > 0; i--) {
-            if (hunter.shootsHistory.get(i).getCoord().equals(shootPosition)) {
-                hunter.shootsHistory.remove(i);
-            }
-        }
-        hunter.shootsHistory.add(cellEvent);
-        return cellEvent;
     }
 
     public ArrayList<ICellEvent> getHistory() {

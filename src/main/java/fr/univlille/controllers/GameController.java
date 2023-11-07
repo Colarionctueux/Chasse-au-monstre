@@ -1,11 +1,11 @@
-package fr.univlille.ihm;
+package fr.univlille.controllers;
 
 import fr.univlille.CellEvent;
-import fr.univlille.Game;
 import fr.univlille.Theme;
 import fr.univlille.Coordinate;
-import fr.univlille.ihm.views.GameView;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
+import fr.univlille.models.GameModel;
+import fr.univlille.views.GameView;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -43,10 +43,10 @@ public class GameController {
 
 
     private GameView gameView;
-    private Game game;
+    private GameModel game;
 
     public void initGame() {
-        game = new Game();
+        game = new GameModel();
         game.generateMaze(11, 11);
         
         if(gameView != null) {
@@ -95,7 +95,7 @@ public class GameController {
         if(gameView.isHunterTurn) {
             gameView.hunterView.hunterShooted = false;
         } else {
-            if(gameView.playMove()) {
+            if(gameView.play()) {
                 errorLabel.setText("");
             } else {
                 errorLabel.setText("Movment invalide!");

@@ -1,12 +1,11 @@
-package fr.univlille.ihm.views;
+package fr.univlille.views;
 
-import fr.univlille.CellEvent;
-import fr.univlille.Game;
 import fr.univlille.Theme;
+import fr.univlille.controllers.GameController;
 import fr.univlille.Coordinate;
-import fr.univlille.ihm.GameController;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
+import fr.univlille.models.GameModel;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,7 +16,7 @@ public class GameView extends Canvas {
     /**
      * A reference to the instance of "Game" containing the hunter and monster models, as well as the maze itself.
      */
-    public final Game model;
+    public final GameModel model;
 
     /**
      * The context that allows us to draw stuff into.
@@ -53,7 +52,7 @@ public class GameView extends Canvas {
      */
     public Theme theme;
 
-    public GameView(Game model) {
+    public GameView(GameModel model) {
         this.model = model;
         this.gc = getGraphicsContext2D();
 
@@ -87,10 +86,10 @@ public class GameView extends Canvas {
                 if(model.isGameEnded() || hunterView.hunterShooted) {
                     return;
                 }
-                if(isHunterTurn && hunterView.isHunterShootValid(cursorPosition)) {
-                    playMove();
+                if(isHunterTurn && model.getHunter().isHunterShootValid(cursorPosition)) {
+                    play();
                     draw();
-                } else if(monsterView.isMonsterMovementValid(cursorPosition)) {
+                } else if(model.getMonster().isMonsterMovementValid(cursorPosition)) {
                     movePosition = cursorPosition;
                     draw();
                 }
@@ -114,6 +113,9 @@ public class GameView extends Canvas {
         this.movePosition = movePosition;
     }
 
+    /**
+     * Cette fonction affiche sur le Canvas les informations nécessaires. Elle est appellée à chaque mouvement de souris ou à chaque action.
+     */
     public void draw() {
         if(isHunterTurn) {
             hunterView.draw();
@@ -122,39 +124,44 @@ public class GameView extends Canvas {
         }
     }
 
-    public boolean playMove() {
-        if(isHunterTurn) {
-            if(hunterView.hunterShooted) {
-                return false;
+
+    public boolean playHunterMove() {
+        if(hunterView.hunterShooted) {
+            return false;
+        }
+        hunterView.hunterShooted = true;
+        ICellEvent cellEvent = model.getHunter().shoot(cursorPosition);
+        if(cellEvent.getState() == CellInfo.WALL) {
+            mainPage.errorLabel.setText("Vous avez touché un arbre.");
+        } else if(cellEvent.getState() == CellInfo.MONSTER) {
+            if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
+                mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
+                model.setGameEnded(true);
             } else {
-                hunterView.hunterShooted = true;
-                ICellEvent cellEvent = model.play(cursorPosition);
-                if(cellEvent.getState() == CellInfo.WALL) {
-                    mainPage.errorLabel.setText("Vous avez touché un arbre.");
-                } else if(cellEvent.getState() == CellInfo.MONSTER) {
-                    if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
-                        mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
-                        model.setGameEnded(true);
-                    } else {
-                        mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
-                    }
-                } else {
-                    mainPage.errorLabel.setText("Vous n'avez rien touché...");
-                }
-                draw();
+                mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
             }
         } else {
-            if(monsterView.isMonsterMovementValid(movePosition)) {
-                model.incrementTurn();
-                model.getMonster().play(movePosition);
-                model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
-            } else {
-                return false;
-            }
+            mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
-        cursorPosition = new Coordinate(-1, -1);
-        movePosition = new Coordinate(-1, -1);
+        draw();
         return true;
+    }
+
+
+    
+    
+    public boolean play() {
+        boolean isValid = false;
+        if(isHunterTurn) {
+            isValid = playHunterMove();
+        } else {
+            isValid = model.getMonster().play(movePosition);
+        }
+        if(isValid) {
+            cursorPosition = new Coordinate(-1, -1);
+            movePosition = new Coordinate(-1, -1);
+        }
+        return isValid;
     }
 
     /**

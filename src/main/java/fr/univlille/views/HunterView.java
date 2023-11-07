@@ -1,9 +1,10 @@
-package fr.univlille.ihm.views;
+package fr.univlille.views;
 
 import fr.univlille.Coordinate;
-import fr.univlille.Game;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
+import fr.univlille.models.GameModel;
+import fr.univlille.models.HunterModel;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -14,18 +15,20 @@ public class HunterView {
 
     public GameView gameView;
     private GraphicsContext gc;
-    public Game model;
+    public GameModel gameModel;
     public boolean hunterShooted = false;
+    public HunterModel model;
 
-    public HunterView(GraphicsContext gc, GameView gameView, Game model) {
+    public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel) {
         this.gc = gc;
         this.gameView = gameView;
-        this.model = model;
+        this.gameModel = gameModel;
+        this.model = gameModel.getHunter();
     }
 
 
     public void draw() {
-        Coordinate dimensions = model.getMazeDimensions();
+        Coordinate dimensions = gameModel.getMazeDimensions();
         for (int y = 0; y < dimensions.getRow(); y++) {
             for (int x = 0; x < dimensions.getCol(); x++) {
                 if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
@@ -43,7 +46,7 @@ public class HunterView {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         gc.setFont(new Font("Comic Sans MS", 16));
-        for (ICellEvent cellEvent : model.getHunter().shootsHistory) {
+        for (ICellEvent cellEvent : gameModel.getHunter().shootsHistory) {
             Coordinate coord = (Coordinate) cellEvent.getCoord();
             if(cellEvent.getState() == CellInfo.WALL) {
                 ViewUtils.drawSimpleTexture(gc, 0, 64, coord.getCol(), coord.getRow());
@@ -52,7 +55,7 @@ public class HunterView {
                 ViewUtils.drawSimpleTexture(gc, 192, 256, coord.getCol(), coord.getRow());
             }
             if(cellEvent.getState() == CellInfo.MONSTER) {
-                if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur la case (en gros il est mort)
+                if(cellEvent.getTurn() == gameModel.getTurn()) { // Si le monstre est actuellement sur la case (en gros il est mort)
                     ViewUtils.drawSimpleTexture(gc, 64, 0, coord.getCol(), coord.getRow()); // Tombe
                 } else {
                     if(cellEvent.getState() == CellInfo.MONSTER) {
@@ -62,7 +65,7 @@ public class HunterView {
             }
         }
 
-        if(!isHunterShootValid(gameView.getCursorPosition())) {
+        if(!model.isHunterShootValid(gameView.getCursorPosition())) {
             ViewUtils.drawSimpleTexture(gc, new Coordinate(128, 256), gameView.getCursorPosition()); // Position souris (si mouvement impossible)
         } else {
             ViewUtils.drawSimpleTexture(gc, new Coordinate(0, 256), gameView.getCursorPosition()); // Position souris (si mouvement possible)
@@ -75,15 +78,15 @@ public class HunterView {
             return false;
         } else {
             hunterShooted = true;
-            ICellEvent cellEvent = model.play(gameView.getCursorPosition());
+            ICellEvent cellEvent = model.shoot(gameView.getCursorPosition());
             if(cellEvent.getState() == CellInfo.WALL) {
                 gameView.mainPage.errorLabel.setText("Vous avez touché un arbre.");
             } else if(cellEvent.getState() == CellInfo.MONSTER) {
-                if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
+                if(cellEvent.getTurn() == gameModel.getTurn()) { // Si le monstre est actuellement sur cette case
                     gameView.mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
-                    model.setGameEnded(true);
+                    gameModel.setGameEnded(true);
                 } else {
-                    gameView.mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
+                    gameView.mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (gameModel.getTurn() - cellEvent.getTurn()) + " tours.");
                 }
             } else {
                 gameView.mainPage.errorLabel.setText("Vous n'avez rien touché...");
@@ -93,17 +96,6 @@ public class HunterView {
         gameView.setMovePosition(new Coordinate(-1, -1));
         gameView.setCursorPosition(new Coordinate(-1, -1));
         return true;
-    }
-
-    /**
-     * Makes sure that the given hunter's target is valid.
-     * The hunter cannot shoot outside of the maze and cannot shoot the borders.
-     * @param shoot The target's position.
-     * @return `true` if the target's position is valid, `false` otherwise.
-     */
-    public boolean isHunterShootValid(Coordinate shoot) {
-        Coordinate mazeDimensions = model.getMazeDimensions();
-        return shoot.getCol() > 0 && shoot.getCol() < mazeDimensions.getCol() - 1 && shoot.getRow() > 0 && shoot.getRow() < mazeDimensions.getRow() - 1;
     }
     
 }

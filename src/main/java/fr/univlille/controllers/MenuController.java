@@ -1,6 +1,7 @@
-package fr.univlille.ihm;
+package fr.univlille.controllers;
 
 
+import fr.univlille.App;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 

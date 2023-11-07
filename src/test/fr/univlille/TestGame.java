@@ -6,13 +6,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
+import fr.univlille.models.GameModel;
 
 public class TestGame {
-    Game game;
+    GameModel game;
 
     @BeforeEach
     public void setup() {
-        game = new Game();
+        game = new GameModel();
         game.generateMaze(11, 11);
     }
 

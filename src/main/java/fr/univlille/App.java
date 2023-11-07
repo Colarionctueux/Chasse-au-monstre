@@ -1,4 +1,4 @@
-package fr.univlille.ihm;
+package fr.univlille;
  
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private static Parent loadFXML(String filename) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(filename + ".fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("controllers/" + filename + ".fxml"));
         
         if(fxmlLoader.getLocation() == null) {
             System.err.println("Le chemin du fichier FXML est invalide!");

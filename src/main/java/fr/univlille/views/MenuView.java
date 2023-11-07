@@ -1,4 +1,4 @@
-package fr.univlille.ihm.views;
+package fr.univlille.views;
 
 public class MenuView {
     
