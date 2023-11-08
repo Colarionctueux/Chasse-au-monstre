@@ -28,20 +28,8 @@ public class HunterView {
 
     public void draw() {
         Coordinate dimensions = gameModel.getMazeDimensions();
-        for (int y = 0; y < dimensions.getRow(); y++) {
-            for (int x = 0; x < dimensions.getCol(); x++) {
-                if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
-                    ViewUtils.drawSimpleTexture(gc, 192, 128, x, y);
-                } else {
-                    ViewUtils.drawSimpleTexture(gc, 192, 192, x, y);
-                }
-            }
-        }
-
-        gc.setFill(Color.BLACK);
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setFont(new Font("Comic Sans MS", 16));
+        InitMazeWithDimensions(dimensions);
+        GraphicStyle();
         for (ICellEvent cellEvent : gameModel.getHunter().shootsHistory) {
             Coordinate coord = (Coordinate) cellEvent.getCoord();
             if(cellEvent.getState() == CellInfo.WALL) {
@@ -60,13 +48,33 @@ public class HunterView {
                 }
             }
         }
-
         if(!model.isHunterShootValid(gameView.getCursorPosition())) {
             ViewUtils.drawSimpleTexture(gc, new Coordinate(128, 256), gameView.getCursorPosition()); // Position souris (si mouvement impossible)
         } else {
             ViewUtils.drawSimpleTexture(gc, new Coordinate(0, 256), gameView.getCursorPosition()); // Position souris (si mouvement possible)
         }
         ViewUtils.drawSimpleTexture(gc, new Coordinate(64, 256), gameView.getMovePosition()); // Le mouvement
+    }
+
+
+    private void GraphicStyle() {
+        gc.setFill(Color.BLACK);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFont(new Font("Comic Sans MS", 16));
+    }
+
+
+    private void InitMazeWithDimensions(Coordinate dimensions) {
+        for (int y = 0; y < dimensions.getRow(); y++) {
+            for (int x = 0; x < dimensions.getCol(); x++) {
+                if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
+                    ViewUtils.drawSimpleTexture(gc, 192, 128, x, y);
+                } else {
+                    ViewUtils.drawSimpleTexture(gc, 192, 192, x, y);
+                }
+            }
+        }
     }
 
     public boolean playMove() {
