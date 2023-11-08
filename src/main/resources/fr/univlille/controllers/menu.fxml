@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('../../../images/nightforest.jpg'); -fx-background-size: 100%;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Region prefHeight="22.0" prefWidth="600.0" />
-      <Text stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Chasse au monstre" textAlignment="CENTER">
+      <Region prefHeight="25.0" prefWidth="600.0" />
+      <Label alignment="CENTER" prefHeight="62.0" prefWidth="339.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE">
          <font>
-            <Font size="32.0" />
+            <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
-      </Text>
-      <Region prefHeight="53.0" prefWidth="600.0" />
-      <Button mnemonicParsing="false" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Jouer seul contre une ia :(">
+      </Label>
+      <Region prefHeight="38.0" prefWidth="600.0" />
+      <Button mnemonicParsing="false" prefHeight="71.0" prefWidth="435.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 10, 0, 0, 0);" text="Jouer seul contre une ia :(" textFill="WHITE">
          <font>
-            <Font size="32.0" />
+            <Font name="System Bold" size="32.0" />
          </font>
       </Button>
       <Region prefHeight="13.0" prefWidth="600.0" />
-      <Button mnemonicParsing="false" prefHeight="68.0" prefWidth="404.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Jouer avec un ami :)">
+      <Button mnemonicParsing="false" prefHeight="71.0" prefWidth="435.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 10, 0, 0, 0);" text="Jouer avec un ami :)" textFill="WHITE">
          <font>
-            <Font size="32.0" />
+            <Font name="System Bold" size="32.0" />
          </font>
       </Button>
       <Region prefHeight="13.0" prefWidth="600.0" />
       <HBox alignment="TOP_CENTER" prefHeight="91.0" prefWidth="600.0">
          <children>
-            <Button mnemonicParsing="false" prefHeight="68.0" prefWidth="180.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Regles">
+            <Button mnemonicParsing="false" prefHeight="71.0" prefWidth="206.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 10, 0, 0, 0);" text="Regles" textFill="WHITE">
                <font>
-                  <Font size="32.0" />
+                  <Font name="System Bold" size="32.0" />
                </font>
             </Button>
-            <Region prefHeight="91.0" prefWidth="44.0" />
-            <Button mnemonicParsing="false" prefHeight="68.0" prefWidth="180.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Credits">
+            <Region prefHeight="91.0" prefWidth="30.0" />
+            <Button mnemonicParsing="false" prefHeight="71.0" prefWidth="199.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 10, 0, 0, 0);" text="Credits" textFill="WHITE">
                <font>
-                  <Font size="32.0" />
+                  <Font name="System Bold" size="32.0" />
                </font>
             </Button>
          </children>
