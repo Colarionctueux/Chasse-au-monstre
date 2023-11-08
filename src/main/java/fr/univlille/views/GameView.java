@@ -194,12 +194,7 @@ public class GameView extends Canvas implements Observer {
         if(cellEvent.getState() == CellInfo.WALL) {
             mainPage.errorLabel.setText("Vous avez touché un arbre.");
         } else if(cellEvent.getState() == CellInfo.MONSTER) {
-            if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
-                mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
-                model.setGameEnded(true);
-            } else {
-                mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
-            }
+            monsterCase(cellEvent);
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
@@ -209,19 +204,22 @@ public class GameView extends Canvas implements Observer {
     @Override
     public void update(Subject subj, Object data) {
         ICellEvent cellEvent = (ICellEvent) data;
-        System.out.println(cellEvent);
         if(cellEvent.getState() == CellInfo.WALL) {
             mainPage.errorLabel.setText("Vous avez touché un arbre.");
         } else if(cellEvent.getState() == CellInfo.MONSTER) {
-            if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
-                mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
-                model.setGameEnded(true);
-            } else {
-                mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
-            }
+            monsterCase(cellEvent);
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
         draw();
+    }
+
+    private void monsterCase(ICellEvent cellEvent) {
+        if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
+            mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
+            model.setGameEnded(true);
+        } else {
+            mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
+        }
     }
 }
