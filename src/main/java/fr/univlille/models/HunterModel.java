@@ -38,7 +38,7 @@ public class HunterModel extends Subject {
      * @param shootPosition The coordinates of the hunter's target.
      * @return The type of cell that the hunter has shot.
      */
-    public ICellEvent shoot(Coordinate shootPosition) {
+    public void shoot(Coordinate shootPosition) {
         CellInfo state = CellInfo.EMPTY;
         if (gameModel.isWallAt(shootPosition)) {
             state = CellInfo.WALL;
@@ -47,7 +47,8 @@ public class HunterModel extends Subject {
         for (ICellEvent cellEvent : gameModel.getHistory()) {
             if (cellEvent.getCoord().equals(shootPosition)) {
                 shootsHistory.add(cellEvent);
-                return cellEvent;
+                notifyObservers(cellEvent);
+                return;
             }
         }
         CellEvent cellEvent = new CellEvent(shootPosition, state, gameModel.getTurn());
@@ -61,6 +62,5 @@ public class HunterModel extends Subject {
         shootsHistory.add(cellEvent);
         shootLeft -= 1;
         notifyObservers(cellEvent);
-        return cellEvent;
     }
 }

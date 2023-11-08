@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import fr.univlille.Coordinate;
+import fr.univlille.Labyrinthe;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.utils.Subject;
@@ -123,8 +124,18 @@ public class GameModel extends Subject {
      * @return A random position in the maze.
      */
     public Coordinate randomPosition() {
+        ArrayList<Coordinate> availableCoordinates = new ArrayList<>();
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if(!isWallAt(x, y)) {
+                    availableCoordinates.add(new Coordinate(x, y));
+                }
+            }
+        }
+        
+
         Random random = new Random();
-        return new Coordinate(random.nextInt(getWidth() / 2) * 2 + 1, random.nextInt(getHeight() / 2) * 2 + 1);
+        return availableCoordinates.get(random.nextInt(availableCoordinates.size()));
     }
 
     /**
@@ -137,18 +148,19 @@ public class GameModel extends Subject {
      * @param height The desired height of the maze.
      */
     public void generateMaze(int width, int height) {
-        
-        maze = new boolean[height][width];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                // THIS IS SCARY BUT TEMPORARY
-                // for now we want the borders of the maze to be walls
-                // and we also want every other square to be a wall (exluding the borders).
-                if(x % 2 == 0 && y % 2 == 0 || x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-                    maze[y][x] = true;
-                }
-            }
-        }
+        Labyrinthe laby = new Labyrinthe();
+        maze = laby.creer_labyrinthe(width, height);
+        // maze = new boolean[height][width];
+        // for (int y = 0; y < height; y++) {
+        //     for (int x = 0; x < width; x++) {
+        //         // THIS IS SCARY BUT TEMPORARY
+        //         // for now we want the borders of the maze to be walls
+        //         // and we also want every other square to be a wall (exluding the borders).
+        //         if(x % 2 == 0 && y % 2 == 0 || x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+        //             maze[y][x] = true;
+        //         }
+        //     }
+        // }
 
         this.hunter = new HunterModel(this);
         this.monster = new MonsterModel(this, randomPosition());

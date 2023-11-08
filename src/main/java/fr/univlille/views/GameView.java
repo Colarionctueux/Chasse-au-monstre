@@ -46,7 +46,7 @@ public class GameView extends Canvas implements Observer {
      * A spritesheet is a set of fixed-size images, and each image is a "decoration".
      * Each decoration has a unique index, just like an array.
      */
-    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/thomas.png"));
+    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
 
     /**
      * The game allows the player to choose a custom theme.
@@ -209,6 +209,7 @@ public class GameView extends Canvas implements Observer {
     @Override
     public void update(Subject subj, Object data) {
         ICellEvent cellEvent = (ICellEvent) data;
+        System.out.println(cellEvent);
         if(cellEvent.getState() == CellInfo.WALL) {
             mainPage.errorLabel.setText("Vous avez touché un arbre.");
         } else if(cellEvent.getState() == CellInfo.MONSTER) {

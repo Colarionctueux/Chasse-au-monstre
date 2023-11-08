@@ -76,24 +76,8 @@ public class HunterView {
         if(model.shootLeft <= 0) {
             return false;
         } else {
-            model.shootLeft -= 1;
-            ICellEvent cellEvent = model.shoot(gameView.getCursorPosition());
-            if(cellEvent.getState() == CellInfo.WALL) {
-                gameView.mainPage.errorLabel.setText("Vous avez touché un arbre.");
-            } else if(cellEvent.getState() == CellInfo.MONSTER) {
-                if(cellEvent.getTurn() == gameModel.getTurn()) { // Si le monstre est actuellement sur cette case
-                    gameView.mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
-                    gameModel.setGameEnded(true);
-                } else {
-                    gameView.mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (gameModel.getTurn() - cellEvent.getTurn()) + " tours.");
-                }
-            } else {
-                gameView.mainPage.errorLabel.setText("Vous n'avez rien touché...");
-            }
-            draw();
+            model.shoot(gameView.getCursorPosition());
         }
-        gameView.setMovePosition(new Coordinate(-1, -1));
-        gameView.setCursorPosition(new Coordinate(-1, -1));
         return true;
     }
     

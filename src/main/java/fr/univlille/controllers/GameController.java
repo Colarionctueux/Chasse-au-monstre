@@ -47,7 +47,7 @@ public class GameController {
 
     public void initGame() {
         game = new GameModel();
-        game.generateMaze(11, 11);
+        game.generateMaze(5, 5);
         
         if(gameView != null) {
             mainVBox.getChildren().remove(gameView);
