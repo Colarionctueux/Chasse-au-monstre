@@ -97,14 +97,12 @@ public class MonsterView {
             GameView.TILE_SIZE, GameView.TILE_SIZE * 2
         ); // La sortie
         
-        if(!gameView.hunterView.hunterShooted) {
-            if(!model.isMonsterMovementValid(gameView.getCursorPosition())) {
-                ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
-            } else {
-                ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
-            }
-            ViewUtils.drawSimpleTexture(gc, 64, 192, gameView.getMovePosition()); // Le mouvement
+        if(!model.isMonsterMovementValid(gameView.getCursorPosition())) {
+            ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
+        } else {
+            ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
         }
+        ViewUtils.drawSimpleTexture(gc, 64, 192, gameView.getMovePosition()); // Le mouvement
 
         ArrayList<ICellEvent> shoots = gameModel.getHunter().shootsHistory;
         if(shoots.size() > 0) {

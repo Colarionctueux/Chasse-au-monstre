@@ -6,13 +6,15 @@ import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
+import fr.univlille.utils.Observer;
+import fr.univlille.utils.Subject;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-public class GameView extends Canvas {
+public class GameView extends Canvas implements Observer {
     /**
      * A reference to the instance of "Game" containing the hunter and monster models, as well as the maze itself.
      */
@@ -44,7 +46,7 @@ public class GameView extends Canvas {
      * A spritesheet is a set of fixed-size images, and each image is a "decoration".
      * Each decoration has a unique index, just like an array.
      */
-    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
+    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/thomas.png"));
 
     /**
      * The game allows the player to choose a custom theme.
@@ -68,7 +70,7 @@ public class GameView extends Canvas {
         setOnMouseMoved((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(model.isGameEnded() || hunterView.hunterShooted) {
+                if(model.isGameEnded() || (isHunterTurn && model.getHunter().shootLeft <= 0)) {
                     return;
                 }
                 Coordinate relativeMousePosition = new Coordinate(
@@ -83,19 +85,37 @@ public class GameView extends Canvas {
         setOnMousePressed((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(model.isGameEnded() || hunterView.hunterShooted) {
-                    return;
-                }
-                if(isHunterTurn && model.getHunter().isHunterShootValid(cursorPosition)) {
-                    play();
-                    draw();
-                } else if(model.getMonster().isMonsterMovementValid(cursorPosition)) {
-                    movePosition = cursorPosition;
-                    draw();
+                if(isHunterTurn) {
+                    handleMousePressedHunter();
+                } else {
+                    handleMousePressedMonster();
                 }
             }
         });
+
+
+        // on attache la vue au hunter
+        model.getHunter().attach(this);
     }
+
+    public void handleMousePressedHunter() {
+        if(model.isGameEnded() || model.getHunter().shootLeft <= 0) {
+            return;
+        }
+        if(model.getHunter().isHunterShootValid(cursorPosition)) {
+            play();
+        }
+        draw();
+    }
+    
+    public void handleMousePressedMonster() {
+        if(model.getMonster().isMonsterMovementValid(cursorPosition)) {
+            movePosition = cursorPosition;
+            draw();
+        }
+    }
+
+
 
     public Coordinate getCursorPosition() {
         return cursorPosition;
@@ -126,30 +146,14 @@ public class GameView extends Canvas {
 
 
     public boolean playHunterMove() {
-        if(hunterView.hunterShooted) {
+        if(model.getHunter().shootLeft <= 0) {
             return false;
         }
-        hunterView.hunterShooted = true;
-        ICellEvent cellEvent = model.getHunter().shoot(cursorPosition);
-        if(cellEvent.getState() == CellInfo.WALL) {
-            mainPage.errorLabel.setText("Vous avez touché un arbre.");
-        } else if(cellEvent.getState() == CellInfo.MONSTER) {
-            if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
-                mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
-                model.setGameEnded(true);
-            } else {
-                mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
-            }
-        } else {
-            mainPage.errorLabel.setText("Vous n'avez rien touché...");
-        }
-        draw();
+        model.getHunter().shoot(cursorPosition);
         return true;
     }
 
 
-    
-    
     public boolean play() {
         boolean isValid = false;
         if(isHunterTurn) {
@@ -181,6 +185,42 @@ public class GameView extends Canvas {
                 return;
         }
         this.theme = theme;
+        draw();
+    }
+
+    @Override
+    public void update(Subject subj) {
+        ICellEvent cellEvent = (ICellEvent) subj;
+        if(cellEvent.getState() == CellInfo.WALL) {
+            mainPage.errorLabel.setText("Vous avez touché un arbre.");
+        } else if(cellEvent.getState() == CellInfo.MONSTER) {
+            if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
+                mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
+                model.setGameEnded(true);
+            } else {
+                mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
+            }
+        } else {
+            mainPage.errorLabel.setText("Vous n'avez rien touché...");
+        }
+        draw();
+    }
+
+    @Override
+    public void update(Subject subj, Object data) {
+        ICellEvent cellEvent = (ICellEvent) data;
+        if(cellEvent.getState() == CellInfo.WALL) {
+            mainPage.errorLabel.setText("Vous avez touché un arbre.");
+        } else if(cellEvent.getState() == CellInfo.MONSTER) {
+            if(cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
+                mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
+                model.setGameEnded(true);
+            } else {
+                mainPage.errorLabel.setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
+            }
+        } else {
+            mainPage.errorLabel.setText("Vous n'avez rien touché...");
+        }
         draw();
     }
 }

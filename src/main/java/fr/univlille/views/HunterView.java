@@ -16,7 +16,6 @@ public class HunterView {
     public GameView gameView;
     private GraphicsContext gc;
     public GameModel gameModel;
-    public boolean hunterShooted = false;
     public HunterModel model;
 
     public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel) {
@@ -74,10 +73,10 @@ public class HunterView {
     }
 
     public boolean playMove() {
-        if(hunterShooted) {
+        if(model.shootLeft <= 0) {
             return false;
         } else {
-            hunterShooted = true;
+            model.shootLeft -= 1;
             ICellEvent cellEvent = model.shoot(gameView.getCursorPosition());
             if(cellEvent.getState() == CellInfo.WALL) {
                 gameView.mainPage.errorLabel.setText("Vous avez touché un arbre.");

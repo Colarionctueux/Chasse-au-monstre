@@ -84,7 +84,8 @@ public class GameController {
         };
         sleeper.setOnSucceeded(event -> continuation.run());
         new Thread(sleeper).start();
-      }
+    }
+
 
     @FXML
     public void playButtonPressed() throws InterruptedException {
@@ -92,25 +93,25 @@ public class GameController {
         if(game.isGameEnded()) {
             return;
         }
-        if(gameView.isHunterTurn) {
-            gameView.hunterView.hunterShooted = false;
+        if(gameView.isHunterTurn || gameView.play()) {
+            errorLabel.setText("");
         } else {
-            if(gameView.play()) {
-                errorLabel.setText("");
-            } else {
-                errorLabel.setText("Movment invalide!");
-                return;
-            }
-            
+            errorLabel.setText("Mouvement invalide!");
+            return;
         }
         turnLabel.setText("Tour n°" + game.getTurn());
         
         if(game.monsterWon()) {
             game.setGameEnded(true);
-            gameView.draw();
             errorLabel.setText("Le monstre a gagné!");
+            gameView.draw();
             return;
         }
+        swapScreen();
+        gameView.draw();
+    }
+
+    private void swapScreen() {
         switchPane.setVisible(true);
         switchPaneCountdown.setText("Dans 3...");
         delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
@@ -118,11 +119,12 @@ public class GameController {
         delay(3000, () -> switchPane.setVisible(false));
         gameView.isHunterTurn = !gameView.isHunterTurn;
         if(gameView.isHunterTurn) {
+            game.getHunter().turnBegin();
             currentPlayerLabel.setText("C'est le tour du chasseur.");
         } else {
+            game.getMonster().turnBegin();
             currentPlayerLabel.setText("C'est le tour du monstre.");
         }
-        gameView.draw();
     }
 
     @FXML

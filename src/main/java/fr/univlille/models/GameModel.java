@@ -6,8 +6,9 @@ import java.util.Random;
 import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
+import fr.univlille.utils.Subject;
 
-public class GameModel {
+public class GameModel extends Subject {
     /**
      * The current turn of the game.
      * Initialized at 1 when creating the maze.
@@ -169,4 +170,6 @@ public class GameModel {
     public void addToHistory(ICellEvent cellEvent) {
         history.add(cellEvent);
     }
+
+    
 }

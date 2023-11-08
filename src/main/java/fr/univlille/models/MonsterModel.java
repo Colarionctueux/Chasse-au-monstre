@@ -2,15 +2,18 @@ package fr.univlille.models;
 
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
-import fr.univlille.iutinfo.cam.player.monster.IMonsterStrategy;
-import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
-import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
+import fr.univlille.utils.Subject;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
-public class MonsterModel implements IMonsterStrategy{
+public class MonsterModel extends Subject {
 
     Coordinate position;
     public GameModel model;
+
+    public void turnBegin() {
+    
+    }
 
     public MonsterModel(GameModel model, Coordinate startPosition) {
         this.model = model;
@@ -28,32 +31,15 @@ public class MonsterModel implements IMonsterStrategy{
     }
 
     public boolean play(Coordinate movePosition) {
-        if(model.getMonster().isMonsterMovementValid(movePosition)) {
+        if(isMonsterMovementValid(movePosition)) {
             model.incrementTurn();
-            model.getMonster().move(movePosition);
+            move(movePosition);
             model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
             return true;
         }
         return false;
     }
 
-    @Override
-    public ICoordinate play() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'play'");
-    }
-
-    @Override
-    public void update(ICellEvent arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public void initialize(boolean[][] arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
-    }
 
         /**
      * Makes sure that the given movement is valid for the monster.
