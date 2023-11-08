@@ -1,92 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
-  All rights reserved. Use is subject to license terms.
-
-  This file is available and licensed under the following license:
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  - Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-  - Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in
-    the documentation and/or other materials provided with the distribution.
-  - Neither the name of Oracle Corporation nor the names of its
-    contributors may be used to endorse or promote products derived
-    from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--->
-
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MenuController">
-  <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Region prefHeight="22.0" prefWidth="600.0" />
+      <Text stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Chasse au monstre" textAlignment="CENTER">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Text>
+      <Region prefHeight="53.0" prefWidth="600.0" />
+      <Button mnemonicParsing="false" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Jouer seul contre une ia :(">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Button>
+      <Region prefHeight="13.0" prefWidth="600.0" />
+      <Button mnemonicParsing="false" prefHeight="68.0" prefWidth="404.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Jouer avec un ami :)">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Button>
+      <Region prefHeight="13.0" prefWidth="600.0" />
+      <HBox alignment="TOP_CENTER" prefHeight="91.0" prefWidth="600.0">
          <children>
-            <VBox alignment="CENTER" layoutX="228.0" layoutY="89.0" prefHeight="200.0" prefWidth="304.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <Label text="Chasse au monstre">
-                     <font>
-                        <Font name="System Bold" size="24.0" />
-                     </font>
-                  </Label>
-                  <Label text="v1.0">
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </Label>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <VBox prefHeight="200.0" prefWidth="160.0">
-                           <children>
-                              <Button fx:id="pvpButton" mnemonicParsing="false" text="Humain contre Humain" />
-                           </children>
-                        </VBox>
-                        <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="160.0">
-                           <children>
-                              <Button fx:id="pveButton" disable="true" mnemonicParsing="false" text="Humain contre Machine" />
-                              <Label text="En developpément!" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </HBox>
-                  <Separator prefWidth="200.0" />
-                  <Label layoutX="10.0" layoutY="10.0" text="Un jeu de...">
-                     <font>
-                        <Font name="System Italic" size="12.0" />
-                     </font></Label>
-                  <Label layoutX="10.0" layoutY="28.0" text="BELGUEBLI Rayane" />
-                  <Label layoutX="10.0" layoutY="46.0" text="ECKMAN Nicolas" />
-                  <Label layoutX="10.0" layoutY="64.0" text="GYSEMANS Thomas" />
-                  <Label layoutX="10.0" layoutY="82.0" text="LECLERCQ Manon" />
-                  <Label layoutX="10.0" layoutY="100.0" text="TOURNEUR Aymeri" />
-                  <Hyperlink onAction="#gitlabLinkPressed" text="Voir la page GitLab" />
-               </children>
-            </VBox>
+            <Button mnemonicParsing="false" prefHeight="68.0" prefWidth="180.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Regles">
+               <font>
+                  <Font size="32.0" />
+               </font>
+            </Button>
+            <Region prefHeight="91.0" prefWidth="44.0" />
+            <Button mnemonicParsing="false" prefHeight="68.0" prefWidth="180.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black;" text="Credits">
+               <font>
+                  <Font size="32.0" />
+               </font>
+            </Button>
          </children>
-    </AnchorPane>
-  </children>
+      </HBox>
+   </children>
 </VBox>
