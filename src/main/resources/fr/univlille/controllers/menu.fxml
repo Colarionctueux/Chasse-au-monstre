@@ -2,13 +2,15 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('../../../images/nightforest.jpg'); -fx-background-size: 100%;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('../../../images/nightforest.jpg'); -fx-background-size: 100%;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MenuController">
    <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
       <Region prefHeight="25.0" prefWidth="600.0" />
       <Label alignment="CENTER" prefHeight="62.0" prefWidth="339.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE">
          <font>
@@ -16,7 +18,7 @@
          </font>
       </Label>
       <Region prefHeight="38.0" prefWidth="600.0" />
-      <Button mnemonicParsing="false" prefHeight="71.0" prefWidth="435.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 10, 0, 0, 0);" text="Jouer seul contre une ia :(" textFill="WHITE">
+      <Button mnemonicParsing="false" onAction="#pvpButtonPressed" prefHeight="71.0" prefWidth="435.0" style="-fx-background-color: rgba(255,255,255, 0.21); -fx-border-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 10, 0, 0, 0);" text="Jouer seul contre une ia :(" textFill="WHITE">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>

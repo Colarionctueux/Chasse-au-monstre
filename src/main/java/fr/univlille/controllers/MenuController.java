@@ -24,9 +24,15 @@ public class MenuController {
     @FXML
     public Button pveButton;
 
+
+    @FXML
+    public void pvpButtonPressed() {
+        System.out.println("test!");
+    }
     
     @FXML
     public void gitlabLinkPressed() {
+        // App.
     //     getHostServices().showDocument("https://gitlab.univ-lille.fr/sae2.01-2.02/2023/F4");
     }
 }

@@ -19,7 +19,7 @@ public class HunterModel extends Subject {
     }
 
     public void turnBegin() {
-        shootLeft = 1;
+        shootLeft = 1000;
     }
 
     /**
