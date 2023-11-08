@@ -30,7 +30,7 @@ public class HunterModel extends Subject {
      */
     public boolean isHunterShootValid(Coordinate shoot) {
         Coordinate mazeDimensions = gameModel.getMazeDimensions();
-        return shoot.getCol() > 0 && shoot.getCol() < mazeDimensions.getCol() - 1 && shoot.getRow() > 0 && shoot.getRow() < mazeDimensions.getRow() - 1;
+        return shoot.getCol() >= 0 && shoot.getCol() < mazeDimensions.getCol() && shoot.getRow() >= 0 && shoot.getRow() < mazeDimensions.getRow();
     }
 
     /**

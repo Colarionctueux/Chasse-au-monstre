@@ -69,7 +69,6 @@ public class Labyrinthe {
                     if(!t.west) {
                         t.west = random.nextDouble() > 0.8;
                     }
-                    
                 }
                 tableau[y][x] = t;
             }

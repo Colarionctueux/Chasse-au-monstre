@@ -150,17 +150,12 @@ public class GameModel extends Subject {
     public void generateMaze(int width, int height) {
         Labyrinthe laby = new Labyrinthe();
         maze = laby.creer_labyrinthe(width, height);
-        // maze = new boolean[height][width];
-        // for (int y = 0; y < height; y++) {
-        //     for (int x = 0; x < width; x++) {
-        //         // THIS IS SCARY BUT TEMPORARY
-        //         // for now we want the borders of the maze to be walls
-        //         // and we also want every other square to be a wall (exluding the borders).
-        //         if(x % 2 == 0 && y % 2 == 0 || x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-        //             maze[y][x] = true;
-        //         }
-        //     }
-        // }
+        for (int y = 0; y < height * 2; y++) {
+            for (int x = 0; x < width * 2; x++) {
+                System.out.print(maze[y][x] + " ");
+            }
+            System.out.print("\n");
+        }
 
         this.hunter = new HunterModel(this);
         this.monster = new MonsterModel(this, randomPosition());

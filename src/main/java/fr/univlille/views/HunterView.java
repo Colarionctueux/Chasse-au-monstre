@@ -35,9 +35,6 @@ public class HunterView {
                 } else {
                     ViewUtils.drawSimpleTexture(gc, 192, 192, x, y);
                 }
-                if(x == 0 || y == 0 || x == dimensions.getCol() - 1 || y == dimensions.getRow() - 1) {
-                    ViewUtils.drawSimpleTexture(gc, 0, 64, x, y); // Arbre
-                }
             }
         }
 
