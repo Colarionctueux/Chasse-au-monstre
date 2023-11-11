@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import fr.univlille.Coordinate;
-import fr.univlille.Labyrinthe;
+import fr.univlille.Maze;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.utils.Subject;
@@ -148,10 +148,10 @@ public class GameModel extends Subject {
      * @param height The desired height of the maze.
      */
     public void generateMaze(int width, int height) {
-        Labyrinthe laby = new Labyrinthe();
-        maze = laby.creer_labyrinthe(width, height);
-        for (int y = 0; y < height * 2; y++) {
-            for (int x = 0; x < width * 2; x++) {
+        Maze laby = new Maze(width, height);
+        maze = laby.createMaze();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 System.out.print(maze[y][x] + " ");
             }
             System.out.print("\n");

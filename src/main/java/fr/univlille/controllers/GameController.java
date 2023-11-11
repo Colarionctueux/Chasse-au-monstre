@@ -38,8 +38,6 @@ public class GameController {
     @FXML
     public Label errorLabel;
 
-    @FXML
-    public CheckBox halloweenButton;
 
 
     private GameView gameView;
@@ -47,13 +45,13 @@ public class GameController {
 
     public void initGame() {
         game = new GameModel();
-        game.generateMaze(5, 5);
+        game.generateMaze(19, 19);
         
         if(gameView != null) {
             mainVBox.getChildren().remove(gameView);
         }
         gameView = new GameView(game);
-        mainVBox.getChildren().add(2, gameView);
+        mainVBox.getChildren().add(3, gameView);
         gameView.draw();
         gameView.mainPage = this;
 
@@ -62,10 +60,6 @@ public class GameController {
 
         Coordinate monsterPosition = game.getMonster().getPosition();
         game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()), CellInfo.MONSTER, game.getTurn()));
-        
-        if(halloweenButton.isSelected()) {
-            gameView.setTheme(Theme.HALLOWEEN);
-        }
     }
 
     @FXML
@@ -130,14 +124,5 @@ public class GameController {
     @FXML
     public void restartGamePressed() {
         initGame();
-    }
-
-    @FXML
-    public void halloweenThemePressed() {
-        if(gameView.theme == Theme.HALLOWEEN) {
-            gameView.setTheme(Theme.DEFAULT);
-        } else {
-            gameView.setTheme(Theme.HALLOWEEN);
-        }
     }
 }
