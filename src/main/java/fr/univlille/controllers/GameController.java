@@ -1,7 +1,6 @@
 package fr.univlille.controllers;
 
 import fr.univlille.CellEvent;
-import fr.univlille.Theme;
 import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
@@ -9,7 +8,6 @@ import fr.univlille.views.GameView;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -43,6 +41,9 @@ public class GameController {
     private GameView gameView;
     private GameModel game;
 
+    /**
+     * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque rédemarrage du jeu.
+     */
     public void initGame() {
         game = new GameModel();
         game.generateMaze(19, 19);
@@ -58,15 +59,25 @@ public class GameController {
         currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
 
+        // On ajoute la première position du monstre dans l'historique
         Coordinate monsterPosition = game.getMonster().getPosition();
+
+        // Cela peut paraître bizarre de récreer une coordonnée avec les mêmes coordonnées,
+        // mais c'est simplement car sinon les deux instances seront liés et cette position
+        // sera dans l'historique sera modifiée à chaque nouveau déplacement du monstre (ce qu'on ne veut pas!)
         game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()), CellInfo.MONSTER, game.getTurn()));
     }
+
 
     @FXML
     public void initialize() {
         initGame();
     }
 
+    /** Cette méthode permet de créer un Thread qui attends automatiquement le nombre de millisecondes données en paramètre, puis éxecute le code de l'argument continuation.
+     * @param millis Le nombre de millisecondes à attendre
+     * @param continuation Le code à éxecuter à la fin du delay.
+     */
     public static void delay(long millis, Runnable continuation) {
         Task<Void> sleeper = new Task<Void>() {
             @Override
@@ -106,11 +117,14 @@ public class GameController {
     }
 
     private void swapScreen() {
+        // Animation de l'écran
         switchPane.setVisible(true);
         switchPaneCountdown.setText("Dans 3...");
         delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
         delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
         delay(3000, () -> switchPane.setVisible(false));
+
+        // On échange les tours
         gameView.isHunterTurn = !gameView.isHunterTurn;
         if(gameView.isHunterTurn) {
             game.getHunter().turnBegin();

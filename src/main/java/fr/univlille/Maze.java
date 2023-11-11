@@ -14,7 +14,6 @@ public class Maze {
         this.tailleY = tailleY;
         this.maze = new boolean[tailleY][tailleX];
         initializeMaze();
-        createMaze();
     }
 
     private void initializeMaze() {
@@ -48,12 +47,28 @@ public class Maze {
         return x >= 0 && x < tailleX && y >= 0 && y < tailleY;
     }
 
-    public void displayMaze() {
-        for (boolean[] row : maze) {
-            for (boolean cell : row) {
-                System.out.print(cell + " ");
+    public boolean[][] getMaze() {
+        return maze;
+    }
+
+    public Coordinate getDimensions() {
+        return new Coordinate(tailleX, tailleY);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append("Maze " + tailleX + ", " + tailleY + "\n");
+        for (int y = 0; y < tailleY; y++) {
+            for (int x = 0; x < tailleX; x++) {
+                if(maze[y][x]) {
+                    str.append(' ');
+                } else {
+                    str.append('#');
+                }
             }
-            System.out.println();
+            str.append('\n');
         }
+        return str.toString();
     }
 }
