@@ -24,21 +24,26 @@ Lancer App.java
 
 ### Fonctionnalités actuelles :
 
-- Création du labyrinthe qui a toujours un chemin vers la sortie
-- Placement du monstre aléatoirement
+- Génération d'un labyrinthe généré à l'aide d'un algorithme. (Recursive Backtracing)
+- Affichage de l'historique de déplacement du monstre pour le chasseur
+- Placement du monstre/de la sortie aléatoirement
 - Vue monstre/chasseur différente
+- Condition de victoire monstre/chasseur
 - Thèmes
 
 
 ### Fonctionnalités futures :
 
 - Menu principal
-- Brouillard pour le monstre au-delà de 2/3 de distance
 - IA pour le monstre et le chasseur, pour pouvoir jouer en solo
 - Possibilité de jouer sur 2 PC différents à l'IUT
 - Règles du jeu personnalisables
 - Créer un JAR pour lancer le jeu
 
+### Fonctionnalités éventuelles :
+
+- Brouillard pour le monstre au-delà de 2/3 de distance
+- Mécaniques de gameplay et de jeu additionnelles
 
 ### Jalon 1
 
