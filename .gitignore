@@ -3,5 +3,6 @@ bin/
 .intellij/
 .eclipse/
 lib/
+test-lib/
 doc/
 .DS_Store
