@@ -49,6 +49,7 @@ public class HunterModel extends Subject {
         for (ICellEvent cellEvent : gameModel.getHistory()) {
             if (cellEvent.getCoord().equals(shootPosition)) {
                 shootsHistory.add(cellEvent);
+                System.out.println(cellEvent);
                 notifyObservers(cellEvent);
                 return;
             }
@@ -62,7 +63,6 @@ public class HunterModel extends Subject {
             }
         }
         shootsHistory.add(cellEvent);
-        shootLeft -= 1;
         notifyObservers(cellEvent);
     }
 

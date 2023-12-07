@@ -70,7 +70,7 @@ public class GameView extends Canvas implements Observer {
         setOnMouseMoved((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(model.isGameEnded() || (isHunterTurn && model.getHunter().shootLeft <= 0)) {
+                if(model.isGameEnded() || (isHunterTurn && model.getHunter().shootLeft <= 0 && model.getHunter().grenadeLeft <= 0)) {
                     return;
                 }
                 Coordinate relativeMousePosition = new Coordinate(
@@ -103,9 +103,7 @@ public class GameView extends Canvas implements Observer {
             return;
         }
         if(model.getHunter().grenade == true){
-            if(model.getHunter().isHunterGrenadeValid(cursorPosition)){
                 playGrenade();
-            }
         }
         if(model.getHunter().isHunterShootValid(cursorPosition)) {
             play();
@@ -155,6 +153,7 @@ public class GameView extends Canvas implements Observer {
             return false;
         }
         model.getHunter().shoot(cursorPosition);
+        model.getHunter().shootLeft -= 1;
         return true;
     }
 
@@ -174,10 +173,11 @@ public class GameView extends Canvas implements Observer {
     }
 
     public boolean playHunterGrenade() {
-        if(model.getHunter().shootLeft <= 0) {
+        if(model.getHunter().grenadeLeft <= 0) {
             return false;
         }
-        model.getHunter().shoot(cursorPosition);
+        model.getHunter().grenade(cursorPosition);
+        model.getHunter().grenadeLeft -= 1;
         return true;
     }
 
@@ -185,7 +185,7 @@ public class GameView extends Canvas implements Observer {
     public boolean playGrenade() {
         boolean isValid = false;
         if(isHunterTurn) {
-            isValid = playHunterMove();
+            isValid = playHunterGrenade();
         } else {
             isValid = model.getMonster().play(movePosition);
         }
@@ -226,6 +226,7 @@ public class GameView extends Canvas implements Observer {
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
+        mainPage.grenadeLabel.setText("");
         draw();
     }
 
@@ -239,6 +240,7 @@ public class GameView extends Canvas implements Observer {
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
+        mainPage.grenadeLabel.setText("");
         draw();
     }
 

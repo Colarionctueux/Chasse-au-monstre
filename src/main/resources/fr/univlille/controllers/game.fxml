@@ -29,8 +29,26 @@
             </Label>
             <Label fx:id="currentPlayerLabel" text="C'est le tour du {}" />
             <Label fx:id="errorLabel" textFill="RED" />
-            <Button mnemonicParsing="false" onAction="#grenadeButtonPressed" text="Grenade" />
-            <Button mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
+            <HBox alignment="CENTER" prefHeight="48.0" prefWidth="768.0">
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="grenadeButton" mnemonicParsing="false" onAction="#grenadeButtonPressed" prefHeight="24.0" prefWidth="101.0" text="Grenade" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="grenadeLabel" prefHeight="16.0" prefWidth="98.0" />
+                     </children>
+                  </VBox>
+                  <HBox prefHeight="32.0" prefWidth="63.0" />
+                  <VBox prefHeight="48.0" prefWidth="124.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
          </children>
       </VBox>
       <AnchorPane fx:id="switchPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #000;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

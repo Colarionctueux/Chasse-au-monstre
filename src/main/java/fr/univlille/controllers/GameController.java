@@ -17,9 +17,16 @@ public class GameController {
 
     @FXML
     public Button stopGameButton;
-    
+
+    @FXML
+    public Button grenadeButton;
+
     @FXML
     public Label turnLabel;
+
+    @FXML 
+    public Label grenadeLabel;
+
 
     @FXML
     public Label currentPlayerLabel;
@@ -118,8 +125,19 @@ public class GameController {
 
     @FXML
     public void grenadeButtonPressed() throws InterruptedException {
-
-        game.getHunter().grenade = true;
+        if(game.getHunter().grenadeLeft > 0){
+            if(game.getHunter().grenade == true){
+                grenadeLabel.setText(" ");
+                game.getHunter().grenade = false;
+            }
+            else{
+                grenadeLabel.setText("Actif");
+                game.getHunter().grenade = true;
+            }
+        }
+        else{
+            grenadeLabel.setText("Vous n'avez plus de grenade...");
+        }
     }
 
     private void swapScreen() {
@@ -135,9 +153,11 @@ public class GameController {
         if(gameView.isHunterTurn) {
             game.getHunter().turnBegin();
             currentPlayerLabel.setText("C'est le tour du chasseur.");
+            grenadeButton.isVisible();
         } else {
             game.getMonster().turnBegin();
             currentPlayerLabel.setText("C'est le tour du monstre.");
+            
         }
     }
 
