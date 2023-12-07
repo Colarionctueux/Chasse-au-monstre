@@ -33,9 +33,7 @@ public class GameController {
     @FXML 
     public Label grenadeLabel;
 
-    @FXML
-    public Label test;
-    
+
     @FXML
     public Label currentPlayerLabel;
 

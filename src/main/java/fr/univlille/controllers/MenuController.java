@@ -1,11 +1,13 @@
 package fr.univlille.controllers;
 
 
+import java.io.IOException;
+
 import fr.univlille.App;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
 
-public class MenuController {
+public class MenuController extends AnchorPane {
     private App app;
 
     public App getApp() {
@@ -17,22 +19,9 @@ public class MenuController {
         this.app = app;
     }
 
-
     @FXML
-    public Button pvpButton;
-    
-    @FXML
-    public Button pveButton;
-
-
-    @FXML
-    public void pvpButtonPressed() {
-        System.out.println("test!");
-    }
-    
-    @FXML
-    public void gitlabLinkPressed() {
-        // App.
-    //     getHostServices().showDocument("https://gitlab.univ-lille.fr/sae2.01-2.02/2023/F4");
+    public void playButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene();
     }
 }

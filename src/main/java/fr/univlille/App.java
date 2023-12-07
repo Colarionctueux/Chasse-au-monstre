@@ -9,6 +9,17 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
  
 public class App extends Application {
+    private static App app;
+
+    public static App getApp() {
+        if(app == null) {
+            app = new App();
+        }
+        return app;
+    }
+
+    private static Stage stage;
+    private static Scene scene;
 
     private static Parent loadFXML(String filename) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("controllers/" + filename + ".fxml"));
@@ -28,21 +39,18 @@ public class App extends Application {
         launch(args);
     }
     
-    @Override
+    @Override 
     public void start(Stage stage) throws IOException {
-        // VBox root = new VBox();
-        // Scene scene = new Scene(root, 600, 500);
-        // stage.setScene(scene);
-        // Game game = new Game();
-        // game.generateMaze(11, 11);
-        // GameView gameView = new GameView(game);
-        // root.getChildren().addAll(new Label("Test du jeu"), gameView);
-        // gameView.update();
-        // stage.show();
-        Parent parent = loadFXML("game");
-        Scene scene = new Scene(parent, 800, 600);
+        Parent parent = loadFXML("menu");
+        App.scene = new Scene(parent, 800, 600);
+        App.scene.getStylesheets().add(getClass().getResource("bootstrap3.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");
         stage.show();
+        App.stage = stage;
+    }
+
+    public void changeScene() throws IOException {
+        scene.setRoot(loadFXML("game"));
     }
 }

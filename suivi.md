@@ -11,13 +11,14 @@
 ### 8 novembre TP de 14h30 à 16h30
 
 |Personne|Travail|
-|--------|-------|
-|Rayane|continué à améliorer le code|
-|Aymeri|continué à améliorer le code|
-|Thomas|tuto des sockets java|
-|Manon|commencé l'algo pour l'ia du monstre|
-|Nicolas|commencé à faire le menu principal sur javafx|
+|--------|---------------------------------------------------|
+|Rayane  |continué à améliorer le code                       |
+|Aymeri  |continué à améliorer le code                       |
+|Thomas  |tuto des sockets java                              |
+|Manon   |commencé l'algo pour l'ia du monstre|
+|Nicolas |commencé à faire le menu principal sur javafx|
 
 
 (On a tous continué à travailler sur nos tâches respectives mais le travail n'étant pas terminé, on n'a pas commit pour ne pas tout casser)
 
+### 7 Novembre Autonomie de 13h30 à 16h30
