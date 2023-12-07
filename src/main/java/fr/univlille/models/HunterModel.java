@@ -12,6 +12,8 @@ public class HunterModel extends Subject {
     public GameModel gameModel;
 
     public int shootLeft = 1;
+    public int grenadeLeft = 1;
+    public boolean grenade = false;
 
     public HunterModel(GameModel gameModel) {
         this.gameModel = gameModel;
@@ -19,7 +21,7 @@ public class HunterModel extends Subject {
     }
 
     public void turnBegin() {
-        shootLeft = 1000;
+        shootLeft = 1;
     }
 
     /**
@@ -62,5 +64,34 @@ public class HunterModel extends Subject {
         shootsHistory.add(cellEvent);
         shootLeft -= 1;
         notifyObservers(cellEvent);
+    }
+
+    public boolean isHunterGrenadeValid(Coordinate grenade) {
+        boolean res = true;
+        Coordinate mazeDimensions = gameModel.getMazeDimensions();
+        if(isHunterShootValid(grenade) == false){
+            res = false;
+        }
+        if(grenade.getCol()+1 <= 0 && grenade.getCol()+1 < mazeDimensions.getCol() && grenade.getRow() >= 0 && grenade.getRow() < mazeDimensions.getRow()){
+            res = false;
+        }
+        if(grenade.getCol()-1 <= 0 && grenade.getCol()-1 < mazeDimensions.getCol() && grenade.getRow() >= 0 && grenade.getRow() < mazeDimensions.getRow()){
+            res = false;
+        }
+        if(grenade.getCol() >= 0 && grenade.getCol() < mazeDimensions.getCol() && grenade.getRow()+1 >= 0 && grenade.getRow()+1 < mazeDimensions.getRow()){
+            res = false;
+        }
+        if(grenade.getCol() >= 0 && grenade.getCol() < mazeDimensions.getCol() && grenade.getRow()-1 >= 0 && grenade.getRow()-1 < mazeDimensions.getRow()){
+            res = false;
+        }
+        return res;
+    }
+
+    public void grenade(Coordinate greandePosition){
+        shoot(greandePosition);
+        shoot(new Coordinate(greandePosition.getCol()+1, greandePosition.getRow()));
+        shoot(new Coordinate(greandePosition.getCol()-1, greandePosition.getRow()));
+        shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()+1));
+        shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()-1));
     }
 }

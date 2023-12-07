@@ -102,6 +102,11 @@ public class GameView extends Canvas implements Observer {
         if(model.isGameEnded() || model.getHunter().shootLeft <= 0) {
             return;
         }
+        if(model.getHunter().grenade == true){
+            if(model.getHunter().isHunterGrenadeValid(cursorPosition)){
+                playGrenade();
+            }
+        }
         if(model.getHunter().isHunterShootValid(cursorPosition)) {
             play();
         }
@@ -155,6 +160,29 @@ public class GameView extends Canvas implements Observer {
 
 
     public boolean play() {
+        boolean isValid = false;
+        if(isHunterTurn) {
+            isValid = playHunterMove();
+        } else {
+            isValid = model.getMonster().play(movePosition);
+        }
+        if(isValid) {
+            cursorPosition = new Coordinate(-1, -1);
+            movePosition = new Coordinate(-1, -1);
+        }
+        return isValid;
+    }
+
+    public boolean playHunterGrenade() {
+        if(model.getHunter().shootLeft <= 0) {
+            return false;
+        }
+        model.getHunter().shoot(cursorPosition);
+        return true;
+    }
+
+
+    public boolean playGrenade() {
         boolean isValid = false;
         if(isHunterTurn) {
             isValid = playHunterMove();

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.GameController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.GameController">
    <children>
       <VBox fx:id="mainVBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
@@ -31,7 +31,13 @@
             <Label fx:id="errorLabel" textFill="RED" />
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="768.0">
                <children>
-                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
+                  <Button mnemonicParsing="false" onAction="#grenadeButtonPressed" text="Grenade" />
+                  <HBox prefHeight="32.0" prefWidth="63.0">
+                     <children>
+                        <Label fx:id="test" />
+                     </children>
+                  </HBox>
+                  <Button layoutX="432.0" layoutY="14.0" mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
                </children>
             </HBox>
          </children>
