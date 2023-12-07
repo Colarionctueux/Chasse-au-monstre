@@ -41,7 +41,7 @@ public class App extends Application {
     
     @Override 
     public void start(Stage stage) throws IOException {
-        Parent parent = loadFXML("menu");
+        Parent parent = loadFXML("game");
         App.scene = new Scene(parent, 800, 600);
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");

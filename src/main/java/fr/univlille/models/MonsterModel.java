@@ -10,10 +10,9 @@ public class MonsterModel extends Subject {
 
     Coordinate position;
     public GameModel model;
+    public int superJumpLeft = 1;
+    public boolean superJump = false;
 
-    public void turnBegin() {
-    
-    }
 
     public MonsterModel(GameModel model, Coordinate startPosition) {
         this.model = model;
@@ -31,7 +30,7 @@ public class MonsterModel extends Subject {
     }
 
     public boolean play(Coordinate movePosition) {
-        if(isMonsterMovementValid(movePosition)) {
+        if(isMonsterMovementValid(movePosition, 1.0)) {
             model.incrementTurn();
             move(movePosition);
             model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
@@ -49,7 +48,7 @@ public class MonsterModel extends Subject {
      * @param movement The desired movement of the monster.
      * @return `true` if the movement is valid, `false` otherwise.
      */
-    public boolean isMonsterMovementValid(Coordinate movement) {
+    public boolean isMonsterMovementValid(Coordinate movement, double max) {
         Coordinate mazeDimensions = model.getMazeDimensions();
 
         // On vérifie déjà si le déplacement est dans la grille du jeu
@@ -58,7 +57,7 @@ public class MonsterModel extends Subject {
         }
         
         double distance = model.getMonster().getPosition().distance(movement);
-        if(distance > 1.0 || distance < 1.0) {
+        if(distance > max || distance < max) {
             return false;
         }
 
@@ -68,4 +67,6 @@ public class MonsterModel extends Subject {
         }
         return true;
     }
+
+    
 }

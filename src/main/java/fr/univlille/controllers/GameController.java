@@ -174,7 +174,6 @@ public class GameController {
             grenadeRemainLabel.setVisible(true);
             grenadeButton.setVisible(true);
         } else {
-            game.getMonster().turnBegin();
             currentPlayerLabel.setText("C'est le tour du monstre.");
             shootRemainLabel.setVisible(false);
             grenadeRemainLabel.setVisible(false);
