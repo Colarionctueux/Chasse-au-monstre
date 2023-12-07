@@ -24,6 +24,12 @@ public class GameController {
     @FXML
     public Label turnLabel;
 
+    @FXML
+    public Label shootRemainLabel;
+
+    @FXML
+    public Label grenadeRemainLabel;
+
     @FXML 
     public Label grenadeLabel;
 
@@ -62,6 +68,9 @@ public class GameController {
         mainVBox.getChildren().add(3, gameView);
         gameView.draw();
         gameView.mainPage = this;
+        shootRemainLabel.setVisible(false);
+        grenadeRemainLabel.setVisible(false);
+        grenadeButton.setVisible(false);
 
         currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
@@ -107,6 +116,8 @@ public class GameController {
         }
         if(gameView.isHunterTurn || gameView.play()) {
             errorLabel.setText("");
+            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
+            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
         } else {
             errorLabel.setText("Mouvement invalide!");
             return;
@@ -136,7 +147,7 @@ public class GameController {
             }
         }
         else{
-            grenadeLabel.setText("Vous n'avez plus de grenade...");
+            errorLabel.setText("Vous n'avez plus de grenade...");
         }
     }
 
@@ -153,11 +164,17 @@ public class GameController {
         if(gameView.isHunterTurn) {
             game.getHunter().turnBegin();
             currentPlayerLabel.setText("C'est le tour du chasseur.");
-            grenadeButton.isVisible();
+            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
+            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
+            shootRemainLabel.setVisible(true);
+            grenadeRemainLabel.setVisible(true);
+            grenadeButton.setVisible(true);
         } else {
             game.getMonster().turnBegin();
             currentPlayerLabel.setText("C'est le tour du monstre.");
-            
+            shootRemainLabel.setVisible(false);
+            grenadeRemainLabel.setVisible(false);
+            grenadeButton.setVisible(false);
         }
     }
 

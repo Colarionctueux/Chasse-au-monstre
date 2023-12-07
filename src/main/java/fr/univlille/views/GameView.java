@@ -99,16 +99,20 @@ public class GameView extends Canvas implements Observer {
     }
 
     public void handleMousePressedHunter() {
-        if(model.isGameEnded() || model.getHunter().shootLeft <= 0) {
+        if(model.isGameEnded() || (model.getHunter().shootLeft <= 0 && model.getHunter().grenadeLeft <= 0)) {
             return;
         }
         if(model.getHunter().grenade == true){
-                playGrenade();
+            playGrenade();
         }
         if(model.getHunter().isHunterShootValid(cursorPosition)) {
             play();
         }
         draw();
+        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
+        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
+
+
     }
     
     public void handleMousePressedMonster() {
@@ -227,6 +231,8 @@ public class GameView extends Canvas implements Observer {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
         mainPage.grenadeLabel.setText("");
+        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
+        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
         draw();
     }
 
@@ -241,6 +247,8 @@ public class GameView extends Canvas implements Observer {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
         mainPage.grenadeLabel.setText("");
+        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
+        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
         draw();
     }
 

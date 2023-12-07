@@ -66,32 +66,22 @@ public class HunterModel extends Subject {
         notifyObservers(cellEvent);
     }
 
-    public boolean isHunterGrenadeValid(Coordinate grenade) {
-        boolean res = true;
-        Coordinate mazeDimensions = gameModel.getMazeDimensions();
-        if(isHunterShootValid(grenade) == false){
-            res = false;
-        }
-        if(grenade.getCol()+1 <= 0 && grenade.getCol()+1 < mazeDimensions.getCol() && grenade.getRow() >= 0 && grenade.getRow() < mazeDimensions.getRow()){
-            res = false;
-        }
-        if(grenade.getCol()-1 <= 0 && grenade.getCol()-1 < mazeDimensions.getCol() && grenade.getRow() >= 0 && grenade.getRow() < mazeDimensions.getRow()){
-            res = false;
-        }
-        if(grenade.getCol() >= 0 && grenade.getCol() < mazeDimensions.getCol() && grenade.getRow()+1 >= 0 && grenade.getRow()+1 < mazeDimensions.getRow()){
-            res = false;
-        }
-        if(grenade.getCol() >= 0 && grenade.getCol() < mazeDimensions.getCol() && grenade.getRow()-1 >= 0 && grenade.getRow()-1 < mazeDimensions.getRow()){
-            res = false;
-        }
-        return res;
-    }
 
     public void grenade(Coordinate greandePosition){
         shoot(greandePosition);
-        shoot(new Coordinate(greandePosition.getCol()+1, greandePosition.getRow()));
-        shoot(new Coordinate(greandePosition.getCol()-1, greandePosition.getRow()));
-        shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()+1));
-        shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()-1));
+        if(isHunterShootValid(new Coordinate(greandePosition.getCol()+1, greandePosition.getRow()))){
+            shoot(new Coordinate(greandePosition.getCol()+1, greandePosition.getRow()));
+        }
+        if(isHunterShootValid(new Coordinate(greandePosition.getCol()-1, greandePosition.getRow()))){
+            shoot(new Coordinate(greandePosition.getCol()-1, greandePosition.getRow()));
+        }
+        if(isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow()+1))){
+            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()+1));
+        }
+        if(isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow()-1))){
+            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()-1));
+        }
     }
 }
+
+
