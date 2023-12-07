@@ -49,7 +49,7 @@ public class App extends Application {
         App.stage = stage;
     }
 
-    public void changeScene() throws IOException {
-        scene.setRoot(loadFXML("game"));
+    public void changeScene(String name) throws IOException {
+        scene.setRoot(loadFXML(name));
     }
 }

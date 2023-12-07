@@ -19,7 +19,7 @@
             <HBox alignment="TOP_CENTER" prefHeight="32.0" prefWidth="768.0" spacing="8.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#restartGamePressed" text="Recommencer la partie" />
-                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#restartGamePressed" text="Retourner au menu" />
+                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#menuButtonPressed" text="Retourner au menu" />
                </children>
             </HBox>
             <Label fx:id="turnLabel" text="Tour n°{}">
@@ -29,19 +29,29 @@
             </Label>
             <Label fx:id="currentPlayerLabel" text="C'est le tour du {}" />
             <Label fx:id="errorLabel" textFill="RED" />
-            <HBox alignment="CENTER" prefHeight="48.0" prefWidth="768.0">
+            <HBox alignment="CENTER" prefHeight="74.0" prefWidth="768.0">
                <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
+                  <VBox prefHeight="48.0" prefWidth="180.0">
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="49.0" prefWidth="180.0">
                            <children>
                               <Button fx:id="grenadeButton" mnemonicParsing="false" onAction="#grenadeButtonPressed" prefHeight="24.0" prefWidth="101.0" text="Grenade" />
+                              <VBox prefHeight="32.0" prefWidth="10.0" />
+                              <VBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="82.0">
+                                 <children>
+                                    <Label fx:id="shootRemainLabel" prefHeight="16.0" prefWidth="91.0" />
+                                    <Label fx:id="grenadeRemainLabel" prefHeight="16.0" prefWidth="109.0" />
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
-                        <Label fx:id="grenadeLabel" prefHeight="16.0" prefWidth="98.0" />
+                        <Label fx:id="grenadeLabel" prefHeight="38.0" prefWidth="180.0" />
                      </children>
                   </VBox>
-                  <HBox prefHeight="32.0" prefWidth="63.0" />
+                  <HBox prefHeight="32.0" prefWidth="63.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0" />
+                     </children></HBox>
                   <VBox prefHeight="48.0" prefWidth="124.0">
                      <children>
                         <Button mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />

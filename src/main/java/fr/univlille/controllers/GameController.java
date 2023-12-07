@@ -1,5 +1,8 @@
 package fr.univlille.controllers;
 
+import java.io.IOException;
+
+import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
@@ -24,6 +27,12 @@ public class GameController {
     @FXML
     public Label turnLabel;
 
+    @FXML
+    public Label shootRemainLabel;
+
+    @FXML
+    public Label grenadeRemainLabel;
+
     @FXML 
     public Label grenadeLabel;
 
@@ -47,7 +56,8 @@ public class GameController {
 
     private GameView gameView;
     private GameModel game;
-
+    private App app;
+    
     /**
      * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque rédemarrage du jeu.
      */
@@ -62,6 +72,9 @@ public class GameController {
         mainVBox.getChildren().add(3, gameView);
         gameView.draw();
         gameView.mainPage = this;
+        shootRemainLabel.setVisible(false);
+        grenadeRemainLabel.setVisible(false);
+        grenadeButton.setVisible(false);
 
         currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
@@ -107,6 +120,8 @@ public class GameController {
         }
         if(gameView.isHunterTurn || gameView.play()) {
             errorLabel.setText("");
+            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
+            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
         } else {
             errorLabel.setText("Mouvement invalide!");
             return;
@@ -136,7 +151,7 @@ public class GameController {
             }
         }
         else{
-            grenadeLabel.setText("Vous n'avez plus de grenade...");
+            errorLabel.setText("Vous n'avez plus de grenade...");
         }
     }
 
@@ -153,16 +168,28 @@ public class GameController {
         if(gameView.isHunterTurn) {
             game.getHunter().turnBegin();
             currentPlayerLabel.setText("C'est le tour du chasseur.");
-            grenadeButton.isVisible();
+            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
+            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
+            shootRemainLabel.setVisible(true);
+            grenadeRemainLabel.setVisible(true);
+            grenadeButton.setVisible(true);
         } else {
             game.getMonster().turnBegin();
             currentPlayerLabel.setText("C'est le tour du monstre.");
-            
+            shootRemainLabel.setVisible(false);
+            grenadeRemainLabel.setVisible(false);
+            grenadeButton.setVisible(false);
         }
     }
 
     @FXML
     public void restartGamePressed() {
         initGame();
+    }
+
+    @FXML
+    public void menuButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("menu");
     }
 }
