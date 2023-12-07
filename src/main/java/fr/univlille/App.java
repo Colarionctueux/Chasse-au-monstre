@@ -18,7 +18,6 @@ public class App extends Application {
         return app;
     }
 
-    private static Stage stage;
     private static Scene scene;
 
     private static Parent loadFXML(String filename) throws IOException {
@@ -41,13 +40,11 @@ public class App extends Application {
     
     @Override 
     public void start(Stage stage) throws IOException {
-        Parent parent = loadFXML("settings");
+        Parent parent = loadFXML("menu");
         App.scene = new Scene(parent, 800, 600);
-        App.scene.getStylesheets().add(getClass().getResource("bootstrap3.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");
         stage.show();
-        App.stage = stage;
     }
 
     public void changeScene(String filename) throws IOException {

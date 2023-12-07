@@ -116,7 +116,11 @@ public class GameView extends Canvas implements Observer {
     }
     
     public void handleMousePressedMonster() {
-        if(model.getMonster().isMonsterMovementValid(cursorPosition)) {
+        if(model.getMonster().superJump == true && model.getMonster().superJumpLeft > 0){
+            movePosition = cursorPosition;
+            draw();
+        }
+        if(model.getMonster().isMonsterMovementValid(cursorPosition, 1.0)) {
             movePosition = cursorPosition;
             draw();
         }

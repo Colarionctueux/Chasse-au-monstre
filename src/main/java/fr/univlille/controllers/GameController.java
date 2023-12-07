@@ -1,5 +1,8 @@
 package fr.univlille.controllers;
 
+import java.io.IOException;
+
+import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
@@ -53,7 +56,8 @@ public class GameController {
 
     private GameView gameView;
     private GameModel game;
-
+    private App app;
+    
     /**
      * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque rédemarrage du jeu.
      */
@@ -170,7 +174,6 @@ public class GameController {
             grenadeRemainLabel.setVisible(true);
             grenadeButton.setVisible(true);
         } else {
-            game.getMonster().turnBegin();
             currentPlayerLabel.setText("C'est le tour du monstre.");
             shootRemainLabel.setVisible(false);
             grenadeRemainLabel.setVisible(false);
@@ -181,5 +184,11 @@ public class GameController {
     @FXML
     public void restartGamePressed() {
         initGame();
+    }
+
+    @FXML
+    public void menuButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("menu");
     }
 }

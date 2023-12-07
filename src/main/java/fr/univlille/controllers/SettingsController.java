@@ -23,14 +23,10 @@ public class SettingsController {
     @FXML
     public Spinner<Integer> mazeSizeYSpinner;
 
-    @FXML
-    public void initialize() {
-        System.out.println("caca");
-    }
 
     @FXML
     public void startGamePressed() throws IOException {
-        App.getApp().changeScene("settings");
+        App.getApp().changeScene("game");
     }
     
     @FXML

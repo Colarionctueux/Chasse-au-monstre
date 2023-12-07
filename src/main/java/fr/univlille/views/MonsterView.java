@@ -97,7 +97,7 @@ public class MonsterView {
             GameView.TILE_SIZE, GameView.TILE_SIZE * 2
         ); // La sortie
         
-        if(!model.isMonsterMovementValid(gameView.getCursorPosition())) {
+        if(!model.isMonsterMovementValid(gameView.getCursorPosition(), 1.0)) {
             ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
         } else {
             ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
@@ -113,7 +113,7 @@ public class MonsterView {
     }
 
     public boolean playMove() {
-        if(model.isMonsterMovementValid(gameView.getMovePosition())) {
+        if(model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
             gameModel.incrementTurn();
             gameModel.getMonster().move(gameView.getMovePosition());
             gameModel.addToHistory(new CellEvent(new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()), CellInfo.MONSTER, gameModel.getTurn()));
