@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="749.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MenuController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="749.0" style="-fx-background-image: url(&quot;./nightforest.jpg&quot;);" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MenuController">
    <children>
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="159.0" layoutY="24.0" prefHeight="128.0" prefWidth="432.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE" AnchorPane.topAnchor="24.0">
          <font>
