@@ -1,7 +1,7 @@
 ### 8 novembre TP de 9h à 12h
 
 |Personne|Travail|
-|--------|-------|
+|:--------:|:-------:|
 |Rayane|correction de bugs, refactoring|
 |Aymeri|génération du labyrinthe, correction de bugs, refactoring|
 |Thomas|début de la version du mode multijoueur|
@@ -10,15 +10,23 @@
 
 ### 8 novembre TP de 14h30 à 16h30
 
-|Personne|Travail|
-|--------|---------------------------------------------------|
+|Personne|         Travail                                   |
+|:------:|:-------------------------------------------------:|
 |Rayane  |continué à améliorer le code                       |
 |Aymeri  |continué à améliorer le code                       |
 |Thomas  |tuto des sockets java                              |
-|Manon   |commencé l'algo pour l'ia du monstre|
-|Nicolas |commencé à faire le menu principal sur javafx|
+|Manon   |commencé l'algo pour l'ia du monstre               |
+|Nicolas |commencé à faire le menu principal sur javafx      |
 
 
 (On a tous continué à travailler sur nos tâches respectives mais le travail n'étant pas terminé, on n'a pas commit pour ne pas tout casser)
 
-### 7 Novembre Autonomie de 13h30 à 16h30
+### 7 Décembre Autonomie de 13h30 à 16h30
+
+| Personne |                              Travail                             |
+|:--------:|:----------------------------------------------------------------:|
+|Rayane    | grenade foctionnelle pour le chasseur + amélioration visuelle    |
+|Aymeri    | début des paramètres de la partie + refactor                     |
+|Thomas    | avancement sockets java                                          |
+|Manon     | problèmes javafx                                                 |
+|Nicolas   | implémentation menu principal                                    |

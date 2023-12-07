@@ -41,7 +41,7 @@ public class App extends Application {
     
     @Override 
     public void start(Stage stage) throws IOException {
-        Parent parent = loadFXML("menu");
+        Parent parent = loadFXML("settings");
         App.scene = new Scene(parent, 800, 600);
         App.scene.getStylesheets().add(getClass().getResource("bootstrap3.css").toExternalForm());
         stage.setScene(scene);
@@ -50,7 +50,7 @@ public class App extends Application {
         App.stage = stage;
     }
 
-    public void changeScene() throws IOException {
-        scene.setRoot(loadFXML("game"));
+    public void changeScene(String filename) throws IOException {
+        scene.setRoot(loadFXML(filename));
     }
 }
