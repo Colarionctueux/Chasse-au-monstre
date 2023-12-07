@@ -22,9 +22,6 @@ public class GameController {
     public Label turnLabel;
 
     @FXML
-    public Label test;
-    
-    @FXML
     public Label currentPlayerLabel;
 
     @FXML
@@ -120,10 +117,9 @@ public class GameController {
     }
 
     @FXML
-    public void GrenadeButtonPressed() throws InterruptedException {
+    public void grenadeButtonPressed() throws InterruptedException {
 
         game.getHunter().grenade = true;
-        test.setText(game.getHunter().grenade + "");
     }
 
     private void swapScreen() {
