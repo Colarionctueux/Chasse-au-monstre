@@ -30,13 +30,3 @@
 |Thomas    | avancement sockets java                                          |
 |Manon     | problèmes javafx                                                 |
 |Nicolas   | implémentation menu principal                                    |
-
-### 8 Décembre Autonomie de 9h à 12h
-
-| Personne |                              Travail                             |
-|:--------:|:----------------------------------------------------------------:|
-|Rayane    | grenade foctionnelle pour le chasseur + amélioration visuelle    |
-|Aymeri    | début des paramètres de la partie + refactor                     |
-|Thomas    | avancement sockets java                                          |
-|Manon     | problèmes javafx                                                 |
-|Nicolas   | implémentation menu principal                                    |

@@ -18,7 +18,6 @@ public class App extends Application {
         return app;
     }
 
-    private static Stage stage;
     private static Scene scene;
 
     private static Parent loadFXML(String filename) throws IOException {
@@ -46,7 +45,6 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");
         stage.show();
-        App.stage = stage;
     }
 
     public void changeScene(String name) throws IOException {
