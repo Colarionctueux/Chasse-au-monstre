@@ -24,4 +24,10 @@ public class MenuController extends AnchorPane {
         app = App.getApp();
         app.changeScene("settings");
     }
+    
+    @FXML
+    public void multiButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("multiMenu");
+    }
 }

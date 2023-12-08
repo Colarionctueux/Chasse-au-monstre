@@ -32,7 +32,16 @@ public class MonsterModel extends Subject {
     }
 
     public boolean play(Coordinate movePosition) {
-        if(isMonsterMovementValid(movePosition, 1.0)) {
+        if(superJump == true && superJumpLeft > 0){
+            if(isMonsterMovementValid(movePosition, 2.0)) {
+            superJumpLeft -= 1;
+            model.incrementTurn();
+            move(movePosition);
+            model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
+            return true;
+            }
+        }
+        else if(isMonsterMovementValid(movePosition, 1.0)) {
             model.incrementTurn();
             move(movePosition);
             model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));

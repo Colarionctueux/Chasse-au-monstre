@@ -11,7 +11,11 @@ import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.models.MonsterModel;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 
 public class MonsterView {
     
@@ -74,9 +78,16 @@ public class MonsterView {
         }
     }
 
+    private void GraphicStyle() {
+        gc.setFill(Color.RED);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFont(new Font("Comic Sans MS", 16));
+    }
 
     public void draw() {
         Coordinate dimensions = gameModel.getMazeDimensions();
+        GraphicStyle();
         for (int y = 0; y < dimensions.getRow(); y++) {
             for (int x = 0; x < dimensions.getCol(); x++) {
                 if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
@@ -117,24 +128,43 @@ public class MonsterView {
             exitPosition.getRow() * GameView.TILE_SIZE - GameView.TILE_SIZE,
             GameView.TILE_SIZE, GameView.TILE_SIZE * 2
         ); // La sortie
-        
-        if(!model.isMonsterMovementValid(gameView.getCursorPosition(), 1.0)) {
+        if(gameModel.getMonster().superJump == true && gameModel.getMonster().superJumpLeft > 0){
+            if(!model.isMonsterMovementValid(gameView.getCursorPosition(), 2.0)) {
+                ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
+            }
+            else {
+                ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
+            }
+        }
+        else if(!model.isMonsterMovementValid(gameView.getCursorPosition(), 1.0)) {
             ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
-        } else {
+        } 
+        else {
             ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
         }
         ViewUtils.drawSimpleTexture(gc, 64, 192, gameView.getMovePosition()); // Le mouvement
 
         ArrayList<ICellEvent> shoots = gameModel.getHunter().shootsHistory;
         if(shoots.size() > 0) {
-            Coordinate coord = (Coordinate) shoots.get(shoots.size() - 1).getCoord();
-            ViewUtils.drawSimpleTexture(gc, 64, 256, coord);
+            for(int i = 0; i<shoots.size(); i++){
+                Coordinate coord = (Coordinate) shoots.get(i).getCoord();                                   
+                ViewUtils.drawSimpleTexture(gc, 64, 256, coord);
+                gc.fillText(String.valueOf(shoots.get(i).getTurn() - 1), coord.getCol() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2, coord.getRow() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2);
+            }
+            
         }
         ViewUtils.drawSimpleTexture(gc, 0, 0, monsterPosition); // Joueur
     }
 
     public boolean playMove() {
-        if(model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
+        if(gameModel.getMonster().superJump == true && gameModel.getMonster().superJumpLeft > 0){
+            if(model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
+                gameModel.incrementTurn();
+                gameModel.getMonster().move(gameView.getMovePosition());
+                gameModel.addToHistory(new CellEvent(new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()), CellInfo.MONSTER, gameModel.getTurn()));
+            }
+        }
+        else if(model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
             gameModel.incrementTurn();
             gameModel.getMonster().move(gameView.getMovePosition());
             gameModel.addToHistory(new CellEvent(new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()), CellInfo.MONSTER, gameModel.getTurn()));
