@@ -19,6 +19,9 @@ public class MonsterView {
     public GameModel gameModel;
     public MonsterModel model;
 
+    public boolean[][] fogOfWar;
+    public boolean fogEnabled = true;
+
     /**
      * This array contains the index of decorations within the spritesheet.
      * It has the same dimensions of the maze, and the first element in this 2D-array is the decoration of the first cell within the maze.
@@ -33,8 +36,19 @@ public class MonsterView {
         this.gameView = gameView;
         this.gameModel = gameModel;
         this.model = gameModel.getMonster();
-        addDecorations(gameModel.getMazeDimensions());
+        Coordinate mazeDimensions = gameModel.getMazeDimensions();
+        addDecorations(mazeDimensions);
+        if(fogEnabled) {
+            fogOfWar = new boolean[mazeDimensions.getRow()][mazeDimensions.getRow()];
+            updateFog(this.gameModel.getMonster().getPosition());
+            updateFog(this.gameModel.getExit());
+        }
     }
+
+    public void turnStarted() {
+        updateFog(gameModel.getMonster().getPosition());
+    }
+
 
     /**
      * Initializes the set of decorations randomly.
@@ -72,17 +86,20 @@ public class MonsterView {
                     // Décorations
                     switch (decorations[y][x]) {
                         case 0:
-                            ViewUtils.drawSimpleTexture(gc, 0, 128, x, y);
-                            break;
+                        ViewUtils.drawSimpleTexture(gc, 0, 128, x, y);
+                        break;
                         case 1:
-                            ViewUtils.drawSimpleTexture(gc, 64, 128, x, y);
-                            break;
+                        ViewUtils.drawSimpleTexture(gc, 64, 128, x, y);
+                        break;
                         case 2:
-                            ViewUtils.drawSimpleTexture(gc, 128, 128, x, y);
-                            break;
+                        ViewUtils.drawSimpleTexture(gc, 128, 128, x, y);
+                        break;
                         default:
-                            break;
+                        break;
                     }
+                }
+                if(fogEnabled && !fogOfWar[y][x]) {
+                    ViewUtils.drawSimpleTexture(gc, 256, 0, x, y);
                 }
             }
         }
@@ -123,5 +140,21 @@ public class MonsterView {
         gameView.setMovePosition(new Coordinate(-1, -1));
         gameView.setCursorPosition(new Coordinate(-1, -1));
         return true;
+    }
+
+
+    public void updateFog(ICoordinate coordinate) {
+        Coordinate mazeDimensions = gameModel.getMazeDimensions();
+        for (int y = -1; y < 2; y++) {
+            for (int x = -1; x < 2; x++) {
+                if(x * x + y * y <= Math.pow(3, 2) ) {
+                    int posX = coordinate.getCol() + x;
+                    int posY = coordinate.getRow() + y;
+                    if(posX >= 0 && posX < mazeDimensions.getCol() && posY >= 0 && posY < mazeDimensions.getRow()) {
+                        fogOfWar[posY][posX] = true;
+                    }
+                }
+            }
+        }
     }
 }

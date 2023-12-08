@@ -150,7 +150,6 @@ public class GameModel extends Subject {
     public void generateMaze(int width, int height) {
         Maze laby = new Maze(width, height);
         maze = laby.createMaze();
-        System.out.println(laby);
 
         this.hunter = new HunterModel(this);
         this.monster = new MonsterModel(this, randomPosition());

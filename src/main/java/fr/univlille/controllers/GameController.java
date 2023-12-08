@@ -63,7 +63,7 @@ public class GameController {
      */
     public void initGame() {
         game = new GameModel();
-        game.generateMaze(19, 19);
+        game.generateMaze(11, 11);
         
         if(gameView != null) {
             mainVBox.getChildren().remove(gameView);
@@ -175,6 +175,7 @@ public class GameController {
             grenadeButton.setVisible(true);
         } else {
             currentPlayerLabel.setText("C'est le tour du monstre.");
+            gameView.monsterView.turnStarted();
             shootRemainLabel.setVisible(false);
             grenadeRemainLabel.setVisible(false);
             grenadeButton.setVisible(false);
