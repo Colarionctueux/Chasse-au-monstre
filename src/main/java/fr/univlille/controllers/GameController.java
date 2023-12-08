@@ -25,6 +25,9 @@ public class GameController {
     public Button grenadeButton;
 
     @FXML
+    public Button jumpButton;
+
+    @FXML
     public Label turnLabel;
 
     @FXML
@@ -33,9 +36,14 @@ public class GameController {
     @FXML
     public Label grenadeRemainLabel;
 
+    @FXML
+    public Label jumpRemainLabel;
+
     @FXML 
     public Label grenadeLabel;
 
+    @FXML 
+    public Label jumpLabel;
 
     @FXML
     public Label currentPlayerLabel;
@@ -75,6 +83,10 @@ public class GameController {
         shootRemainLabel.setVisible(false);
         grenadeRemainLabel.setVisible(false);
         grenadeButton.setVisible(false);
+        jumpButton.setVisible(true);
+        jumpLabel.setVisible(true);
+        jumpRemainLabel.setVisible(true);
+        jumpRemainLabel.setText("Jump : " + game.getMonster().superJumpLeft );
 
         currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
@@ -155,6 +167,23 @@ public class GameController {
         }
     }
 
+    @FXML
+    public void jumpButtonPressed() throws InterruptedException {
+        if(game.getMonster().superJumpLeft > 0){
+            if(game.getMonster().superJump == true){
+                jumpLabel.setText(" ");
+                game.getMonster().superJump = false;
+            }
+            else{
+                jumpLabel.setText("Actif");
+                game.getMonster().superJump = true;
+            }
+        }
+        else{
+            errorLabel.setText("Vous n'avez plus de superJump...");
+        }
+    }
+
     private void swapScreen() {
         // Animation de l'écran
         switchPane.setVisible(true);
@@ -170,15 +199,26 @@ public class GameController {
             currentPlayerLabel.setText("C'est le tour du chasseur.");
             shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
             grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
+            game.getHunter().grenade = false;
+            grenadeLabel.setText(" ");
             shootRemainLabel.setVisible(true);
             grenadeRemainLabel.setVisible(true);
             grenadeButton.setVisible(true);
+            jumpButton.setVisible(false);
+            jumpLabel.setVisible(false);
+            jumpRemainLabel.setVisible(false);
         } else {
+            game.getMonster().superJump = false;
             currentPlayerLabel.setText("C'est le tour du monstre.");
             gameView.monsterView.turnStarted();
+            jumpRemainLabel.setText("Jump : " + game.getMonster().superJumpLeft );
+            jumpLabel.setText(" ");
             shootRemainLabel.setVisible(false);
             grenadeRemainLabel.setVisible(false);
             grenadeButton.setVisible(false);
+            jumpButton.setVisible(true);
+            jumpLabel.setVisible(true);
+            jumpRemainLabel.setVisible(true);
         }
     }
 

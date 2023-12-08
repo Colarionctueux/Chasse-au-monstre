@@ -33,10 +33,9 @@
                <children>
                   <VBox prefHeight="48.0" prefWidth="180.0">
                      <children>
-                        <HBox prefHeight="49.0" prefWidth="180.0">
+                        <HBox prefHeight="8.0" prefWidth="180.0" spacing="8.0">
                            <children>
-                              <Button fx:id="grenadeButton" mnemonicParsing="false" onAction="#grenadeButtonPressed" prefHeight="24.0" prefWidth="101.0" text="Grenade" />
-                              <VBox prefHeight="32.0" prefWidth="10.0" />
+                              <Button fx:id="grenadeButton" alignment="TOP_CENTER" mnemonicParsing="false" onAction="#grenadeButtonPressed" prefHeight="15.0" prefWidth="97.0" text="Grenade" />
                               <VBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="82.0">
                                  <children>
                                     <Label fx:id="shootRemainLabel" prefHeight="16.0" prefWidth="91.0" />
@@ -45,7 +44,22 @@
                               </VBox>
                            </children>
                         </HBox>
-                        <Label fx:id="grenadeLabel" prefHeight="38.0" prefWidth="180.0" />
+                        <Label fx:id="grenadeLabel" prefHeight="15.0" prefWidth="180.0" />
+                     </children>
+                  </VBox>
+                  <VBox layoutX="211.0" layoutY="10.0" prefHeight="48.0" prefWidth="180.0">
+                     <children>
+                        <HBox prefHeight="19.0" prefWidth="180.0">
+                           <children>
+                              <Button fx:id="jumpButton" mnemonicParsing="false" onAction="#jumpButtonPressed" prefHeight="24.0" prefWidth="101.0" text="SuperJump" />
+                              <VBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="82.0">
+                                 <children>
+                                    <Label fx:id="jumpRemainLabel" alignment="TOP_CENTER" prefHeight="19.0" prefWidth="78.0" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <Label fx:id="jumpLabel" prefHeight="21.0" prefWidth="180.0" />
                      </children>
                   </VBox>
                   <HBox prefHeight="32.0" prefWidth="63.0">
