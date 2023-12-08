@@ -13,6 +13,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
@@ -23,31 +24,25 @@ public class GameController {
     public Button stopGameButton;
 
     @FXML
-    public Button grenadeButton;
+    public ToggleButton grenadeButton;
 
     @FXML
-    public Button jumpButton;
+    public ToggleButton jumpButton;
 
     @FXML
     public Label turnLabel;
 
     @FXML
-    public Label shootRemainLabel;
+    public Button endTurnButton;
+
+
 
     @FXML
-    public Label grenadeRemainLabel;
+    public Label powerupEnabledLabel;
 
     @FXML
-    public Label jumpRemainLabel;
+    public Label shootLeftLabel;
 
-    @FXML 
-    public Label grenadeLabel;
-
-    @FXML 
-    public Label jumpLabel;
-
-    @FXML
-    public Label currentPlayerLabel;
 
     @FXML
     public VBox mainVBox;
@@ -60,7 +55,6 @@ public class GameController {
 
     @FXML
     public Label errorLabel;
-
 
 
     private GameView gameView;
@@ -79,18 +73,13 @@ public class GameController {
             mainVBox.getChildren().remove(gameView);
         }
         gameView = new GameView(game, parameters);
-        mainVBox.getChildren().add(3, gameView);
+        mainVBox.getChildren().add(2, gameView);
         gameView.draw();
         gameView.mainPage = this;
-        shootRemainLabel.setVisible(false);
-        grenadeRemainLabel.setVisible(false);
         grenadeButton.setVisible(false);
         jumpButton.setVisible(true);
-        jumpLabel.setVisible(true);
-        jumpRemainLabel.setVisible(true);
-        jumpRemainLabel.setText("Jump : " + game.getMonster().superJumpLeft );
+        updateEntitiesLabel();
 
-        currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
 
         // On ajoute la première position du monstre dans l'historique
@@ -134,8 +123,7 @@ public class GameController {
         }
         if(gameView.isHunterTurn || gameView.play()) {
             errorLabel.setText("");
-            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
-            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
+            updateEntitiesLabel();
         } else {
             errorLabel.setText("Mouvement invalide!");
             return;
@@ -144,6 +132,7 @@ public class GameController {
         
         if(game.monsterWon()) {
             game.setGameEnded(true);
+            endTurnButton.setVisible(false);
             errorLabel.setText("Le monstre a gagné!");
             gameView.draw();
             return;
@@ -155,17 +144,17 @@ public class GameController {
     @FXML
     public void grenadeButtonPressed() throws InterruptedException {
         if(game.getHunter().grenadeLeft > 0){
-            if(game.getHunter().grenade == true){
-                grenadeLabel.setText(" ");
+            if(game.getHunter().grenade){
+                powerupEnabledLabel.setVisible(false);
                 game.getHunter().grenade = false;
             }
             else{
-                grenadeLabel.setText("Actif");
+                powerupEnabledLabel.setVisible(true);
                 game.getHunter().grenade = true;
             }
         }
         else{
-            errorLabel.setText("Vous n'avez plus de grenade...");
+            errorLabel.setText("Vous n'avez plu de grenade...");
         }
     }
 
@@ -173,16 +162,16 @@ public class GameController {
     public void jumpButtonPressed() throws InterruptedException {
         if(game.getMonster().superJumpLeft > 0){
             if(game.getMonster().superJump == true){
-                jumpLabel.setText(" ");
+                powerupEnabledLabel.setVisible(false);
                 game.getMonster().superJump = false;
             }
             else{
-                jumpLabel.setText("Actif");
+                powerupEnabledLabel.setVisible(true);
                 game.getMonster().superJump = true;
             }
         }
         else{
-            errorLabel.setText("Vous n'avez plus de superJump...");
+            errorLabel.setText("Vous n'avez plu de SuperJump...");
         }
     }
 
@@ -196,31 +185,13 @@ public class GameController {
 
         // On échange les tours
         gameView.isHunterTurn = !gameView.isHunterTurn;
+        updateEntitiesLabel();
         if(gameView.isHunterTurn) {
             game.getHunter().turnBegin();
-            currentPlayerLabel.setText("C'est le tour du chasseur.");
-            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
-            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
             game.getHunter().grenade = false;
-            grenadeLabel.setText(" ");
-            shootRemainLabel.setVisible(true);
-            grenadeRemainLabel.setVisible(true);
-            grenadeButton.setVisible(true);
-            jumpButton.setVisible(false);
-            jumpLabel.setVisible(false);
-            jumpRemainLabel.setVisible(false);
         } else {
             game.getMonster().superJump = false;
-            currentPlayerLabel.setText("C'est le tour du monstre.");
             gameView.monsterView.turnStarted();
-            jumpRemainLabel.setText("Jump : " + game.getMonster().superJumpLeft );
-            jumpLabel.setText(" ");
-            shootRemainLabel.setVisible(false);
-            grenadeRemainLabel.setVisible(false);
-            grenadeButton.setVisible(false);
-            jumpButton.setVisible(true);
-            jumpLabel.setVisible(true);
-            jumpRemainLabel.setVisible(true);
         }
     }
 
@@ -233,5 +204,17 @@ public class GameController {
     public void menuButtonPressed() throws IOException {
         app = App.getApp();
         app.changeScene("menu");
+        System.out.println("co");
+    }
+
+    public void updateEntitiesLabel() {
+        shootLeftLabel.setText("Il vous reste " + game.getHunter().shootLeft + " tir(s)!");
+        grenadeButton.setText("Grenade (" + game.getHunter().grenadeLeft + ")");
+        jumpButton.setText("SuperJump (" + game.getMonster().superJumpLeft + ")");
+        
+        grenadeButton.setVisible(gameView.isHunterTurn);
+        jumpButton.setVisible(!gameView.isHunterTurn);
+        powerupEnabledLabel.setVisible(game.getHunter().grenade || game.getMonster().superJump);
+        shootLeftLabel.setVisible(gameView.isHunterTurn);
     }
 }

@@ -60,7 +60,7 @@ public class GameView extends Canvas implements Observer {
     public GameView(GameModel model, GameParameters parameters) {
         this.model = model;
         this.parameters = parameters;
-        
+
         this.gc = getGraphicsContext2D();
 
         hunterView = new HunterView(gc, this, model, parameters);
@@ -114,10 +114,8 @@ public class GameView extends Canvas implements Observer {
             play();
         }
         draw();
-        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
-        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
-
-
+        mainPage.shootLeftLabel.setText("Il vous reste " + model.getHunter().shootLeft + " tir(s)!");
+        mainPage.grenadeButton.setText("Grenade (" + model.getHunter().grenadeLeft + ")");
     }
     
     public void handleMousePressedMonster() {
@@ -130,7 +128,7 @@ public class GameView extends Canvas implements Observer {
             movePosition = cursorPosition;
         }
         draw();
-        mainPage.jumpRemainLabel.setText("Jump : " + model.getMonster().superJumpLeft );
+        mainPage.jumpButton.setText("SuperJump (" + model.getMonster().superJumpLeft + ")");
     }
 
 
@@ -241,9 +239,7 @@ public class GameView extends Canvas implements Observer {
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
-        mainPage.grenadeLabel.setText("");
-        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
-        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
+        mainPage.updateEntitiesLabel();
         draw();
     }
 
@@ -257,9 +253,7 @@ public class GameView extends Canvas implements Observer {
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
-        mainPage.grenadeLabel.setText("");
-        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
-        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
+        mainPage.updateEntitiesLabel();
         draw();
     }
 
