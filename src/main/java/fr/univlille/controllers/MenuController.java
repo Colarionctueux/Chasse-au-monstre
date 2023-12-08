@@ -20,8 +20,8 @@ public class MenuController extends AnchorPane {
     }
 
     @FXML
-    public void pvpButtonPressed() throws IOException {
+    public void playButtonPressed() throws IOException {
         app = App.getApp();
-        app.changeScene("settings");
+        app.changeScene("game");
     }
 }
