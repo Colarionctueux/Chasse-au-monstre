@@ -34,7 +34,7 @@ public class MultiplayerMenuController extends AnchorPane {
     @FXML
     public void localButtonPressed() throws IOException {
         app = App.getApp();
-        app.changeScene("game");
+        app.changeScene("settings");
     }
 
     @FXML
