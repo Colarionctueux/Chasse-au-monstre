@@ -54,7 +54,9 @@ public class MonsterView {
     }
 
     public void turnStarted() {
-        updateFog(gameModel.getMonster().getPosition());
+        if(fogEnabled) {
+            updateFog(gameModel.getMonster().getPosition());
+        }
     }
 
 
