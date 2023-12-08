@@ -3,6 +3,7 @@ package fr.univlille.views;
 import fr.univlille.Theme;
 import fr.univlille.controllers.GameController;
 import fr.univlille.Coordinate;
+import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
@@ -40,6 +41,8 @@ public class GameView extends Canvas implements Observer {
 
     public HunterView hunterView;
     public MonsterView monsterView;
+
+    public GameParameters parameters;
     
     /**
      * Each image in the game is contained in a spritesheet.
@@ -54,12 +57,14 @@ public class GameView extends Canvas implements Observer {
      */
     public Theme theme;
 
-    public GameView(GameModel model) {
+    public GameView(GameModel model, GameParameters parameters) {
         this.model = model;
+        this.parameters = parameters;
+        
         this.gc = getGraphicsContext2D();
 
-        hunterView = new HunterView(gc, this, model);
-        monsterView = new MonsterView(gc, this, model);
+        hunterView = new HunterView(gc, this, model, parameters);
+        monsterView = new MonsterView(gc, this, model, parameters);
 
         Coordinate mazeDimensions = model.getMazeDimensions(); 
         setWidth(TILE_SIZE * mazeDimensions.getCol());

@@ -13,6 +13,8 @@ public class MonsterModel extends Subject {
     public int superJumpLeft = 1;
     public boolean superJump = false;
 
+    public boolean[][] fogOfWar;
+
 
     public MonsterModel(GameModel model, Coordinate startPosition) {
         this.model = model;

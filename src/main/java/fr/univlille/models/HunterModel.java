@@ -17,11 +17,13 @@ public class HunterModel extends Subject {
 
     public HunterModel(GameModel gameModel) {
         this.gameModel = gameModel;
+        this.shootLeft = gameModel.parameters.hunterShoots;
+        this.grenadeLeft = gameModel.parameters.hunterGrenades;
         shootsHistory = new ArrayList<>();
     }
 
     public void turnBegin() {
-        shootLeft = 1;
+        this.shootLeft = gameModel.parameters.hunterShoots;
     }
 
     /**

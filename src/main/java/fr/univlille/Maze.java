@@ -3,6 +3,7 @@ package fr.univlille;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Maze {
     private int tailleX;
@@ -22,8 +23,17 @@ public class Maze {
         }
     }
 
-    public boolean[][] createMaze() {
+    public boolean[][] createMaze(double threshold) {
         recursiveBacktrack(0, 0);
+        
+        Random random = new Random();
+        for (int y = 0; y < maze.length; y++) {
+            for (int x = 0; x < maze[0].length; x++) {
+                if(random.nextDouble() > threshold) {
+                    maze[y][x] = false;
+                }
+            }
+        }
         return maze;
     }
 

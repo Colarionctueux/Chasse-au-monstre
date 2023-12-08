@@ -5,6 +5,7 @@ import java.io.IOException;
 import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
+import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.views.GameView;
@@ -63,12 +64,13 @@ public class GameController {
      */
     public void initGame() {
         game = new GameModel();
-        game.generateMaze(11, 11);
+        GameParameters parameters = App.getApp().parameters;
+        game.generateMaze(parameters);
         
         if(gameView != null) {
             mainVBox.getChildren().remove(gameView);
         }
-        gameView = new GameView(game);
+        gameView = new GameView(game, parameters);
         mainVBox.getChildren().add(3, gameView);
         gameView.draw();
         gameView.mainPage = this;

@@ -50,4 +50,12 @@ public class App extends Application {
     public void changeScene(String name) throws IOException {
         scene.setRoot(loadFXML(name));
     }
+
+    public GameParameters parameters;
+    
+    public void startGame(GameParameters parameters) throws IOException {
+        this.parameters = parameters;
+        scene.setRoot(loadFXML("game"));
+
+    }
 }
