@@ -22,7 +22,7 @@ public class MenuController extends AnchorPane {
     @FXML
     public void playButtonPressed() throws IOException {
         app = App.getApp();
-        app.changeScene(" ");
+        app.changeScene("game");
     }
     
     @FXML
