@@ -1,6 +1,7 @@
 package fr.univlille.views;
 
 import fr.univlille.Coordinate;
+import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
@@ -18,10 +19,13 @@ public class HunterView {
     public GameModel gameModel;
     public HunterModel model;
 
-    public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel) {
+    private GameParameters parameters;
+
+    public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel, GameParameters parameters) {
         this.gc = gc;
         this.gameView = gameView;
         this.gameModel = gameModel;
+        this.parameters = parameters;
         this.model = gameModel.getHunter();
     }
 

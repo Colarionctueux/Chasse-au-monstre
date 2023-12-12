@@ -3,6 +3,7 @@ package fr.univlille.views;
 import fr.univlille.Theme;
 import fr.univlille.controllers.GameController;
 import fr.univlille.Coordinate;
+import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
@@ -40,6 +41,8 @@ public class GameView extends Canvas implements Observer {
 
     public HunterView hunterView;
     public MonsterView monsterView;
+
+    public GameParameters parameters;
     
     /**
      * Each image in the game is contained in a spritesheet.
@@ -54,12 +57,14 @@ public class GameView extends Canvas implements Observer {
      */
     public Theme theme;
 
-    public GameView(GameModel model) {
+    public GameView(GameModel model, GameParameters parameters) {
         this.model = model;
+        this.parameters = parameters;
+
         this.gc = getGraphicsContext2D();
 
-        hunterView = new HunterView(gc, this, model);
-        monsterView = new MonsterView(gc, this, model);
+        hunterView = new HunterView(gc, this, model, parameters);
+        monsterView = new MonsterView(gc, this, model, parameters);
 
         Coordinate mazeDimensions = model.getMazeDimensions(); 
         setWidth(TILE_SIZE * mazeDimensions.getCol());
@@ -109,21 +114,21 @@ public class GameView extends Canvas implements Observer {
             play();
         }
         draw();
-        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
-        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
-
-
+        mainPage.shootLeftLabel.setText("Il vous reste " + model.getHunter().shootLeft + " tir(s)!");
+        mainPage.grenadeButton.setText("Grenade (" + model.getHunter().grenadeLeft + ")");
     }
     
     public void handleMousePressedMonster() {
         if(model.getMonster().superJump == true && model.getMonster().superJumpLeft > 0){
+            if(model.getMonster().isMonsterMovementValid(cursorPosition, 2.0)) {
             movePosition = cursorPosition;
-            draw();
         }
-        if(model.getMonster().isMonsterMovementValid(cursorPosition, 1.0)) {
+        }
+        else if(model.getMonster().isMonsterMovementValid(cursorPosition, 1.0)) {
             movePosition = cursorPosition;
-            draw();
         }
+        draw();
+        mainPage.jumpButton.setText("SuperJump (" + model.getMonster().superJumpLeft + ")");
     }
 
 
@@ -234,9 +239,7 @@ public class GameView extends Canvas implements Observer {
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
-        mainPage.grenadeLabel.setText("");
-        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
-        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
+        mainPage.updateEntitiesLabel();
         draw();
     }
 
@@ -250,9 +253,7 @@ public class GameView extends Canvas implements Observer {
         } else {
             mainPage.errorLabel.setText("Vous n'avez rien touché...");
         }
-        mainPage.grenadeLabel.setText("");
-        mainPage.shootRemainLabel.setText("Tir : " + model.getHunter().shootLeft );
-        mainPage.grenadeRemainLabel.setText("Grenade : " + model.getHunter().grenadeLeft);
+        mainPage.updateEntitiesLabel();
         draw();
     }
 

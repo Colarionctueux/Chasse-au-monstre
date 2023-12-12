@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import fr.univlille.Coordinate;
+import fr.univlille.GameParameters;
 import fr.univlille.Maze;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.utils.Subject;
 
 public class GameModel extends Subject {
+
     /**
      * The current turn of the game.
      * Initialized at 1 when creating the maze.
@@ -29,6 +31,8 @@ public class GameModel extends Subject {
 
     private HunterModel hunter;
     private MonsterModel monster;
+
+    public GameParameters parameters;
 
     /**
      * A list containing all the moves of the hunter and the monster.
@@ -138,18 +142,18 @@ public class GameModel extends Subject {
         return availableCoordinates.get(random.nextInt(availableCoordinates.size()));
     }
 
+    
     /**
      * Generates the maze.
      * It initializes the hunter and monster models.
      * It gives a random position to the monster.
      * The turns start at 1 and the history is cleared.
      * The exit is also randomized.
-     * @param width The desired width of the maze.
-     * @param height The desired height of the maze.
      */
-    public void generateMaze(int width, int height) {
-        Maze laby = new Maze(width, height);
-        maze = laby.createMaze();
+    public void generateMaze(GameParameters parameters) {
+        this.parameters = parameters;
+        Maze laby = new Maze(parameters.mazeWidth, parameters.mazeHeight);
+        maze = laby.createMaze(parameters.wallsPercentage);
 
         this.hunter = new HunterModel(this);
         this.monster = new MonsterModel(this, randomPosition());
@@ -161,7 +165,6 @@ public class GameModel extends Subject {
         while(exit.equals(getMonster().getPosition())) {
             exit = randomPosition();
         }
-
     }
 
     public ArrayList<ICellEvent> getHistory() {

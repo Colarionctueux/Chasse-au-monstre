@@ -13,6 +13,8 @@ public class MonsterModel extends Subject {
     public int superJumpLeft = 1;
     public boolean superJump = false;
 
+    public boolean[][] fogOfWar;
+
 
     public MonsterModel(GameModel model, Coordinate startPosition) {
         this.model = model;
@@ -30,13 +32,24 @@ public class MonsterModel extends Subject {
     }
 
     public boolean play(Coordinate movePosition) {
-        if(isMonsterMovementValid(movePosition, 1.0)) {
-            model.incrementTurn();
-            move(movePosition);
-            model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
+        if(superJump == true && superJumpLeft > 0){
+            if(isMonsterMovementValid(movePosition, 2.0)) {
+            superJumpLeft -= 1;
+            changePosition(movePosition);
+            return true;
+            }
+        }
+        else if(isMonsterMovementValid(movePosition, 1.0)) {
+            changePosition(movePosition);
             return true;
         }
         return false;
+    }
+
+    private void changePosition(Coordinate movePosition) {
+        model.incrementTurn();
+        move(movePosition);
+        model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
     }
 
 

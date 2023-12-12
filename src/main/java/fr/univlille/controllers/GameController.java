@@ -5,6 +5,7 @@ import java.io.IOException;
 import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
+import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.views.GameView;
@@ -12,6 +13,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
@@ -22,23 +24,25 @@ public class GameController {
     public Button stopGameButton;
 
     @FXML
-    public Button grenadeButton;
+    public ToggleButton grenadeButton;
+
+    @FXML
+    public ToggleButton jumpButton;
 
     @FXML
     public Label turnLabel;
 
     @FXML
-    public Label shootRemainLabel;
+    public Button endTurnButton;
 
-    @FXML
-    public Label grenadeRemainLabel;
-
-    @FXML 
-    public Label grenadeLabel;
 
 
     @FXML
-    public Label currentPlayerLabel;
+    public Label powerupEnabledLabel;
+
+    @FXML
+    public Label shootLeftLabel;
+
 
     @FXML
     public VBox mainVBox;
@@ -53,7 +57,6 @@ public class GameController {
     public Label errorLabel;
 
 
-
     private GameView gameView;
     private GameModel game;
     private App app;
@@ -63,20 +66,20 @@ public class GameController {
      */
     public void initGame() {
         game = new GameModel();
-        game.generateMaze(11, 11);
+        GameParameters parameters = App.getApp().parameters;
+        game.generateMaze(parameters);
         
         if(gameView != null) {
             mainVBox.getChildren().remove(gameView);
         }
-        gameView = new GameView(game);
-        mainVBox.getChildren().add(3, gameView);
+        gameView = new GameView(game, parameters);
+        mainVBox.getChildren().add(2, gameView);
         gameView.draw();
         gameView.mainPage = this;
-        shootRemainLabel.setVisible(false);
-        grenadeRemainLabel.setVisible(false);
         grenadeButton.setVisible(false);
+        jumpButton.setVisible(true);
+        updateEntitiesLabel();
 
-        currentPlayerLabel.setText("C'est le tour du monstre.");
         turnLabel.setText("Tour n°" + game.getTurn());
 
         // On ajoute la première position du monstre dans l'historique
@@ -120,8 +123,7 @@ public class GameController {
         }
         if(gameView.isHunterTurn || gameView.play()) {
             errorLabel.setText("");
-            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
-            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
+            updateEntitiesLabel();
         } else {
             errorLabel.setText("Mouvement invalide!");
             return;
@@ -130,6 +132,7 @@ public class GameController {
         
         if(game.monsterWon()) {
             game.setGameEnded(true);
+            endTurnButton.setVisible(false);
             errorLabel.setText("Le monstre a gagné!");
             gameView.draw();
             return;
@@ -141,17 +144,34 @@ public class GameController {
     @FXML
     public void grenadeButtonPressed() throws InterruptedException {
         if(game.getHunter().grenadeLeft > 0){
-            if(game.getHunter().grenade == true){
-                grenadeLabel.setText(" ");
+            if(game.getHunter().grenade){
+                powerupEnabledLabel.setVisible(false);
                 game.getHunter().grenade = false;
             }
             else{
-                grenadeLabel.setText("Actif");
+                powerupEnabledLabel.setVisible(true);
                 game.getHunter().grenade = true;
             }
         }
         else{
-            errorLabel.setText("Vous n'avez plus de grenade...");
+            errorLabel.setText("Vous n'avez plu de grenade...");
+        }
+    }
+
+    @FXML
+    public void jumpButtonPressed() throws InterruptedException {
+        if(game.getMonster().superJumpLeft > 0){
+            if(game.getMonster().superJump == true){
+                powerupEnabledLabel.setVisible(false);
+                game.getMonster().superJump = false;
+            }
+            else{
+                powerupEnabledLabel.setVisible(true);
+                game.getMonster().superJump = true;
+            }
+        }
+        else{
+            errorLabel.setText("Vous n'avez plu de SuperJump...");
         }
     }
 
@@ -165,20 +185,13 @@ public class GameController {
 
         // On échange les tours
         gameView.isHunterTurn = !gameView.isHunterTurn;
+        updateEntitiesLabel();
         if(gameView.isHunterTurn) {
             game.getHunter().turnBegin();
-            currentPlayerLabel.setText("C'est le tour du chasseur.");
-            shootRemainLabel.setText("Tir : " + game.getHunter().shootLeft );
-            grenadeRemainLabel.setText("Grenade : " + game.getHunter().grenadeLeft);
-            shootRemainLabel.setVisible(true);
-            grenadeRemainLabel.setVisible(true);
-            grenadeButton.setVisible(true);
+            game.getHunter().grenade = false;
         } else {
-            currentPlayerLabel.setText("C'est le tour du monstre.");
+            game.getMonster().superJump = false;
             gameView.monsterView.turnStarted();
-            shootRemainLabel.setVisible(false);
-            grenadeRemainLabel.setVisible(false);
-            grenadeButton.setVisible(false);
         }
     }
 
@@ -191,5 +204,17 @@ public class GameController {
     public void menuButtonPressed() throws IOException {
         app = App.getApp();
         app.changeScene("menu");
+        System.out.println("co");
+    }
+
+    public void updateEntitiesLabel() {
+        shootLeftLabel.setText("Il vous reste " + game.getHunter().shootLeft + " tir(s)!");
+        grenadeButton.setText("Grenade (" + game.getHunter().grenadeLeft + ")");
+        jumpButton.setText("SuperJump (" + game.getMonster().superJumpLeft + ")");
+        
+        grenadeButton.setVisible(gameView.isHunterTurn);
+        jumpButton.setVisible(!gameView.isHunterTurn);
+        powerupEnabledLabel.setVisible(game.getHunter().grenade || game.getMonster().superJump);
+        shootLeftLabel.setVisible(gameView.isHunterTurn);
     }
 }

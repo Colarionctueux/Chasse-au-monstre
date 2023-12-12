@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -11,56 +12,28 @@
    <children>
       <VBox fx:id="mainVBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
-            <Label text="Chasse au monstre">
-               <font>
-                  <Font name="System Bold" size="28.0" />
-               </font>
-            </Label>
-            <HBox alignment="TOP_CENTER" prefHeight="32.0" prefWidth="768.0" spacing="8.0">
-               <children>
-                  <Button mnemonicParsing="false" onAction="#restartGamePressed" text="Recommencer la partie" />
-                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#menuButtonPressed" text="Retourner au menu" />
-               </children>
-            </HBox>
             <Label fx:id="turnLabel" text="Tour n°{}">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>
             </Label>
-            <Label fx:id="currentPlayerLabel" text="C'est le tour du {}" />
+            <Label fx:id="shootLeftLabel" text="Il vous reste 1 tir">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
             <Label fx:id="errorLabel" textFill="RED" />
-            <HBox alignment="CENTER" prefHeight="74.0" prefWidth="768.0">
+            <HBox alignment="CENTER" prefHeight="32.0" prefWidth="768.0">
                <children>
-                  <VBox prefHeight="48.0" prefWidth="180.0">
-                     <children>
-                        <HBox prefHeight="49.0" prefWidth="180.0">
-                           <children>
-                              <Button fx:id="grenadeButton" mnemonicParsing="false" onAction="#grenadeButtonPressed" prefHeight="24.0" prefWidth="101.0" text="Grenade" />
-                              <VBox prefHeight="32.0" prefWidth="10.0" />
-                              <VBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="82.0">
-                                 <children>
-                                    <Label fx:id="shootRemainLabel" prefHeight="16.0" prefWidth="91.0" />
-                                    <Label fx:id="grenadeRemainLabel" prefHeight="16.0" prefWidth="109.0" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </HBox>
-                        <Label fx:id="grenadeLabel" prefHeight="38.0" prefWidth="180.0" />
-                     </children>
-                  </VBox>
-                  <HBox prefHeight="32.0" prefWidth="63.0">
-                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0" />
-                     </children></HBox>
-                  <VBox prefHeight="48.0" prefWidth="124.0">
-                     <children>
-                        <Button mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
-                     </children>
-                  </VBox>
+                  <ToggleButton fx:id="grenadeButton" mnemonicParsing="false" onAction="#grenadeButtonPressed" text="Grenade" />
+                  <ToggleButton fx:id="jumpButton" mnemonicParsing="false" onAction="#jumpButtonPressed" text="SuperJump" />
                </children>
             </HBox>
+            <Label fx:id="powerupEnabledLabel" prefHeight="16.0" prefWidth="40.0" text="[Actif]" textAlignment="CENTER" textFill="LIME" />
+            <Button fx:id="endTurnButton" mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
          </children>
       </VBox>
+      <Button mnemonicParsing="false" onAction="#menuButtonPressed" text="Retourner au menu" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="16.0" />
       <AnchorPane fx:id="switchPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #000;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
