@@ -7,7 +7,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1000.0" styleClass="body" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MenuController">
    <children>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="278.0" layoutY="113.0" prefHeight="128.0" prefWidth="432.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE" AnchorPane.topAnchor="113.0">
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="278.0" layoutY="113.0" prefHeight="128.0" prefWidth="432.0" styleClass="title" stylesheets="@style.css" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE" AnchorPane.topAnchor="113.0">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>

@@ -38,7 +38,19 @@ public class MultiplayerMenuController extends AnchorPane {
     }
 
     @FXML
-    public void lanButtonPressed() throws IOException {
+    public void hostButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("lobby");
+    }
+    
+    @FXML
+    public void joinButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("recherche");
+    }
+
+    @FXML
+    public void lanButtonPressed() {
         boutonHeberger.setVisible(true);
         boutonRejoindre.setVisible(true);
     }

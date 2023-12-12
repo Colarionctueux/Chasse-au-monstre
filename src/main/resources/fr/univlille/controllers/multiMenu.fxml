@@ -8,7 +8,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1000.0" styleClass="body" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MultiplayerMenuController">
    <children>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="278.0" layoutY="113.0" prefHeight="128.0" prefWidth="432.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE">
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="278.0" layoutY="113.0" prefHeight="128.0" prefWidth="432.0" styleClass="title" stylesheets="@style.css" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
@@ -23,12 +23,12 @@
             <Font name="System Bold" size="32.0" />
          </font>
       </Button>
-      <Button fx:id="boutonHeberger" layoutX="208.0" layoutY="467.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Héberger" textFill="WHITE" visible="false">
+      <Button fx:id="boutonHeberger" layoutX="208.0" layoutY="467.0" mnemonicParsing="false" onAction="#hostButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Héberger" textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>
       </Button>
-      <Button fx:id="boutonRejoindre" layoutX="506.0" layoutY="467.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Rejoindre" textFill="WHITE" visible="false">
+      <Button fx:id="boutonRejoindre" layoutX="506.0" layoutY="467.0" mnemonicParsing="false" onAction="#joinButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Rejoindre" textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>
