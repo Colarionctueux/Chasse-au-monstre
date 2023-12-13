@@ -40,7 +40,10 @@ public class Client extends MultiplayerBody {
 					try {
 						incoming = new MultiplayerCommunication(serverMessage);
 						incomingBuffer.add(incoming);
-						System.out.println("Server received : " + incoming.toString());
+						if (onIncomingCommunicationCallback != null) {
+							onIncomingCommunicationCallback.run();
+						}
+						System.out.println("client received from server : " + incoming.toString());
 					} catch (InvalidCommunicationException e) {
 						// An invalid communication is ignored.
 						System.err.println("Server received invalid communication: " + serverMessage);

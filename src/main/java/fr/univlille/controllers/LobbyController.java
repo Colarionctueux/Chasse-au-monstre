@@ -3,17 +3,19 @@ package fr.univlille.controllers;
 import java.io.IOException;
 
 import fr.univlille.App;
+import fr.univlille.models.LobbyModel;
 import fr.univlille.multiplayer.Client;
 import fr.univlille.multiplayer.MultiplayerCommand;
 import fr.univlille.multiplayer.MultiplayerCommunication;
 import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.Label;
+import javafx.fxml.FXML;
 
 public class LobbyController extends AnchorPane {
+    private LobbyModel model;
     private App app;
 
     @FXML
@@ -23,20 +25,77 @@ public class LobbyController extends AnchorPane {
     private Label client_name;
 
     @FXML
+    private Label host_role;
+
+    @FXML
+    private Label client_role;
+
+    @FXML
     public void backButtonPressed() throws IOException {
         app = App.getApp();
         app.changeScene("menu");
         Server.getInstance().kill();
     }
 
-    public void initialize() {
-        if (Client.getInstance().isAlive()) {
-            // The client should already have the welcome message in its pending communications.
-            MultiplayerCommunication welcomeMessage = Client.getInstance().pollCommunication();
-            if (welcomeMessage.isCommand(MultiplayerCommand.HOST) && welcomeMessage.hasParameters()) {
-                hostname_label.setText(welcomeMessage.getParameter(0));
-                client_name.setText(MultiplayerUtils.getHostname());
+    @FXML
+    public void reverseRoles() {
+        // Only the host can change the roles
+        if (Server.getInstance().isAlive()) {
+            model.invertRoles();
+            applyModel();
+            try {
+                Server.getInstance().broadcast(
+                    new MultiplayerCommunication(
+                        MultiplayerCommand.INVERTED_ROLES,
+                        model.isHostHunter() ? "1" : "0"
+                    )
+                );
+            } catch (IOException e) {
+                System.err.println("Broadcast of inverted roles failed : " + e.getMessage());
+                // TODO: handle error message
             }
+        }
+    }
+
+    private void applyModel() {
+        if (model.isHostHunter()) {
+            host_role.setText("Chasseur");
+            client_role.setText("Monstre");
+        } else {
+            host_role.setText("Monstre");
+            client_role.setText("Chasseur");
+        }
+    }
+
+    public void initialize() {
+        this.model = new LobbyModel();
+        if (Client.getInstance().isAlive()) {
+            Client client = Client.getInstance();
+
+            // Will handle all messages from the server (in the lobby only)
+            client.setIncomingCommunicationCallback(() -> {
+                Platform.runLater(() -> {
+                    MultiplayerCommunication message = Client.getInstance().pollCommunication();
+                    try {
+                        switch (message.getCommand()) {
+                            case HOST:
+                                hostname_label.setText(message.getParameter(0));
+                                client_name.setText(MultiplayerUtils.getHostname());
+                                break;
+                            case INVERTED_ROLES:
+                                model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
+                                applyModel();
+                                break;
+                            default:
+                                System.out.println("incoming communication from server was ignored by client : " + message);
+                                // ignored
+                        }
+                    } catch (Exception e) {
+                        System.err.println("An error occured while interpreting the communication of the server : ");
+                        e.printStackTrace();
+                    }
+                });
+            });
         } else {
             Server server = Server.getInstance();
             // The server listens to the client's arrival

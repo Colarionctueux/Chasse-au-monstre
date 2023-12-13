@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * A multiplayer instance (the server, or a client) capable of receiving asynchronous messages.
- * Those messages need to be contained in a queue,
+ * A multiplayer instance (the server, or a client)
+ * capable of receiving and sending asynchronous messages.
+ * 
+ * The received messages need to be contained in a queue,
  * and the program will read them whenever it needs to.
  */
 public abstract class MultiplayerBody {
@@ -16,6 +18,11 @@ public abstract class MultiplayerBody {
 	 * Invalid communications are ignored.
 	 */
 	protected Queue<MultiplayerCommunication> incomingBuffer = new LinkedList<>();
+
+	/**
+	 * The callback to execute when the body is receiving a message (optional).
+	 */
+	protected Runnable onIncomingCommunicationCallback;
 
 	/**
 	 * Checks if the buffer holding the pending requests isn't empty.
@@ -40,6 +47,35 @@ public abstract class MultiplayerBody {
 	 */
 	public void dropCommunications() {
 		incomingBuffer.clear();
+	}
+
+	/**
+	 * Sets the Runnable callback to execute when there is an incoming communication.
+	 * It's very useful because if the server or the client are waiting for a communication,
+	 * we don't want this action to block the main thread.
+	 * 
+	 * If there are pending requests when calling this method,
+	 * then the given callback is ran as many times
+	 * as there are pending requests.
+	 * @param callback
+	 */
+	public void setIncomingCommunicationCallback(Runnable callback) {
+		// WARNING: cannot use while(hasPendingRequests()) { callback.run(); }
+		// because even tough the callback is ran, the actual code is ran using Platform.runLater()
+		// and as a consequence, the very first callback is actually executed when the loop is over,
+		// and so it would lead to infinite loop.
+		// We must use a for loop, keeping in mind that the incomingBuffer will not get modified in this thread.
+ 		for (int i = 0; i < incomingBuffer.size(); i++) {
+			callback.run();
+		}
+		onIncomingCommunicationCallback = callback;
+	}
+
+	/**
+	 * Reset the callback that's executed when the body receives an incoming communication.
+	 */
+	public void stopIncomingCommunicationCallback() {
+		onIncomingCommunicationCallback = null;
 	}
 
 	public abstract boolean isAlive();

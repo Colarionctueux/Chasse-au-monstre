@@ -14,7 +14,6 @@ public class Server extends MultiplayerBody {
 	private ServerSocket server;
 	private boolean acceptingNewUsers = true;
 	private List<Socket> clientSockets = new ArrayList<>();
-	private Runnable onIncomingCommunicationCallback;
 
 	private Server() { }
 
@@ -36,7 +35,7 @@ public class Server extends MultiplayerBody {
 			server = new ServerSocket(port);
 			new Thread(() -> {
 				try {
-					while (acceptingNewUsers) {
+					while (isAlive() && acceptingNewUsers) {
 						Socket clientSocket = server.accept();
 						welcomeIncomingClient(clientSocket);
 
@@ -88,23 +87,6 @@ public class Server extends MultiplayerBody {
 	@Override
 	public boolean isAlive() {
 		return server != null;
-	}
-
-	/**
-	 * Sets the Runnable callback to execute when there is an incoming communication.
-	 * It's very useful because if the server or the client are waiting for a communication,
-	 * we don't want this action to block the main thread.
-	 * @param callback
-	 */
-	public void setIncomingCommunicationCallback(Runnable callback) {
-		onIncomingCommunicationCallback = callback;
-	}
-
-	/**
-	 * Reset the callback that's executed when the server receive an incoming communication.
-	 */
-	public void stopIncomingCommunicationCallback() {
-		onIncomingCommunicationCallback = null;
 	}
 
 	/**
