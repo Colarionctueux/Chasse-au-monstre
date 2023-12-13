@@ -42,7 +42,6 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         Parent parent = loadFXML("menu");
         App.scene = new Scene(parent, 1000, 1000);
-        scene.getStylesheets().add(getClass().getResource("bootstrap3.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");
         stage.show();
