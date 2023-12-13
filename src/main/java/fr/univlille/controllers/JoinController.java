@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 
 import fr.univlille.App;
 import fr.univlille.multiplayer.Client;
-import fr.univlille.multiplayer.Server;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
@@ -29,7 +28,7 @@ public class JoinController extends AnchorPane {
         try {
             String hostname = textarea.getText().trim();
             System.out.println("Trying to join " + hostname);
-            Client.getInstance().connect(hostname, Server.getDefaultPort());
+            Client.getInstance().connect(hostname, App.getDefaultMultiplayerPort());
             System.out.println("joined");
             success = true;
         } catch (UnknownHostException e) {

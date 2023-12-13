@@ -2,6 +2,8 @@ package fr.univlille;
  
 import java.io.IOException;
 
+import fr.univlille.multiplayer.Client;
+import fr.univlille.multiplayer.Server;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,7 +11,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
  
 public class App extends Application {
+    private static final int DEFAULT_MULTIPLAYER_PORT = 6666;
+    public GameParameters parameters;
+    private static Scene scene;
     private static App app;
+
+    public static int getDefaultMultiplayerPort() {
+        return DEFAULT_MULTIPLAYER_PORT;
+    }
 
     public static App getApp() {
         if(app == null) {
@@ -17,8 +26,6 @@ public class App extends Application {
         }
         return app;
     }
-
-    private static Scene scene;
 
     private static Parent loadFXML(String filename) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("controllers/" + filename + ".fxml"));
@@ -33,11 +40,6 @@ public class App extends Application {
         return parent;
     }
 
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
     @Override 
     public void start(Stage stage) throws IOException {
         Parent parent = loadFXML("menu");
@@ -47,15 +49,24 @@ public class App extends Application {
         stage.show();
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        // making sure the server and the client are properly closed when exiting the app
+        Server.getInstance().kill();
+        Client.getInstance().kill();
+    }
+
     public void changeScene(String name) throws IOException {
         scene.setRoot(loadFXML(name));
     }
 
-    public GameParameters parameters;
-    
     public void startGame(GameParameters parameters) throws IOException {
         this.parameters = parameters;
         scene.setRoot(loadFXML("game"));
+    }
 
+    public static void main(String[] args) {
+        launch(args);
     }
 }

@@ -43,7 +43,7 @@ public class MultiplayerMenuController extends AnchorPane {
         app = App.getApp();
         app.changeScene("lobby");
         if (!Server.getInstance().isAlive()) {
-            Server.getInstance().host();
+            Server.getInstance().host(App.getDefaultMultiplayerPort());
             System.out.println("Server is running at '" + MultiplayerUtils.getHostname() + "'");
         }
     }

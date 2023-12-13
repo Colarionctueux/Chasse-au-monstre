@@ -59,6 +59,9 @@ public class Client extends MultiplayerBody {
 	 */
 	@Override
 	public void kill() throws IOException {
+		if (!isAlive()) {
+			return;
+		}
 		super.kill();
 		socket.close();
 		socket = null;

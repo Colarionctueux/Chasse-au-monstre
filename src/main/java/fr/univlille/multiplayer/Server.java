@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server extends MultiplayerBody {
-	private static final int DEFAULT_PORT = 6666;
 	private static Server instance = null;
 
 	private ServerSocket server;
@@ -24,10 +23,6 @@ public class Server extends MultiplayerBody {
 			instance = new Server();
 		}
 		return instance;
-	}
-
-	public static int getDefaultPort() {
-		return DEFAULT_PORT;
 	}
 
 	/**
@@ -59,14 +54,6 @@ public class Server extends MultiplayerBody {
 	}
 
 	/**
-	 * Hosts a game with the default port.
-	 * @return The name of the host.
-	 */
-	public void host() {
-		host(DEFAULT_PORT);
-	}
-
-	/**
 	 * Stops new users from joining the server.
 	 */
 	public void closeRequests() {
@@ -81,6 +68,9 @@ public class Server extends MultiplayerBody {
 	 */
 	@Override
 	public void kill() throws IOException {
+		if (!isAlive()) {
+			return;
+		}
 		super.kill();
 		for (Socket socket : clientSockets) {
 			socket.close();
