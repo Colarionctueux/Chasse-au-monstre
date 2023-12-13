@@ -1,9 +1,10 @@
 package fr.univlille.controllers;
 
-
 import java.io.IOException;
 
 import fr.univlille.App;
+import fr.univlille.multiplayer.MultiplayerUtils;
+import fr.univlille.multiplayer.Server;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
@@ -41,6 +42,10 @@ public class MultiplayerMenuController extends AnchorPane {
     public void hostButtonPressed() throws IOException {
         app = App.getApp();
         app.changeScene("lobby");
+        if (!Server.getInstance().isAlive()) {
+            Server.getInstance().host();
+            System.out.println("Server is running at '" + MultiplayerUtils.getHostname() + "'");
+        }
     }
     
     @FXML
@@ -51,9 +56,7 @@ public class MultiplayerMenuController extends AnchorPane {
 
     @FXML
     public void lanButtonPressed() {
-        boutonHeberger.setVisible(true);
-        boutonRejoindre.setVisible(true);
+        boutonHeberger.setVisible(!boutonHeberger.isVisible());
+        boutonRejoindre.setVisible(!boutonRejoindre.isVisible());
     }
-
-
 }

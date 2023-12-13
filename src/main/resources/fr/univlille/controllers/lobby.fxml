@@ -20,7 +20,7 @@
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="155.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="acajou28" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="hostname_label" alignment="CENTER" contentDisplay="CENTER" layoutX="155.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="???" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
@@ -30,7 +30,7 @@
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="604.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="acajou27" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="client_name" alignment="CENTER" contentDisplay="CENTER" layoutX="604.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="???" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
