@@ -10,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 
 public class SettingsController {
 
@@ -38,6 +39,9 @@ public class SettingsController {
     public Spinner<Integer> wallPercentageSpinner;
 
     @FXML
+    public TextField nameTextField;
+
+    @FXML
     public Label gameModeLabel;
 
     private void bindFactory(Spinner<Integer> spinner, int min, int max, int defaultValue) {
@@ -56,6 +60,7 @@ public class SettingsController {
         bindFactory(fogOfWarSpinner, 1, 10, 1);
         GameMode gameMode = App.getApp().parameters.getGameMode();
         playerRoleCheckBox.setVisible(gameMode == GameMode.BOT);
+        nameTextField.setVisible(gameMode == GameMode.BOT);
         switch (gameMode) {
             case BOT:
                 gameModeLabel.setText("Jouer contre un robot");

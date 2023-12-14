@@ -58,9 +58,11 @@ public class LobbyController extends AnchorPane {
             applyModel();
             try {
                 Server.getInstance().broadcast(
-                        new MultiplayerCommunication(
-                                MultiplayerCommand.INVERTED_ROLES,
-                                model.isHostHunter() ? "1" : "0"));
+                    new MultiplayerCommunication(
+                        MultiplayerCommand.INVERTED_ROLES,
+                        model.isHostHunter() ? "1" : "0"
+                    )
+                );
             } catch (IOException e) {
                 System.err.println("Broadcast of inverted roles failed : " + e.getMessage());
                 // TODO: handle error message
@@ -79,7 +81,7 @@ public class LobbyController extends AnchorPane {
     }
 
     private void hideStartGameButton() {
-        button_start_game.setDisable(true);
+        button_start_game.setDisable(true); 
         button_start_game.setVisible(false);
     }
 
@@ -104,8 +106,7 @@ public class LobbyController extends AnchorPane {
                                 applyModel();
                                 break;
                             default:
-                                System.out.println(
-                                        "incoming communication from server was ignored by client : " + message);
+                                System.out.println("incoming communication from server was ignored by client : " + message);
                                 // ignored
                         }
                     } catch (Exception e) {
@@ -118,8 +119,7 @@ public class LobbyController extends AnchorPane {
             Server server = Server.getInstance();
             // The server listens to the client's arrival
             // in a non-blocking way for the main thread.
-            // Indeed we don't know when he's going to arrive, or if he's going to arrive at
-            // all.
+            // Indeed we don't know when he's going to arrive, or if he's going to arrive at all.
             server.setIncomingCommunicationCallback(() -> {
                 // Because we cannot update the JavaFX UI outside of the main thread,
                 // as it would cause synchronization issues,
