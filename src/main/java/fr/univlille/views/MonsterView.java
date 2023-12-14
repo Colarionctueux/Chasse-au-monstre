@@ -18,7 +18,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 public class MonsterView {
-    
+
     private GameView gameView;
     private GraphicsContext gc;
     private GameModel gameModel;
@@ -29,54 +29,57 @@ public class MonsterView {
 
     /**
      * This array contains the index of decorations within the spritesheet.
-     * It has the same dimensions of the maze, and the first element in this 2D-array is the decoration of the first cell within the maze.
+     * It has the same dimensions of the maze, and the first element in this
+     * 2D-array is the decoration of the first cell within the maze.
      * 
      * 0 would be the first 64x64 image from the spritesheet of the selected theme.
      * Some cells don't have a decoration, and as such the index is "-1".
      */
     private int[][] decorations;
 
-    public MonsterView(GraphicsContext gc, GameView gameView, fr.univlille.models.GameModel gameModel, GameParameters parameters) {
+    public MonsterView(GraphicsContext gc, GameView gameView, fr.univlille.models.GameModel gameModel,
+            GameParameters parameters) {
         this.gc = gc;
         this.gameView = gameView;
         this.gameModel = gameModel;
         this.model = gameModel.getMonster();
         ICoordinate mazeDimensions = gameModel.getMazeDimensions();
-        
+
         fogEnabled = parameters.isFogOfWar();
         fogRadius = parameters.getFogOfWarRadius();
 
         addDecorations(mazeDimensions);
-        if(fogEnabled) {
+        if (fogEnabled) {
             model.fogOfWar = new boolean[mazeDimensions.getRow()][mazeDimensions.getCol()];
             updateFog(this.gameModel.getMonster().getPosition());
         }
     }
 
     public void turnStarted() {
-        if(fogEnabled) {
+        if (fogEnabled) {
             updateFog(gameModel.getMonster().getPosition());
         }
     }
 
-
     /**
      * Initializes the set of decorations randomly.
-     * @param mazeDimensions The dimensions of the maze as an instance of `Coordinate`.
+     * 
+     * @param mazeDimensions The dimensions of the maze as an instance of
+     *                       `Coordinate`.
      */
     public void addDecorations(ICoordinate mazeDimensions) {
         Random random = new Random();
         decorations = new int[mazeDimensions.getRow()][mazeDimensions.getCol()];
         for (int y = 0; y < mazeDimensions.getRow(); y++) {
             for (int x = 0; x < mazeDimensions.getCol(); x++) {
-                if(!gameModel.isWallAt(x, y)) {
-                    if(random.nextDouble() > 0.85) {
+                if (!gameModel.isWallAt(x, y)) {
+                    if (random.nextDouble() > 0.85) {
                         decorations[y][x] = random.nextInt(3);
                     } else {
                         decorations[y][x] = -1;
                     }
                 }
-            }   
+            }
         }
     }
 
@@ -87,7 +90,6 @@ public class MonsterView {
         gc.setFont(new Font("Comic Sans MS", 16));
     }
 
-
     public void draw() {
         graphicStyle();
         drawBoard();
@@ -97,24 +99,24 @@ public class MonsterView {
     private void drawEntities() {
         ICoordinate exitPosition = gameModel.getExit();
         gc.drawImage(
-            GameView.spritesheet, 128, 0, 64, 128,
-            (double) exitPosition.getCol() * GameView.TILE_SIZE,
-            (double) exitPosition.getRow() * GameView.TILE_SIZE - GameView.TILE_SIZE,
-            GameView.TILE_SIZE, GameView.TILE_SIZE * 2.0
-        ); // La sortie
-        if(gameModel.getMonster().superJump && gameModel.getMonster().superJumpLeft > 0){
-            if(!model.isMonsterMovementValid(gameView.getCursorPosition(), 2.0)) {
-                ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
+                GameView.spritesheet, 128, 0, 64, 128,
+                (double) exitPosition.getCol() * GameView.TILE_SIZE,
+                (double) exitPosition.getRow() * GameView.TILE_SIZE - GameView.TILE_SIZE,
+                GameView.TILE_SIZE, GameView.TILE_SIZE * 2.0); // La sortie
+        if (gameModel.getMonster().superJump && gameModel.getMonster().superJumpLeft > 0) {
+            if (!model.isMonsterMovementValid(gameView.getCursorPosition(), 2.0)) {
+                ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si
+                                                                                         // mouvement impossible)
+            } else {
+                ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement
+                                                                                       // possible)
             }
-            else {
-                ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
-            }
-        }
-        else if(!model.isMonsterMovementValid(gameView.getCursorPosition(), 1.0)) {
-            ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement impossible)
-        } 
-        else {
-            ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement possible)
+        } else if (!model.isMonsterMovementValid(gameView.getCursorPosition(), 1.0)) {
+            ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement
+                                                                                     // impossible)
+        } else {
+            ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement
+                                                                                   // possible)
         }
         ViewUtils.drawSimpleTexture(gc, 64, 192, gameView.getMovePosition()); // Le mouvement
 
@@ -125,14 +127,14 @@ public class MonsterView {
 
     private void drawHunterShoots() {
         List<ICellEvent> shoots = gameModel.getHunter().getShootsHistory();
-        if(!shoots.isEmpty()) {
-            for(int i = 0; i < shoots.size(); i++){
-                Coordinate coord = (Coordinate) shoots.get(i).getCoord();                                   
+        if (!shoots.isEmpty()) {
+            for (int i = 0; i < shoots.size(); i++) {
+                Coordinate coord = (Coordinate) shoots.get(i).getCoord();
                 ViewUtils.drawSimpleTexture(gc, 64, 256, coord);
                 gc.fillText(String.valueOf(
-                    shoots.get(i).getTurn() - 1),
-                    coord.getCol() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2.0,
-                    coord.getRow() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2.0);
+                        shoots.get(i).getTurn() - 1),
+                        coord.getCol() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2.0,
+                        coord.getRow() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2.0);
             }
         }
     }
@@ -141,12 +143,12 @@ public class MonsterView {
         ICoordinate dimensions = gameModel.getMazeDimensions();
         for (int y = 0; y < dimensions.getRow(); y++) {
             for (int x = 0; x < dimensions.getCol(); x++) {
-                if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
+                if (x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
                     ViewUtils.drawSimpleTexture(gc, 192, 0, x, y);
                 } else {
                     ViewUtils.drawSimpleTexture(gc, 192, 64, x, y);
                 }
-                if(gameModel.isWallAt(x, y)) {
+                if (gameModel.isWallAt(x, y)) {
                     ViewUtils.drawSimpleTexture(gc, 0, 64, x, y); // Arbre
                 } else {
                     // Décorations
@@ -164,7 +166,7 @@ public class MonsterView {
                             break;
                     }
                 }
-                if(fogEnabled && !model.fogOfWar[y][x]) {
+                if (fogEnabled && !model.fogOfWar[y][x]) {
                     ViewUtils.drawSimpleTexture(gc, 256, 0, x, y);
                 }
             }
@@ -172,17 +174,20 @@ public class MonsterView {
     }
 
     public boolean playMove() {
-        if(gameModel.getMonster().superJump && gameModel.getMonster().superJumpLeft > 0){
-            if(model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
+        if (gameModel.getMonster().superJump && gameModel.getMonster().superJumpLeft > 0) {
+            if (model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
                 gameModel.incrementTurn();
                 gameModel.getMonster().move(gameView.getMovePosition());
-                gameModel.addToHistory(new CellEvent(new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()), CellInfo.MONSTER, gameModel.getTurn()));
+                gameModel.addToHistory(new CellEvent(
+                        new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()),
+                        CellInfo.MONSTER, gameModel.getTurn()));
             }
-        }
-        else if(model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
+        } else if (model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
             gameModel.incrementTurn();
             gameModel.getMonster().move(gameView.getMovePosition());
-            gameModel.addToHistory(new CellEvent(new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()), CellInfo.MONSTER, gameModel.getTurn()));
+            gameModel.addToHistory(new CellEvent(
+                    new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()),
+                    CellInfo.MONSTER, gameModel.getTurn()));
         } else {
             return false;
         }
@@ -191,15 +196,14 @@ public class MonsterView {
         return true;
     }
 
-
     public void updateFog(ICoordinate coordinate) {
         ICoordinate mazeDimensions = gameModel.getMazeDimensions();
         for (int y = -fogRadius; y < fogRadius + 1; y++) {
             for (int x = -fogRadius; x < fogRadius + 1; x++) {
-                if(x * x + y * y <= Math.pow(3, 2) ) {
+                if (x * x + y * y <= Math.pow(3, 2)) {
                     int posX = coordinate.getCol() + x;
                     int posY = coordinate.getRow() + y;
-                    if(posX >= 0 && posX < mazeDimensions.getCol() && posY >= 0 && posY < mazeDimensions.getRow()) {
+                    if (posX >= 0 && posX < mazeDimensions.getCol() && posY >= 0 && posY < mazeDimensions.getRow()) {
                         model.fogOfWar[posY][posX] = true;
                     }
                 }

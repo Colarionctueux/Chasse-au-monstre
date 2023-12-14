@@ -28,7 +28,7 @@ public class CellEvent implements ICellEvent {
     public int getTurn() {
         return turn;
     }
-    
+
     @Override
     public String toString() {
         return "<" + getCoord() + ", " + getState() + ", " + getTurn() + ">";

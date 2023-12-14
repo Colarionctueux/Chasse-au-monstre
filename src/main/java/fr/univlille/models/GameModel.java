@@ -21,7 +21,8 @@ public class GameModel extends Subject {
     /**
      * 1 represents a wall,
      * 0 represents an empty cell.
-     * There is no need for other types of cells as they're contained in other variables or in "history".
+     * There is no need for other types of cells as they're contained in other
+     * variables or in "history".
      */
     private boolean[][] maze;
 
@@ -45,8 +46,10 @@ public class GameModel extends Subject {
 
     /**
      * A list containing all the moves of the hunter and the monster.
-     * As it stores instances of `ICellEvent` it remembers at which turn one particular move was done,
-     * so it's thanks to this variable that we can know at which turn the monster was on a particular cell.
+     * As it stores instances of `ICellEvent` it remembers at which turn one
+     * particular move was done,
+     * so it's thanks to this variable that we can know at which turn the monster
+     * was on a particular cell.
      */
     private ArrayList<ICellEvent> history = new ArrayList<>();
 
@@ -87,9 +90,9 @@ public class GameModel extends Subject {
         this.turn += 1;
     }
 
-
     /**
      * Checks if a particular cell is a wall or empty.
+     * 
      * @param x The X coordinate of the given cell.
      * @param y The Y coordinate of the given cell.
      * @return `true` if this cell is a wall, `false` if it's empty.
@@ -100,6 +103,7 @@ public class GameModel extends Subject {
 
     /**
      * Checks if a particular cell is a wall or empty.
+     * 
      * @param coordinate The coordinates of the given cell.
      * @return `true` if this cell is a wall, `false` if it's empty.
      */
@@ -109,15 +113,18 @@ public class GameModel extends Subject {
 
     /**
      * Checks if the position of the monster matches the position of the exit.
+     * 
      * @return `true` if the monster has reached the exit, `false` otherwise.
      */
     public boolean monsterWon() {
         return monster.getPosition().equals(exit);
     }
-    
+
     /**
      * Gets the width and height of the maze as an instance of `Coordinate`.
-     * @return An instance of `Coordinate` where `x` is the width of the maze and `y` the height.
+     * 
+     * @return An instance of `Coordinate` where `x` is the width of the maze and
+     *         `y` the height.
      */
     public ICoordinate getMazeDimensions() {
         return new Coordinate(getWidth(), getHeight());
@@ -125,6 +132,7 @@ public class GameModel extends Subject {
 
     /**
      * Gets the position of the exit.
+     * 
      * @return The exact coordinates of the exit.
      */
     public ICoordinate getExit() {
@@ -134,24 +142,23 @@ public class GameModel extends Subject {
     /**
      * Gets a random position within the maze.
      * For now, it gives a random position that is not a wall.
+     * 
      * @return A random position in the maze.
      */
     public ICoordinate randomPosition() {
         ArrayList<Coordinate> availableCoordinates = new ArrayList<>();
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
-                if(!isWallAt(x, y)) {
+                if (!isWallAt(x, y)) {
                     availableCoordinates.add(new Coordinate(x, y));
                 }
             }
         }
-        
 
         Random random = new Random();
         return availableCoordinates.get(random.nextInt(availableCoordinates.size()));
     }
 
-    
     /**
      * Generates the maze.
      * It initializes the hunter and monster models.
@@ -171,7 +178,7 @@ public class GameModel extends Subject {
         this.history.clear();
 
         exit = randomPosition();
-        while(exit.equals(getMonster().getPosition())) {
+        while (exit.equals(getMonster().getPosition())) {
             exit = randomPosition();
         }
     }
@@ -184,5 +191,4 @@ public class GameModel extends Subject {
         history.add(cellEvent);
     }
 
-    
 }

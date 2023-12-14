@@ -1,6 +1,5 @@
 package fr.univlille.controllers;
 
-
 import java.io.IOException;
 
 import fr.univlille.App;
@@ -15,7 +14,6 @@ public class MenuController extends AnchorPane {
         return app;
     }
 
-
     public void setApp(App app) {
         this.app = app;
     }
@@ -25,7 +23,7 @@ public class MenuController extends AnchorPane {
         app = App.getApp();
         app.showParameters(GameMode.BOT);
     }
-    
+
     @FXML
     public void multiButtonPressed() throws IOException {
         app = App.getApp();

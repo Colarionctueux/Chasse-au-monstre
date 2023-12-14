@@ -25,11 +25,11 @@ public class Maze {
 
     public boolean[][] createMaze(double threshold) {
         recursiveBacktrack(0, 0);
-        
+
         Random random = new Random();
         for (int y = 0; y < mazeTile.length; y++) {
             for (int x = 0; x < mazeTile[0].length; x++) {
-                if(random.nextDouble() > threshold) {
+                if (random.nextDouble() > threshold) {
                     mazeTile[y][x] = false;
                 }
             }
@@ -38,7 +38,8 @@ public class Maze {
     }
 
     private void recursiveBacktrack(int currentX, int currentY) {
-        List<int[]> directions = Arrays.asList(new int[]{0, -2}, new int[]{0, 2}, new int[]{-2, 0}, new int[]{2, 0});
+        List<int[]> directions = Arrays.asList(new int[] { 0, -2 }, new int[] { 0, 2 }, new int[] { -2, 0 },
+                new int[] { 2, 0 });
         Collections.shuffle(directions);
 
         for (int[] direction : directions) {
@@ -71,7 +72,7 @@ public class Maze {
         str.append("mazeTile " + tailleX + ", " + tailleY + "\n");
         for (int y = 0; y < tailleY; y++) {
             for (int x = 0; x < tailleX; x++) {
-                if(mazeTile[y][x]) {
+                if (mazeTile[y][x]) {
                     str.append(' ');
                 } else {
                     str.append('#');

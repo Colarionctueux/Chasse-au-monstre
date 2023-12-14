@@ -1,4 +1,5 @@
 package fr.univlille.models;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +12,15 @@ import fr.univlille.utils.Subject;
 
 public class HunterModel extends Subject {
     private ArrayList<ICellEvent> shootsHistory;
-    
-    
+
     private GameModel gameModel;
-    
+
     private int maxShoots;
     private int maxGrenades;
-    
+
     private int shootsLeft;
     private int grenadesLeft;
-    
+
     private boolean grenadeMode;
 
     public boolean isGrenadeMode() {
@@ -38,7 +38,6 @@ public class HunterModel extends Subject {
     public void setShootsLeft(int shootsLeft) {
         this.shootsLeft = shootsLeft;
     }
-
 
     public int getGrenadesLeft() {
         return grenadesLeft;
@@ -60,7 +59,6 @@ public class HunterModel extends Subject {
         return maxGrenades;
     }
 
-    
     public HunterModel(GameModel gameModel) {
         this.gameModel = gameModel;
         this.maxShoots = gameModel.getParameters().getHunterShoots();
@@ -77,16 +75,19 @@ public class HunterModel extends Subject {
     /**
      * Makes sure that the given hunter's target is valid.
      * The hunter cannot shoot outside of the maze and cannot shoot the borders.
+     * 
      * @param shoot The target's position.
      * @return `true` if the target's position is valid, `false` otherwise.
      */
     public boolean isHunterShootValid(ICoordinate shoot) {
         ICoordinate mazeDimensions = gameModel.getMazeDimensions();
-        return shoot.getCol() >= 0 && shoot.getCol() < mazeDimensions.getCol() && shoot.getRow() >= 0 && shoot.getRow() < mazeDimensions.getRow();
+        return shoot.getCol() >= 0 && shoot.getCol() < mazeDimensions.getCol() && shoot.getRow() >= 0
+                && shoot.getRow() < mazeDimensions.getRow();
     }
 
     /**
      * Gets information about the cell that the hunter is targeting.
+     * 
      * @param shootPosition The coordinates of the hunter's target.
      * @return The type of cell that the hunter has shot.
      */
@@ -115,22 +116,19 @@ public class HunterModel extends Subject {
         notifyObservers(cellEvent);
     }
 
-
-    public void grenade(Coordinate greandePosition){
+    public void grenade(Coordinate greandePosition) {
         shoot(greandePosition);
-        if(isHunterShootValid(new Coordinate(greandePosition.getCol()+1, greandePosition.getRow()))){
-            shoot(new Coordinate(greandePosition.getCol()+1, greandePosition.getRow()));
+        if (isHunterShootValid(new Coordinate(greandePosition.getCol() + 1, greandePosition.getRow()))) {
+            shoot(new Coordinate(greandePosition.getCol() + 1, greandePosition.getRow()));
         }
-        if(isHunterShootValid(new Coordinate(greandePosition.getCol()-1, greandePosition.getRow()))){
-            shoot(new Coordinate(greandePosition.getCol()-1, greandePosition.getRow()));
+        if (isHunterShootValid(new Coordinate(greandePosition.getCol() - 1, greandePosition.getRow()))) {
+            shoot(new Coordinate(greandePosition.getCol() - 1, greandePosition.getRow()));
         }
-        if(isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow()+1))){
-            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()+1));
+        if (isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow() + 1))) {
+            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow() + 1));
         }
-        if(isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow()-1))){
-            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow()-1));
+        if (isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow() - 1))) {
+            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow() - 1));
         }
     }
 }
-
-

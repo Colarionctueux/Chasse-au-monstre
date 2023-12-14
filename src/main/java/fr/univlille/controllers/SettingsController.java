@@ -12,10 +12,10 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 
 public class SettingsController {
-    
+
     @FXML
     public CheckBox fogOfWarCheckBox;
-    
+
     @FXML
     public Spinner<Integer> fogOfWarSpinner;
 
@@ -25,30 +25,27 @@ public class SettingsController {
     @FXML
     public CheckBox playerRoleCheckBox;
 
-    
     @FXML
     public Spinner<Integer> hunterGrenadesSpinner;
-    
+
     @FXML
     public Spinner<Integer> mazeSizeXSpinner;
-    
+
     @FXML
     public Spinner<Integer> mazeSizeYSpinner;
-    
+
     @FXML
     public Spinner<Integer> wallPercentageSpinner;
 
     @FXML
     public Label gameModeLabel;
-    
-    
+
     private void bindFactory(Spinner<Integer> spinner, int min, int max, int defaultValue) {
         SpinnerValueFactory<Integer> factory = new SpinnerValueFactory.IntegerSpinnerValueFactory(min, max);
-        factory.setValue(defaultValue); 
+        factory.setValue(defaultValue);
         spinner.setValueFactory(factory);
     }
 
-    
     @FXML
     public void initialize() {
         bindFactory(hunterShootsSpinner, 1, 10, 1);
@@ -74,7 +71,6 @@ public class SettingsController {
         }
     }
 
-
     @FXML
     public void startGamePressed() throws IOException {
         GameParameters parameters = App.getApp().parameters;
@@ -88,12 +84,12 @@ public class SettingsController {
         parameters.setFogOfWarRadius(fogOfWarSpinner.getValue());
 
         parameters.setWallsPercentage(wallPercentageSpinner.getValue() / 100.0);
-        
+
         parameters.setAiPlayerIsHunter(playerRoleCheckBox.isSelected());
-        
+
         App.getApp().startGame(parameters);
     }
-    
+
     @FXML
     public void cancelPressed() throws IOException {
         App.getApp().changeScene("menu");

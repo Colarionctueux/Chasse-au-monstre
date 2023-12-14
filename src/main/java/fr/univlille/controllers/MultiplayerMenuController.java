@@ -23,7 +23,7 @@ public class MultiplayerMenuController extends AnchorPane {
 
     @FXML
     private Button boutonHeberger;
-    
+
     @FXML
     private Button boutonRejoindre;
 
@@ -48,7 +48,7 @@ public class MultiplayerMenuController extends AnchorPane {
             System.out.println("Server is running at '" + MultiplayerUtils.getHostname() + "'");
         }
     }
-    
+
     @FXML
     public void joinButtonPressed() throws IOException {
         app = App.getApp();
