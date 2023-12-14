@@ -64,17 +64,25 @@ public class LobbyController extends AnchorPane {
         if (Server.getInstance().isAlive()) {
             model.invertRoles();
             applyModel();
-            try {
-                Server.getInstance().broadcast(
-                    new MultiplayerCommunication(
-                        MultiplayerCommand.INVERTED_ROLES,
-                        model.isHostHunter() ? "1" : "0"
-                    )
-                );
-            } catch (IOException e) {
-                System.err.println("Broadcast of inverted roles failed : " + e.getMessage());
-                // TODO: handle error message
-            }
+            broadcastRoles();
+        }
+    }
+
+    /**
+     * Informs the clients about the selected roles.
+     */
+    private void broadcastRoles() {
+        try {
+            System.out.println("broadcasting roles information");
+            Server.getInstance().broadcast(
+                new MultiplayerCommunication(
+                    MultiplayerCommand.SET_GAME_ROLES,
+                    model.isHostHunter() ? "1" : "0"
+                )
+            );
+        } catch (IOException e) {
+            System.err.println("Broadcast of inverted roles failed : " + e.getMessage());
+            // TODO: handle error message
         }
     }
 
@@ -103,32 +111,27 @@ public class LobbyController extends AnchorPane {
             client.setIncomingCommunicationCallback(() -> {
                 Platform.runLater(() -> {
                     MultiplayerCommunication message = Client.getInstance().pollCommunication();
-                    try {
-                        switch (message.getCommand()) {
-                            case HOST:
-                                hostname_label.setText(message.getParameter(0));
-                                client_name.setText(MultiplayerUtils.getHostname());
-                                break;
-                            case INVERTED_ROLES:
-                                model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
-                                applyModel();
-                                break;
-                            case SERVER_TERMINATION:
-                                try {
-                                    System.out.println("server termination, about to kill Client");
-                                    Client.getInstance().kill(false);
-                                    App.getApp().changeScene("menu");
-                                } catch (Exception e) {
-                                    System.out.println("Server termination led to error : " + e.getMessage());
-                                }
-                                break;
-                            default:
-                                System.out.println("incoming communication from server was ignored by client : " + message);
-                                // ignored
-                        }
-                    } catch (Exception e) {
-                        System.err.println("An error occured while interpreting the communication of the server : " + message);
-                        e.printStackTrace();
+                    switch (message.getCommand()) {
+                        case HOST:
+                            hostname_label.setText(message.getParameter(0));
+                            client_name.setText(MultiplayerUtils.getHostname());
+                            break;
+                        case SET_GAME_ROLES:
+                            System.out.println("the client was told that the roles were changed :" + message);
+                            model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
+                            applyModel();
+                            break;
+                        case SERVER_TERMINATION:
+                            try {
+                                Client.getInstance().kill(false);
+                                App.getApp().changeScene("menu");
+                            } catch (Exception e) {
+                                System.out.println("Server termination led to error : " + e.getMessage());
+                            }
+                            break;
+                        default:
+                            System.out.println("incoming communication from server was ignored by client : " + message);
+                            // ignored
                     }
                 });
             });
@@ -147,15 +150,20 @@ public class LobbyController extends AnchorPane {
                     System.out.println("Server handling communication : " + announce);
                     switch (announce.getCommand()) {
                         case JOIN:
+                            System.out.println("a new player has joined the game : " + announce);
                             client_name.setText(announce.getParameter(0));
                             server.closeRequests();
+                            if (model.hasChanged()) {
+                                System.out.println("The model has changed, broadcasting this information...");
+                                broadcastRoles();
+                            }
                             break;
                         case DISCONNECTION:
                             client_name.setText("???");
                             server.reacceptRequests();
                             break;
                         default:
-                            System.out.println("incoming communication from server was ignored by client : " + announce);
+                            System.out.println("incoming communication from server was ignored by server : " + announce);
                             // ignored
                     }
                 });

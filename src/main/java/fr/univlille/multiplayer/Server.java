@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Server extends MultiplayerBody {
@@ -142,14 +143,25 @@ public class Server extends MultiplayerBody {
 	}
 
 	/**
-	 * Removes any closed socket from the list of client sockets.
+	 * Removes a socket whose local address is equal to the given address.
+	 * It's necessary to use something that can identity a unique socket,
+	 * because when this method is executed, the client's socket hasn't been closed yet.
+	 * @param localAddress The local address of the socket to remove.
+	 * @return `true` it the socket was removed, `false` otherwise.
 	 */
-	private void filterOutDisconnectedClients() {
-		for (Socket clientSocket : clientSockets) {
-			if (clientSocket.isClosed()) {
-				clientSockets.remove(clientSocket);
+	public boolean removeClientSocket(String localAddress) {
+		if (clientSockets.isEmpty()) {
+			return false;
+		}
+		Iterator<Socket> iter = clientSockets.iterator();
+		while (iter.hasNext()) {
+			Socket clientSocket = iter.next();
+			if (clientSocket.getLocalAddress().toString().equals(localAddress)) {
+				iter.remove();
+				return true;
 			}
 		}
+		return false;
 	}
 
 	private final class ClientHandler implements Runnable {
@@ -177,7 +189,7 @@ public class Server extends MultiplayerBody {
 						// The client socket was closed client-side,
 						// therefore the socket must be removed from the list of subscribers
 						if (incoming.isCommand(MultiplayerCommand.DISCONNECTION)) {
-							filterOutDisconnectedClients();
+							removeClientSocket(incoming.getParameter(0));
 						}
 					} catch (InvalidCommunicationException e) {
 						// Invalid communications are ignored.

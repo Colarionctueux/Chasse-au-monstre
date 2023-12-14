@@ -71,7 +71,12 @@ public class Client extends MultiplayerBody {
 		}
 		super.kill(propagate);
 		if (propagate) {
-			sendMessageToServer(new MultiplayerCommunication(MultiplayerCommand.DISCONNECTION));
+			sendMessageToServer(
+				new MultiplayerCommunication(
+					MultiplayerCommand.DISCONNECTION,
+					socket.getLocalAddress().toString()
+				)
+			);
 		}
 		socket.close();
 		System.out.println("client was killed.");
