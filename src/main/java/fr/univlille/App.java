@@ -35,9 +35,7 @@ public class App extends Application {
             System.exit(1);
         }
 
-        Parent parent = fxmlLoader.load();
-
-        return parent;
+        return fxmlLoader.load();
     }
 
     @Override 

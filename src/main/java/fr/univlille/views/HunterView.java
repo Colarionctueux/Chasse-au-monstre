@@ -32,9 +32,9 @@ public class HunterView {
 
     public void draw() {
         Coordinate dimensions = gameModel.getMazeDimensions();
-        InitMazeWithDimensions(dimensions);
-        GraphicStyle();
-        for (ICellEvent cellEvent : gameModel.getHunter().shootsHistory) {
+        initMazeWithDimensions(dimensions);
+        graphicStyle();
+        for (ICellEvent cellEvent : gameModel.getHunter().getShootsHistory()) {
             Coordinate coord = (Coordinate) cellEvent.getCoord();
             if(cellEvent.getState() == CellInfo.WALL) {
                 ViewUtils.drawSimpleTexture(gc, 0, 64, coord.getCol(), coord.getRow());
@@ -61,7 +61,7 @@ public class HunterView {
     }
 
 
-    private void GraphicStyle() {
+    private void graphicStyle() {
         gc.setFill(Color.BLACK);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
@@ -69,7 +69,7 @@ public class HunterView {
     }
 
 
-    private void InitMazeWithDimensions(Coordinate dimensions) {
+    private void initMazeWithDimensions(Coordinate dimensions) {
         for (int y = 0; y < dimensions.getRow(); y++) {
             for (int x = 0; x < dimensions.getCol(); x++) {
                 if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
@@ -82,7 +82,7 @@ public class HunterView {
     }
 
     public boolean playMove() {
-        if(model.shootLeft <= 0) {
+        if(model.getShootsLeft() <= 0) {
             return false;
         } else {
             model.shoot(gameView.getCursorPosition());

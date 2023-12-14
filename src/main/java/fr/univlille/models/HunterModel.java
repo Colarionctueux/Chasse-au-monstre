@@ -1,5 +1,6 @@
 package fr.univlille.models;
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
@@ -8,22 +9,68 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.utils.Subject;
 
 public class HunterModel extends Subject {
-    public ArrayList<ICellEvent> shootsHistory;
-    public GameModel gameModel;
+    private ArrayList<ICellEvent> shootsHistory;
+    
+    
+    private GameModel gameModel;
+    
+    private int maxShoots;
+    private int maxGrenades;
+    
+    private int shootsLeft;
+    private int grenadesLeft;
+    
+    private boolean grenadeMode;
 
-    public int shootLeft = 1;
-    public int grenadeLeft = 1;
-    public boolean grenade = false;
+    public boolean isGrenadeMode() {
+        return grenadeMode;
+    }
 
+    public void setGrenadeMode(boolean grenadeMode) {
+        this.grenadeMode = grenadeMode;
+    }
+
+    public int getShootsLeft() {
+        return shootsLeft;
+    }
+
+    public void setShootsLeft(int shootsLeft) {
+        this.shootsLeft = shootsLeft;
+    }
+
+
+    public int getGrenadesLeft() {
+        return grenadesLeft;
+    }
+
+    public void setGrenadesLeft(int grenadesLeft) {
+        this.grenadesLeft = grenadesLeft;
+    }
+
+    public List<ICellEvent> getShootsHistory() {
+        return shootsHistory;
+    }
+
+    public int getMaxShoots() {
+        return maxShoots;
+    }
+
+    public int getMaxGrenades() {
+        return maxGrenades;
+    }
+
+    
     public HunterModel(GameModel gameModel) {
         this.gameModel = gameModel;
-        this.shootLeft = gameModel.parameters.hunterShoots;
-        this.grenadeLeft = gameModel.parameters.hunterGrenades;
+        this.maxShoots = gameModel.getParameters().getHunterShoots();
+        this.maxGrenades = gameModel.getParameters().getHunterGrenades();
+        this.shootsLeft = this.maxShoots;
+        this.grenadesLeft = this.maxGrenades;
         shootsHistory = new ArrayList<>();
     }
 
     public void turnBegin() {
-        this.shootLeft = gameModel.parameters.hunterShoots;
+        this.shootsLeft = gameModel.getParameters().getHunterShoots();
     }
 
     /**

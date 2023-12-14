@@ -9,11 +9,9 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.utils.Observer;
 import fr.univlille.utils.Subject;
-import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 
 public class GameView extends Canvas implements Observer {
     /**
@@ -32,17 +30,37 @@ public class GameView extends Canvas implements Observer {
      */
     public static final int TILE_SIZE = 32;
 
-    public boolean isHunterTurn = false;
+    private boolean hunterTurn;
+
+    public boolean isHunterTurn() {
+        return hunterTurn;
+    }
+
+    public void setHunterTurn(boolean hunterTurn) {
+        this.hunterTurn = hunterTurn;
+    }
 
     private Coordinate cursorPosition;
-    public Coordinate movePosition;
+    private Coordinate movePosition;
 
-    public GameController mainPage;
+    private GameController mainPage;
 
-    public HunterView hunterView;
-    public MonsterView monsterView;
+    public GameController getMainPage() {
+        return mainPage;
+    }
 
-    public GameParameters parameters;
+    public void setMainPage(GameController mainPage) {
+        this.mainPage = mainPage;
+    }
+
+    private HunterView hunterView;
+    private MonsterView monsterView;
+
+    public MonsterView getMonsterView() {
+        return monsterView;
+    }
+
+    private GameParameters parameters;
     
     /**
      * Each image in the game is contained in a spritesheet.
@@ -55,7 +73,7 @@ public class GameView extends Canvas implements Observer {
      * The game allows the player to choose a custom theme.
      * Each theme has its own set of graphics.
      */
-    public Theme theme;
+    private Theme theme;
 
     public GameView(GameModel model, GameParameters parameters) {
         this.model = model;
@@ -67,34 +85,32 @@ public class GameView extends Canvas implements Observer {
         monsterView = new MonsterView(gc, this, model, parameters);
 
         Coordinate mazeDimensions = model.getMazeDimensions(); 
-        setWidth(TILE_SIZE * mazeDimensions.getCol());
-        setHeight(TILE_SIZE * mazeDimensions.getRow());
+        setWidth((double) TILE_SIZE * mazeDimensions.getCol());
+        setHeight((double) TILE_SIZE * mazeDimensions.getRow());
 
         cursorPosition = new Coordinate(0, 0);
         movePosition = new Coordinate(-1, -1);
-        setOnMouseMoved((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(model.isGameEnded() || (isHunterTurn && model.getHunter().shootLeft <= 0 && model.getHunter().grenadeLeft <= 0)) {
+        setOnMouseMoved(e -> {
+                if(model.isGameEnded() || (hunterTurn && model.getHunter().getShootsLeft() <= 0 && model.getHunter().getGrenadesLeft() <= 0)) {
                     return;
                 }
                 Coordinate relativeMousePosition = new Coordinate(
-                    (int) (event.getSceneX() - getLayoutX() - (TILE_SIZE * 0.5)),
-                    (int) (event.getSceneY() - getLayoutY() - (TILE_SIZE * 0.5))
+                    (int) (e.getSceneX() - getLayoutX() - (TILE_SIZE * 0.5)),
+                    (int) (e.getSceneY() - getLayoutY() - (TILE_SIZE * 0.5))
                 );
-                cursorPosition = new Coordinate((int) (relativeMousePosition.getCol() / TILE_SIZE), (int) (relativeMousePosition.getRow() / TILE_SIZE));
+                cursorPosition = new Coordinate(
+                    (double) relativeMousePosition.getCol() / TILE_SIZE,
+                    (double) relativeMousePosition.getRow() / TILE_SIZE
+                );
                 draw();
-            }
+            
         });
         
-        setOnMousePressed((EventHandler<? super MouseEvent>) new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(isHunterTurn) {
-                    handleMousePressedHunter();
-                } else {
-                    handleMousePressedMonster();
-                }
+        setOnMousePressed(e -> {
+            if(hunterTurn) {
+                handleMousePressedHunter();
+            } else {
+                handleMousePressedMonster();
             }
         });
 
@@ -104,22 +120,22 @@ public class GameView extends Canvas implements Observer {
     }
 
     public void handleMousePressedHunter() {
-        if(model.isGameEnded() || (model.getHunter().shootLeft <= 0 && model.getHunter().grenadeLeft <= 0)) {
+        if(model.isGameEnded() || (model.getHunter().getShootsLeft() <= 0 && model.getHunter().getGrenadesLeft() <= 0)) {
             return;
         }
-        if(model.getHunter().grenade == true){
+        if(model.getHunter().isGrenadeMode()){
             playGrenade();
         }
         if(model.getHunter().isHunterShootValid(cursorPosition)) {
             play();
         }
         draw();
-        mainPage.shootLeftLabel.setText("Il vous reste " + model.getHunter().shootLeft + " tir(s)!");
-        mainPage.grenadeButton.setText("Grenade (" + model.getHunter().grenadeLeft + ")");
+        mainPage.shootLeftLabel.setText("Il vous reste " + model.getHunter().getShootsLeft() + " tir(s)!");
+        mainPage.grenadeButton.setText("Grenade (" + model.getHunter().getGrenadesLeft() + ")");
     }
     
     public void handleMousePressedMonster() {
-        if(model.getMonster().superJump == true && model.getMonster().superJumpLeft > 0){
+        if(model.getMonster().superJump && model.getMonster().superJumpLeft > 0){
             if(model.getMonster().isMonsterMovementValid(cursorPosition, 2.0)) {
             movePosition = cursorPosition;
         }
@@ -153,7 +169,7 @@ public class GameView extends Canvas implements Observer {
      * Cette fonction affiche sur le Canvas les informations nécessaires. Elle est appellée à chaque mouvement de souris ou à chaque action.
      */
     public void draw() {
-        if(isHunterTurn) {
+        if(hunterTurn) {
             hunterView.draw();
         } else {
             monsterView.draw();
@@ -162,18 +178,18 @@ public class GameView extends Canvas implements Observer {
 
 
     public boolean playHunterMove() {
-        if(model.getHunter().shootLeft <= 0) {
+        if(model.getHunter().getShootsLeft() <= 0) {
             return false;
         }
         model.getHunter().shoot(cursorPosition);
-        model.getHunter().shootLeft -= 1;
+        model.getHunter().setShootsLeft(model.getHunter().getShootsLeft() - 1);
         return true;
     }
 
 
     public boolean play() {
         boolean isValid = false;
-        if(isHunterTurn) {
+        if(hunterTurn) {
             isValid = playHunterMove();
         } else {
             isValid = model.getMonster().play(movePosition);
@@ -186,18 +202,18 @@ public class GameView extends Canvas implements Observer {
     }
 
     public boolean playHunterGrenade() {
-        if(model.getHunter().grenadeLeft <= 0) {
+        if(model.getHunter().getGrenadesLeft() <= 0) {
             return false;
         }
         model.getHunter().grenade(cursorPosition);
-        model.getHunter().grenadeLeft -= 1;
+        model.getHunter().setGrenadesLeft(model.getHunter().getGrenadesLeft() - 1);
         return true;
     }
 
 
     public boolean playGrenade() {
         boolean isValid = false;
-        if(isHunterTurn) {
+        if(hunterTurn) {
             isValid = playHunterGrenade();
         } else {
             isValid = model.getMonster().play(movePosition);

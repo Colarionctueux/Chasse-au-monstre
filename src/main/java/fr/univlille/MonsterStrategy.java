@@ -1,6 +1,8 @@
 package fr.univlille;
 
 
+import java.util.Random;
+
 import fr.univlille.iutinfo.cam.player.monster.IMonsterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
@@ -8,12 +10,9 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 
 public class MonsterStrategy implements IMonsterStrategy{
-    int monsterCol;
-    int monsterRow;
+    ICoordinate monsterPosition;
 
-    int exitCol;
-    int exitRow;
-    
+    ICoordinate exit;
 
     int mazeHeight;
     int mazeWidth;
@@ -23,44 +22,43 @@ public class MonsterStrategy implements IMonsterStrategy{
     boolean[][] knownMaze;
     
     public MonsterStrategy(GameModel game){
-        this.monsterRow = game.getMonster().getPosition().getRow();
-        this.monsterCol = game.getMonster().getPosition().getCol();
+        this.monsterPosition = game.getMonster().getPosition();
+        this.exit = game.getExit();
 
         mazeHeight = game.getHeight();
         mazeWidth = game.getWidth();
 
-        initialize(knownMaze);
-
-        this.exitRow = game.getExit().getRow();
-        this.exitCol = game.getExit().getCol();
+        knownMaze = new boolean[mazeHeight][mazeWidth];
     }
 
     @Override
     public ICoordinate play() {
+        System.out.println(knownMaze);
         /*
          * Very simple implementation, goes to the direction of the exit if there are no walls where we want to go
          * If exit is above and right of the monster, the monster will go on the block above, to get closer to the exit, assuming no wall is there
          */
         
-        ICoordinate toPlay = null;
-
-        if (exitCol<monsterCol && knownMaze[monsterRow][monsterCol-1]){ 
-            toPlay = new Coordinate(monsterRow,monsterCol-1);
-        }
-
-        if (exitCol>monsterCol && knownMaze[monsterRow][monsterCol+1]){
-            toPlay = new Coordinate(monsterRow,monsterCol+1);
-        }
-
-        if (exitRow<monsterRow && knownMaze[monsterRow-1][monsterCol]){
-            toPlay = new Coordinate(monsterRow-1,monsterCol);
+        Coordinate vel = new Coordinate(monsterPosition.getCol(), monsterPosition.getRow());
+        Random random = new Random();
+        switch (random.nextInt(4)) {
+            case 0:
+                vel.setCol(vel.getCol() + 1);
+                break;
+                case 1:
+                vel.setCol(vel.getCol() - 1);
+                break;
+                case 2:
+                vel.setRow(vel.getRow() + 1);
+                break;
+                case 3:
+                vel.setRow(vel.getRow() + 1);
+                break;
+            default:
+                break;
         }
         
-        if (exitCol>monsterCol && knownMaze[monsterRow+1][monsterCol]){
-            toPlay = new Coordinate(monsterRow+1,monsterCol);
-        }
-        
-        return toPlay;
+        return vel;
     }
 
     @Override
@@ -69,9 +67,11 @@ public class MonsterStrategy implements IMonsterStrategy{
             knownMaze[event.getCoord().getRow()][event.getCoord().getCol()] = true;
         }
     }
-    
+
     @Override
-    public void initialize(boolean[][] maze) { //initializes knownMaze with only false
-        maze = new boolean[mazeHeight][mazeWidth];
+    public void initialize(boolean[][] arg0) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
     }
+    
 }

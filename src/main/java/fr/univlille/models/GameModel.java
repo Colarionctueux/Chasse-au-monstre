@@ -1,6 +1,7 @@
 package fr.univlille.models;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import fr.univlille.Coordinate;
@@ -32,7 +33,15 @@ public class GameModel extends Subject {
     private HunterModel hunter;
     private MonsterModel monster;
 
-    public GameParameters parameters;
+    private GameParameters parameters;
+
+    public GameParameters getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(GameParameters parameters) {
+        this.parameters = parameters;
+    }
 
     /**
      * A list containing all the moves of the hunter and the monster.
@@ -44,7 +53,7 @@ public class GameModel extends Subject {
     /**
      * A boolean that stores whether or not the game has finished.
      */
-    public boolean gameEnded;
+    private boolean gameEnded;
 
     public int getHeight() {
         return maze.length;
@@ -152,8 +161,8 @@ public class GameModel extends Subject {
      */
     public void generateMaze(GameParameters parameters) {
         this.parameters = parameters;
-        Maze laby = new Maze(parameters.mazeWidth, parameters.mazeHeight);
-        maze = laby.createMaze(parameters.wallsPercentage);
+        Maze laby = new Maze(parameters.getMazeWidth(), parameters.getMazeHeight());
+        maze = laby.createMaze(parameters.getWallsPercentage());
 
         this.hunter = new HunterModel(this);
         this.monster = new MonsterModel(this, randomPosition());
@@ -167,7 +176,7 @@ public class GameModel extends Subject {
         }
     }
 
-    public ArrayList<ICellEvent> getHistory() {
+    public List<ICellEvent> getHistory() {
         return history;
     }
 

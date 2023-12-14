@@ -57,16 +57,16 @@ public class SettingsController {
     @FXML
     public void startGamePressed() throws IOException {
         GameParameters parameters = new GameParameters();
-        parameters.mazeWidth = mazeSizeXSpinner.getValue();
-        parameters.mazeHeight = mazeSizeYSpinner.getValue();
-        parameters.hunterShoots = hunterShootsSpinner.getValue();
-        parameters.hunterGrenades = hunterGrenadesSpinner.getValue();
+        parameters.setMazeWidth(mazeSizeXSpinner.getValue());
+        parameters.setMazeHeight(mazeSizeYSpinner.getValue());
+        parameters.setHunterShoots(hunterShootsSpinner.getValue());
+        parameters.setHunterGrenades(hunterGrenadesSpinner.getValue());
 
         // fog of war
-        parameters.fogOfWar = fogOfWarCheckBox.isSelected();
-        parameters.fogOfWarRadius = fogOfWarSpinner.getValue();
+        parameters.setFogOfWar(fogOfWarCheckBox.isSelected());
+        parameters.setFogOfWarRadius(fogOfWarSpinner.getValue());
 
-        parameters.wallsPercentage = wallPercentageSpinner.getValue() / 100.0;
+        parameters.setWallsPercentage(wallPercentageSpinner.getValue() / 100.0);
         
         App.getApp().startGame(parameters);
     }
