@@ -12,12 +12,12 @@
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Button layoutX="208.0" layoutY="302.0" mnemonicParsing="false" onAction="#playButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer seul contre une ia :(" textFill="WHITE">
+      <Button layoutX="208.0" layoutY="302.0" mnemonicParsing="false" onAction="#playButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer seul contre une ia" textFill="WHITE">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>
       </Button>
-      <Button layoutX="208.0" layoutY="385.0" mnemonicParsing="false" onAction="#multiButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer avec un ami :)" textFill="WHITE">
+      <Button layoutX="208.0" layoutY="385.0" mnemonicParsing="false" onAction="#multiButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer avec un ami" textFill="WHITE">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>
