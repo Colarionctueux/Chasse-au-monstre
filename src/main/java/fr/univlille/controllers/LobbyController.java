@@ -3,10 +3,6 @@ package fr.univlille.controllers;
 import java.io.IOException;
 
 import fr.univlille.App;
-<<<<<<< HEAD
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-=======
 import fr.univlille.models.LobbyModel;
 import fr.univlille.multiplayer.Client;
 import fr.univlille.multiplayer.MultiplayerCommand;
@@ -14,7 +10,6 @@ import fr.univlille.multiplayer.MultiplayerCommunication;
 import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import javafx.application.Platform;
->>>>>>> ce8d5a8d9a242a4350cd18bb1e2f048c0d4ba310
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -25,13 +20,6 @@ public class LobbyController extends AnchorPane {
     private App app;
 
     @FXML
-<<<<<<< HEAD
-    private Label wtf;
-
-    public void initialize() {
-        wtf.setText("FDHSHGREGtreuhrhhgug");
-    }
-=======
     private Label hostname_label;
 
     @FXML
@@ -45,7 +33,6 @@ public class LobbyController extends AnchorPane {
 
     @FXML
     private Button button_start_game;
->>>>>>> ce8d5a8d9a242a4350cd18bb1e2f048c0d4ba310
 
     @FXML
     public void backButtonPressed() throws IOException {
