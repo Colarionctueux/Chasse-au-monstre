@@ -20,7 +20,7 @@
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="155.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="acajou28" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="hostname_label" alignment="CENTER" contentDisplay="CENTER" layoutX="155.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="???" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
@@ -30,27 +30,27 @@
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="604.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="acajou27" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="client_name" alignment="CENTER" contentDisplay="CENTER" layoutX="604.0" layoutY="410.0" prefHeight="142.0" prefWidth="242.0" styleClass="player" stylesheets="@style.css" text="???" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="155.0" layoutY="265.0" prefHeight="68.0" prefWidth="242.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasseur" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="host_role" alignment="CENTER" contentDisplay="CENTER" layoutX="155.0" layoutY="265.0" prefHeight="68.0" prefWidth="242.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Chasseur" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="604.0" layoutY="265.0" prefHeight="68.0" prefWidth="242.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Monstre" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="client_role" alignment="CENTER" contentDisplay="CENTER" layoutX="604.0" layoutY="265.0" prefHeight="68.0" prefWidth="242.0" style="-fx-background-color: rgba(255,255,255, 0.08); -fx-border-color: white; -fx-border-width: 5px;" text="Monstre" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Heavy" size="35.0" />
          </font>
       </Label>
-      <ImageView fitHeight="68.0" fitWidth="75.0" layoutX="463.0" layoutY="269.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView onMouseClicked="#reverseRoles" fitHeight="68.0" fitWidth="75.0" layoutX="463.0" layoutY="269.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../images/fleche.png" />
          </image>
       </ImageView>
-      <Button layoutX="456.0" layoutY="577.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="390.0" styleClass="buttons" stylesheets="@style.css" text="Lancer la partie" textFill="WHITE">
+      <Button fx:id="button_start_game" onAction="#startGame" layoutX="456.0" layoutY="577.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="390.0" styleClass="buttons" stylesheets="@style.css" text="Lancer la partie" textFill="WHITE">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>
