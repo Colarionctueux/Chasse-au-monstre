@@ -8,7 +8,7 @@ import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
 public class MonsterModel extends Subject {
 
-    Coordinate position;
+    private Coordinate position;
     public GameModel model;
     public int superJumpLeft = 1;
     public boolean superJump = false;
@@ -16,23 +16,23 @@ public class MonsterModel extends Subject {
     public boolean[][] fogOfWar;
 
 
-    public MonsterModel(GameModel model, Coordinate startPosition) {
+    public MonsterModel(GameModel model, ICoordinate startPosition) {
         this.model = model;
-        position = startPosition;
+        position = (Coordinate) startPosition;
     }
 
     public Coordinate getPosition() {
         return position;
     }
 
-    public ICoordinate move(Coordinate movement) {
+    public ICoordinate move(ICoordinate movement) {
         position.setCol(movement.getCol());
         position.setRow(movement.getRow());
         return position;
     }
 
-    public boolean play(Coordinate movePosition) {
-        if(superJump == true && superJumpLeft > 0){
+    public boolean play(ICoordinate movePosition) {
+        if(superJump && superJumpLeft > 0){
             if(isMonsterMovementValid(movePosition, 2.0)) {
             superJumpLeft -= 1;
             changePosition(movePosition);
@@ -46,7 +46,7 @@ public class MonsterModel extends Subject {
         return false;
     }
 
-    private void changePosition(Coordinate movePosition) {
+    private void changePosition(ICoordinate movePosition) {
         model.incrementTurn();
         move(movePosition);
         model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER, model.getTurn()));
@@ -61,15 +61,15 @@ public class MonsterModel extends Subject {
      * @param movement The desired movement of the monster.
      * @return `true` if the movement is valid, `false` otherwise.
      */
-    public boolean isMonsterMovementValid(Coordinate movement, double max) {
-        Coordinate mazeDimensions = model.getMazeDimensions();
+    public boolean isMonsterMovementValid(ICoordinate movement, double max) {
+        ICoordinate mazeDimensions = model.getMazeDimensions();
 
         // On vérifie déjà si le déplacement est dans la grille du jeu
         if(movement.getCol() < 0 || movement.getCol() > mazeDimensions.getCol() || movement.getRow() < 0 || movement.getRow() > mazeDimensions.getRow()) {
             return false;
         }
         
-        double distance = model.getMonster().getPosition().distance(movement);
+        double distance = Coordinate.distance(model.getMonster().getPosition(), movement);
         if(distance > max || distance < max) {
             return false;
         }

@@ -45,8 +45,8 @@ public class Coordinate implements ICoordinate {
         return this.y;
     }
 
-    public double distance(Coordinate other) {
-        return Math.sqrt(Math.pow((getCol() - other.getCol()), 2) + Math.pow((getRow() - other.getRow()), 2));
+    public static double distance(ICoordinate c1, ICoordinate c2) {
+        return Math.sqrt(Math.pow((c1.getCol() - c2.getCol()), 2) + Math.pow((c1.getRow() - c2.getRow()), 2));
     }
 
     @Override

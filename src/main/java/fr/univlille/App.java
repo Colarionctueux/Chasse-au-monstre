@@ -55,6 +55,12 @@ public class App extends Application {
         Client.getInstance().kill();
     }
 
+    public void showParameters(GameMode gameMode) throws IOException {
+        parameters = new GameParameters();
+        parameters.setGameMode(gameMode);
+        changeScene("settings");
+    }
+
     public void changeScene(String name) throws IOException {
         scene.setRoot(loadFXML(name));
     }

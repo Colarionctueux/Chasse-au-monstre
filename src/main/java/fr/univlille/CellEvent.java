@@ -4,11 +4,11 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
 public class CellEvent implements ICellEvent {
-    private Coordinate coord;
+    private ICoordinate coord;
     private CellInfo state;
     private int turn;
 
-    public CellEvent(Coordinate coord, CellInfo state, int turn) {
+    public CellEvent(ICoordinate coord, CellInfo state, int turn) {
         this.coord = coord;
         this.state = state;
         this.turn = turn;

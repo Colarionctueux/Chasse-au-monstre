@@ -11,7 +11,28 @@ public class GameParameters {
 
     private boolean fogOfWar;
     private int fogOfWarRadius = 3;
+
+    private GameMode gameMode;
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    // AI
+    private boolean aiPlayerIsHunter;
     
+    
+    // MULTIPLAYER
+
+    public boolean isAiPlayerIsHunter() {
+        return aiPlayerIsHunter;
+    }
+    public void setAiPlayerIsHunter(boolean aiPlayerIsHunter) {
+        this.aiPlayerIsHunter = aiPlayerIsHunter;
+    }
     public int getMazeWidth() {
         return mazeWidth;
     }

@@ -4,6 +4,7 @@ package fr.univlille.controllers;
 import java.io.IOException;
 
 import fr.univlille.App;
+import fr.univlille.GameMode;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
 
@@ -22,7 +23,7 @@ public class MenuController extends AnchorPane {
     @FXML
     public void playButtonPressed() throws IOException {
         app = App.getApp();
-        app.changeScene("settings");
+        app.showParameters(GameMode.BOT);
     }
     
     @FXML

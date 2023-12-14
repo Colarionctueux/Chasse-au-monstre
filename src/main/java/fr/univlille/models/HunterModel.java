@@ -5,6 +5,7 @@ import java.util.List;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.utils.Subject;
 
@@ -79,8 +80,8 @@ public class HunterModel extends Subject {
      * @param shoot The target's position.
      * @return `true` if the target's position is valid, `false` otherwise.
      */
-    public boolean isHunterShootValid(Coordinate shoot) {
-        Coordinate mazeDimensions = gameModel.getMazeDimensions();
+    public boolean isHunterShootValid(ICoordinate shoot) {
+        ICoordinate mazeDimensions = gameModel.getMazeDimensions();
         return shoot.getCol() >= 0 && shoot.getCol() < mazeDimensions.getCol() && shoot.getRow() >= 0 && shoot.getRow() < mazeDimensions.getRow();
     }
 
@@ -89,7 +90,7 @@ public class HunterModel extends Subject {
      * @param shootPosition The coordinates of the hunter's target.
      * @return The type of cell that the hunter has shot.
      */
-    public void shoot(Coordinate shootPosition) {
+    public void shoot(ICoordinate shootPosition) {
         CellInfo state = CellInfo.EMPTY;
         if (gameModel.isWallAt(shootPosition)) {
             state = CellInfo.WALL;

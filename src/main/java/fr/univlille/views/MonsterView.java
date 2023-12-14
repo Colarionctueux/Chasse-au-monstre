@@ -41,7 +41,7 @@ public class MonsterView {
         this.gameView = gameView;
         this.gameModel = gameModel;
         this.model = gameModel.getMonster();
-        Coordinate mazeDimensions = gameModel.getMazeDimensions();
+        ICoordinate mazeDimensions = gameModel.getMazeDimensions();
         
         fogEnabled = parameters.isFogOfWar();
         fogRadius = parameters.getFogOfWarRadius();
@@ -64,7 +64,7 @@ public class MonsterView {
      * Initializes the set of decorations randomly.
      * @param mazeDimensions The dimensions of the maze as an instance of `Coordinate`.
      */
-    public void addDecorations(Coordinate mazeDimensions) {
+    public void addDecorations(ICoordinate mazeDimensions) {
         Random random = new Random();
         decorations = new int[mazeDimensions.getRow()][mazeDimensions.getCol()];
         for (int y = 0; y < mazeDimensions.getRow(); y++) {
@@ -193,7 +193,7 @@ public class MonsterView {
 
 
     public void updateFog(ICoordinate coordinate) {
-        Coordinate mazeDimensions = gameModel.getMazeDimensions();
+        ICoordinate mazeDimensions = gameModel.getMazeDimensions();
         for (int y = -fogRadius; y < fogRadius + 1; y++) {
             for (int x = -fogRadius; x < fogRadius + 1; x++) {
                 if(x * x + y * y <= Math.pow(3, 2) ) {

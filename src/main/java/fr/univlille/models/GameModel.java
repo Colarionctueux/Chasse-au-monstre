@@ -103,7 +103,7 @@ public class GameModel extends Subject {
      * @param coordinate The coordinates of the given cell.
      * @return `true` if this cell is a wall, `false` if it's empty.
      */
-    public boolean isWallAt(Coordinate coordinate) {
+    public boolean isWallAt(ICoordinate coordinate) {
         return isWallAt(coordinate.getRow(), coordinate.getCol());
     }
 
@@ -119,7 +119,7 @@ public class GameModel extends Subject {
      * Gets the width and height of the maze as an instance of `Coordinate`.
      * @return An instance of `Coordinate` where `x` is the width of the maze and `y` the height.
      */
-    public Coordinate getMazeDimensions() {
+    public ICoordinate getMazeDimensions() {
         return new Coordinate(getWidth(), getHeight());
     }
 
@@ -136,7 +136,7 @@ public class GameModel extends Subject {
      * For now, it gives a random position that is not a wall.
      * @return A random position in the maze.
      */
-    public Coordinate randomPosition() {
+    public ICoordinate randomPosition() {
         ArrayList<Coordinate> availableCoordinates = new ArrayList<>();
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {

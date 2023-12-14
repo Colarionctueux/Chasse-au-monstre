@@ -5,6 +5,7 @@ import fr.univlille.controllers.GameController;
 import fr.univlille.Coordinate;
 import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.utils.Observer;
@@ -84,7 +85,7 @@ public class GameView extends Canvas implements Observer {
         hunterView = new HunterView(gc, this, model, parameters);
         monsterView = new MonsterView(gc, this, model, parameters);
 
-        Coordinate mazeDimensions = model.getMazeDimensions(); 
+        ICoordinate mazeDimensions = model.getMazeDimensions(); 
         setWidth((double) TILE_SIZE * mazeDimensions.getCol());
         setHeight((double) TILE_SIZE * mazeDimensions.getRow());
 
@@ -149,20 +150,20 @@ public class GameView extends Canvas implements Observer {
 
 
 
-    public Coordinate getCursorPosition() {
+    public ICoordinate getCursorPosition() {
         return cursorPosition;
     }
 
-    public void setCursorPosition(Coordinate cursorPosition) {
-        this.cursorPosition = cursorPosition;
+    public void setCursorPosition(ICoordinate cursorPosition) {
+        this.cursorPosition = (Coordinate) cursorPosition;
     }
 
-    public Coordinate getMovePosition() {
+    public ICoordinate getMovePosition() {
         return movePosition;
     }
 
-    public void setMovePosition(Coordinate movePosition) {
-        this.movePosition = movePosition;
+    public void setMovePosition(ICoordinate movePosition) {
+        this.movePosition = (Coordinate) movePosition;
     }
 
     /**

@@ -1,6 +1,6 @@
 package fr.univlille.views;
 
-import fr.univlille.Coordinate;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import javafx.scene.canvas.GraphicsContext;
 
 public class ViewUtils {
@@ -10,7 +10,7 @@ public class ViewUtils {
      * @param spritesheetPosition La position X et Y dans la Sprite Sheet, pour réference voir les images dans resources/images.
      * @param gamePosition La position dans la fenêtre du jeu.
      */
-    public static void drawSimpleTexture(GraphicsContext gc, Coordinate spritesheetPosition, Coordinate gamePosition) {
+    public static void drawSimpleTexture(GraphicsContext gc, ICoordinate spritesheetPosition, ICoordinate gamePosition) {
         gc.drawImage(
             GameView.spritesheet, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
             gamePosition.getCol() * GameView.TILE_SIZE,
@@ -25,7 +25,7 @@ public class ViewUtils {
      * @param y Position Y dans la Sprite Sheet
      * @param gamePosition La position dans la fenêtre du jeu.
      */
-    public static void drawSimpleTexture(GraphicsContext gc, int x, int y, Coordinate gamePosition) {
+    public static void drawSimpleTexture(GraphicsContext gc, int x, int y, ICoordinate gamePosition) {
         gc.drawImage(
             GameView.spritesheet, x, y, 64, 64,
             gamePosition.getCol() * GameView.TILE_SIZE,
@@ -40,7 +40,7 @@ public class ViewUtils {
      * @param x Position X dans le jeu
      * @param y Position Y dans le jeu
      */
-    public static void drawSimpleTexture(GraphicsContext gc, Coordinate spritesheetPosition, int x, int y) {
+    public static void drawSimpleTexture(GraphicsContext gc, ICoordinate spritesheetPosition, int x, int y) {
         gc.drawImage(
             GameView.spritesheet, spritesheetPosition.getCol(), spritesheetPosition.getRow(), 64, 64,
             x * GameView.TILE_SIZE,

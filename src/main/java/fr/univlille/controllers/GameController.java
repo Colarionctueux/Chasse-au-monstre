@@ -5,7 +5,10 @@ import java.io.IOException;
 import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
+import fr.univlille.GameMode;
 import fr.univlille.GameParameters;
+import fr.univlille.HunterStrategy;
+import fr.univlille.MonsterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.views.GameView;
@@ -57,27 +60,28 @@ public class GameController {
     private GameView gameView;
     private GameModel game;
     private App app;
+    private GameParameters parameters;
+
+    private MonsterStrategy monsterStrategy;
+    private HunterStrategy hunterStrategy;
     
     /**
      * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque rédemarrage du jeu.
      */
     public void initGame() {
         game = new GameModel();
-        GameParameters parameters = App.getApp().parameters;
+        this.parameters = App.getApp().parameters;
         game.generateMaze(parameters);
         
         if(gameView != null) {
             mainVBox.getChildren().remove(gameView);
         }
         gameView = new GameView(game, parameters);
+
         mainVBox.getChildren().add(2, gameView);
         gameView.draw();
         gameView.setMainPage(this);
-        grenadeButton.setVisible(false);
-        jumpButton.setVisible(true);
         updateEntitiesLabel();
-
-        turnLabel.setText("Tour n°" + game.getTurn());
 
         // On ajoute la première position du monstre dans l'historique
         Coordinate monsterPosition = game.getMonster().getPosition();
@@ -86,6 +90,15 @@ public class GameController {
         // mais c'est simplement car sinon les deux instances seront liés et cette position
         // sera dans l'historique sera modifiée à chaque nouveau déplacement du monstre (ce qu'on ne veut pas!)
         game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()), CellInfo.MONSTER, game.getTurn()));
+
+        if(parameters.getGameMode() == GameMode.BOT) {
+            if(parameters.isAiPlayerIsHunter()) {
+                monsterStrategy = new MonsterStrategy(game);
+            } else {
+                hunterStrategy = new HunterStrategy();
+            }
+            playTurn();
+        }
     }
 
 
@@ -114,18 +127,26 @@ public class GameController {
 
     @FXML
     public void playButtonPressed() throws InterruptedException {
+        playTurn();
+    }
 
-        if(game.isGameEnded()) {
-            return;
+
+    private void playTurn() {
+        if(parameters.getGameMode() == GameMode.BOT) {
+            if(gameView.isHunterTurn()) {
+                if(parameters.isAiPlayerIsHunter()) {
+                    gameView.setMovePosition(new Coordinate(5, 5));
+                }
+            } else {
+                gameView.setMovePosition(monsterStrategy.play());
+            }
         }
         if(gameView.isHunterTurn() || gameView.play()) {
             errorLabel.setText("");
             updateEntitiesLabel();
         } else {
             errorLabel.setText("Mouvement invalide!");
-            return;
         }
-        turnLabel.setText("Tour n°" + game.getTurn());
         
         if(game.monsterWon()) {
             game.setGameEnded(true);
@@ -173,12 +194,14 @@ public class GameController {
     }
 
     private void swapScreen() {
-        // Animation de l'écran
-        switchPane.setVisible(true);
-        switchPaneCountdown.setText("Dans 3...");
-        delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
-        delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
-        delay(3000, () -> switchPane.setVisible(false));
+        if(parameters.getGameMode() == GameMode.TWO_PLAYERS) {
+            // Animation de l'écran
+            switchPane.setVisible(true);
+            switchPaneCountdown.setText("Dans 3...");
+            delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
+            delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
+            delay(3000, () -> switchPane.setVisible(false));
+        }
 
         // On échange les tours
         gameView.setHunterTurn(!gameView.isHunterTurn());

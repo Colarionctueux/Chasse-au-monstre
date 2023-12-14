@@ -3,6 +3,7 @@ package fr.univlille.views;
 import fr.univlille.Coordinate;
 import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.models.HunterModel;
@@ -31,7 +32,7 @@ public class HunterView {
 
 
     public void draw() {
-        Coordinate dimensions = gameModel.getMazeDimensions();
+        ICoordinate dimensions = gameModel.getMazeDimensions();
         initMazeWithDimensions(dimensions);
         graphicStyle();
         for (ICellEvent cellEvent : gameModel.getHunter().getShootsHistory()) {
@@ -69,7 +70,7 @@ public class HunterView {
     }
 
 
-    private void initMazeWithDimensions(Coordinate dimensions) {
+    private void initMazeWithDimensions(ICoordinate dimensions) {
         for (int y = 0; y < dimensions.getRow(); y++) {
             for (int x = 0; x < dimensions.getCol(); x++) {
                 if(x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
