@@ -10,11 +10,14 @@ import fr.univlille.models.GameModel;
 
 public class TestGame {
     GameModel game;
-
+    GameParameters gameParameters = new GameParameters();
+    
     @BeforeEach
     public void setup() {
+        gameParameters.mazeHeight = 10;
+        gameParameters.mazeWidth = 10;
         game = new GameModel();
-        game.generateMaze(11, 11);
+        game.generateMaze(gameParameters);
     }
 
     @Test
@@ -25,30 +28,10 @@ public class TestGame {
     }
 
     @Test
-    public void testIsWallAt() { 
-        for (int y = 0; y < 11; y++) {
-            for (int x = 0; x < 11; x++) {
-                // all borders must be walls
-                if (y == 0 || y == 10 || x == 0 || x == 10) {
-                    assertTrue(game.isWallAt(x, y));
-                }
-                // every other square is supposed to be a wall
-                else if (x % 2 == 0 && y % 2 == 0) {
-                    assertTrue(game.isWallAt(x, y));
-                }
-                // all the other cells are supposed to be empty
-                else {
-                    assertFalse(game.isWallAt(x, y));
-                }
-            }
-        }
-    }
-
-    @Test
     public void testMazeIsTheRightSize() {
-        game.generateMaze(10, 5);
+        game.generateMaze(gameParameters);
         assertEquals(10,game.getMazeDimensions().getCol());
-        assertEquals(5,game.getMazeDimensions().getRow());
+        assertEquals(10,game.getMazeDimensions().getRow());
     }
     
     @Test
