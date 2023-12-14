@@ -54,8 +54,8 @@ public class SettingsController {
     public void initialize() {
         bindFactory(hunterShootsSpinner, 1, 10, 1);
         bindFactory(hunterGrenadesSpinner, 0, 10, 1);
-        bindFactory(mazeSizeXSpinner, 5, 19, 9);
-        bindFactory(mazeSizeYSpinner, 5, 19, 9);
+        bindFactory(mazeSizeXSpinner, 5, 19, 7);
+        bindFactory(mazeSizeYSpinner, 5, 19, 7);
         bindFactory(wallPercentageSpinner, 50, 100, 100);
         bindFactory(fogOfWarSpinner, 1, 10, 1);
         GameMode gameMode = App.getApp().parameters.getGameMode();

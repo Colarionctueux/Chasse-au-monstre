@@ -20,13 +20,11 @@ public class HunterView {
     public GameModel gameModel;
     public HunterModel model;
 
-    private GameParameters parameters;
 
-    public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel, GameParameters parameters) {
+    public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel) {
         this.gc = gc;
         this.gameView = gameView;
         this.gameModel = gameModel;
-        this.parameters = parameters;
         this.model = gameModel.getHunter();
     }
 
@@ -34,6 +32,21 @@ public class HunterView {
         ICoordinate dimensions = gameModel.getMazeDimensions();
         initMazeWithDimensions(dimensions);
         graphicStyle();
+        drawBoard();
+        
+        if (!model.isHunterShootValid(gameView.getCursorPosition())) {
+            ViewUtils.drawSimpleTexture(gc, new Coordinate(128, 256), gameView.getCursorPosition()); // Position souris
+                                                                                                     // (si mouvement
+                                                                                                     // impossible)
+        } else {
+            ViewUtils.drawSimpleTexture(gc, new Coordinate(0, 256), gameView.getCursorPosition()); // Position souris
+                                                                                                   // (si mouvement
+                                                                                                   // possible)
+        }
+        ViewUtils.drawSimpleTexture(gc, new Coordinate(64, 256), gameView.getMovePosition()); // Le mouvement
+    }
+
+    private void drawBoard() {
         for (ICellEvent cellEvent : gameModel.getHunter().getShootsHistory()) {
             Coordinate coord = (Coordinate) cellEvent.getCoord();
             if (cellEvent.getState() == CellInfo.WALL) {
@@ -49,22 +62,12 @@ public class HunterView {
                 } else {
                     if (cellEvent.getState() == CellInfo.MONSTER) {
                         gc.fillText(String.valueOf(cellEvent.getTurn()),
-                                coord.getCol() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2,
-                                coord.getRow() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2);
+                                coord.getCol() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2.0,
+                                coord.getRow() * GameView.TILE_SIZE + GameView.TILE_SIZE / 2.0);
                     }
                 }
             }
         }
-        if (!model.isHunterShootValid(gameView.getCursorPosition())) {
-            ViewUtils.drawSimpleTexture(gc, new Coordinate(128, 256), gameView.getCursorPosition()); // Position souris
-                                                                                                     // (si mouvement
-                                                                                                     // impossible)
-        } else {
-            ViewUtils.drawSimpleTexture(gc, new Coordinate(0, 256), gameView.getCursorPosition()); // Position souris
-                                                                                                   // (si mouvement
-                                                                                                   // possible)
-        }
-        ViewUtils.drawSimpleTexture(gc, new Coordinate(64, 256), gameView.getMovePosition()); // Le mouvement
     }
 
     private void graphicStyle() {

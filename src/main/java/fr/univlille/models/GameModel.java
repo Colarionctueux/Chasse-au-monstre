@@ -98,6 +98,9 @@ public class GameModel extends Subject {
      * @return `true` if this cell is a wall, `false` if it's empty.
      */
     public boolean isWallAt(int x, int y) {
+        if(x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) { // si en dehors du labyrinthe
+            return true;
+        }
         return maze[y][x];
     }
 

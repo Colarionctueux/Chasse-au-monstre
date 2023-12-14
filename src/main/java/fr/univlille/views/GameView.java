@@ -56,13 +56,15 @@ public class GameView extends Canvas implements Observer {
     }
 
     private HunterView hunterView;
+    public HunterView getHunterView() {
+        return hunterView;
+    }
+
     private MonsterView monsterView;
 
     public MonsterView getMonsterView() {
         return monsterView;
     }
-
-    private GameParameters parameters;
 
     /**
      * Each image in the game is contained in a spritesheet.
@@ -80,11 +82,10 @@ public class GameView extends Canvas implements Observer {
 
     public GameView(GameModel model, GameParameters parameters) {
         this.model = model;
-        this.parameters = parameters;
 
         this.gc = getGraphicsContext2D();
 
-        hunterView = new HunterView(gc, this, model, parameters);
+        hunterView = new HunterView(gc, this, model);
         monsterView = new MonsterView(gc, this, model, parameters);
 
         ICoordinate mazeDimensions = model.getMazeDimensions();
@@ -132,8 +133,7 @@ public class GameView extends Canvas implements Observer {
             play();
         }
         draw();
-        mainPage.shootLeftLabel.setText("Il vous reste " + model.getHunter().getShootsLeft() + " tir(s)!");
-        mainPage.grenadeButton.setText("Grenade (" + model.getHunter().getGrenadesLeft() + ")");
+        mainPage.updateEntitiesLabel();
     }
 
     public void handleMousePressedMonster() {
@@ -187,7 +187,7 @@ public class GameView extends Canvas implements Observer {
 
     public boolean play() {
         boolean isValid = false;
-        if (hunterTurn) {
+        if (isHunterTurn()) {
             isValid = playHunterMove();
         } else {
             isValid = model.getMonster().play(movePosition);
@@ -273,7 +273,6 @@ public class GameView extends Canvas implements Observer {
 
     private void monsterCase(ICellEvent cellEvent) {
         if (cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
-            mainPage.errorLabel.setText("Vous avez tué le monstre! Félicitations!");
             model.setGameEnded(true);
         } else {
             mainPage.errorLabel
