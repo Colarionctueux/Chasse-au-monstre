@@ -1,20 +1,17 @@
 package fr.univlille.models;
 
 public class LobbyModel {
-  // If the host is hunter,
-  // then the client is monster,
-  // and vice-versa
-  private boolean hostIsHunter = true;
+  private boolean host_is_hunter = true;
 
   public void invertRoles() {
-    hostIsHunter = !hostIsHunter;
+    host_is_hunter = !host_is_hunter;
   }
 
   public void setIsHostHunter(boolean v) {
-    hostIsHunter = v;
+    host_is_hunter = v;
   }
 
   public boolean isHostHunter() {
-    return hostIsHunter;
+    return host_is_hunter;
   }
 }

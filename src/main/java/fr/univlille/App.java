@@ -1,5 +1,5 @@
 package fr.univlille;
- 
+
 import java.io.IOException;
 
 import fr.univlille.multiplayer.Client;
@@ -9,8 +9,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
- 
+
 public class App extends Application {
+
     private static final int DEFAULT_MULTIPLAYER_PORT = 6666;
     public GameParameters parameters;
     private static Scene scene;
@@ -21,7 +22,7 @@ public class App extends Application {
     }
 
     public static App getApp() {
-        if(app == null) {
+        if (app == null) {
             app = new App();
         }
         return app;
@@ -29,21 +30,19 @@ public class App extends Application {
 
     private static Parent loadFXML(String filename) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("controllers/" + filename + ".fxml"));
-        
-        if(fxmlLoader.getLocation() == null) {
+
+        if (fxmlLoader.getLocation() == null) {
             System.err.println("Le chemin du fichier FXML est invalide!");
             System.exit(1);
         }
 
-        Parent parent = fxmlLoader.load();
-
-        return parent;
+        return fxmlLoader.load();
     }
 
-    @Override 
+    @Override
     public void start(Stage stage) throws IOException {
         Parent parent = loadFXML("menu");
-        App.scene = new Scene(parent, 1000, 1000);
+        App.scene = new Scene(parent, 800, 600);
         stage.setScene(scene);
         stage.setTitle("Chasse au monstre");
         stage.show();
@@ -55,6 +54,12 @@ public class App extends Application {
         // making sure the server and the client are properly closed when exiting the app
         Client.getInstance().kill(false);
         Server.getInstance().kill(false);
+    }
+
+    public void showParameters(GameMode gameMode) throws IOException {
+        parameters = new GameParameters();
+        parameters.setGameMode(gameMode);
+        changeScene("settings");
     }
 
     public void changeScene(String name) throws IOException {

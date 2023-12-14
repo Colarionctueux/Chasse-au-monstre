@@ -3,40 +3,59 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1000.0" styleClass="body" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MultiplayerMenuController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1000.0" styleClass="body" stylesheets="@style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.MultiplayerMenuController">
    <children>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="278.0" layoutY="113.0" prefHeight="128.0" prefWidth="432.0" styleClass="title" stylesheets="@style.css" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE">
-         <font>
-            <Font name="Franklin Gothic Heavy" size="35.0" />
-         </font>
-      </Label>
-      <Button layoutX="208.0" layoutY="302.0" mnemonicParsing="false" onAction="#localButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer sur une machine" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="32.0" />
-         </font>
-      </Button>
-      <Button layoutX="208.0" layoutY="385.0" mnemonicParsing="false" onAction="#lanButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer sur deux machines" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="32.0" />
-         </font>
-      </Button>
-      <Button fx:id="boutonHeberger" layoutX="208.0" layoutY="467.0" mnemonicParsing="false" onAction="#hostButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Héberger" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="32.0" />
-         </font>
-      </Button>
-      <Button fx:id="boutonRejoindre" layoutX="506.0" layoutY="467.0" mnemonicParsing="false" onAction="#joinButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Rejoindre" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="32.0" />
-         </font>
-      </Button>
-      <Button layoutX="208.0" layoutY="549.0" mnemonicParsing="false" onAction="#backButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="&lt; Retour" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="32.0" />
-         </font>
-      </Button>
+      <VBox alignment="CENTER" layoutX="200.0" layoutY="246.0" prefHeight="508.0" prefWidth="601.0" spacing="16.0" AnchorPane.bottomAnchor="246.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="199.0" AnchorPane.topAnchor="246.0">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="128.0" prefWidth="432.0" styleClass="title" stylesheets="@style.css" text="Chasse au monstre" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Franklin Gothic Heavy" size="35.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" onAction="#localButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer sur une machine" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="32.0" />
+               </font>
+            </Button>
+            <Button disable="true" mnemonicParsing="false" onAction="#lanButtonPressed" prefHeight="71.0" prefWidth="584.0" styleClass="buttons" stylesheets="@style.css" text="Jouer en réseau (WIP)" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="32.0" />
+               </font>
+            </Button>
+            <GridPane alignment="CENTER" VBox.vgrow="ALWAYS">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Button mnemonicParsing="false" onAction="#backButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="&lt; Retour" textFill="WHITE" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="System Bold" size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="boutonRejoindre" mnemonicParsing="false" onAction="#joinButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Rejoindre" textFill="WHITE" visible="false" GridPane.columnIndex="1">
+                     <font>
+                        <Font name="System Bold" size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="boutonHeberger" mnemonicParsing="false" onAction="#hostButtonPressed" prefHeight="71.0" prefWidth="286.0" styleClass="buttons" stylesheets="@style.css" text="Héberger" textFill="WHITE" visible="false">
+                     <font>
+                        <Font name="System Bold" size="32.0" />
+                     </font>
+                  </Button>
+               </children>
+            </GridPane>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

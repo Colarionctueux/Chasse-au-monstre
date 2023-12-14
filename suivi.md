@@ -30,3 +30,15 @@
 |Thomas    | avancement sockets java                                          |
 |Manon     | problèmes javafx                                                 |
 |Nicolas   | implémentation menu principal                                    |
+
+
+### Du 7 décembre au 14 décembre
+
+
+|Personne|Travail|
+|--------|---------------------------------------------------|
+|Rayane  |superjump pour le monstre                          |
+|Aymeri  |clean code, paramètres de la partie                |
+|Thomas  |implémenté les socket pour créer le lobby          |
+|Manon   |continué l'algo pour l'ia du monstre, simple       |
+|Nicolas |sous-menu, menu du lobby, menu avec l'ia etc       |

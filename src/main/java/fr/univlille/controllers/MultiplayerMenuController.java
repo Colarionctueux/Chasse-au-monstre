@@ -3,6 +3,7 @@ package fr.univlille.controllers;
 import java.io.IOException;
 
 import fr.univlille.App;
+import fr.univlille.GameMode;
 import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import javafx.fxml.FXML;
@@ -22,7 +23,7 @@ public class MultiplayerMenuController extends AnchorPane {
 
     @FXML
     private Button boutonHeberger;
-    
+
     @FXML
     private Button boutonRejoindre;
 
@@ -35,7 +36,7 @@ public class MultiplayerMenuController extends AnchorPane {
     @FXML
     public void localButtonPressed() throws IOException {
         app = App.getApp();
-        app.changeScene("settings");
+        app.showParameters(GameMode.TWO_PLAYERS);
     }
 
     @FXML
@@ -47,7 +48,7 @@ public class MultiplayerMenuController extends AnchorPane {
             System.out.println("Server is running at '" + MultiplayerUtils.getHostname() + "'");
         }
     }
-    
+
     @FXML
     public void joinButtonPressed() throws IOException {
         app = App.getApp();

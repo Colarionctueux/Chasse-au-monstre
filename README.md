@@ -55,3 +55,14 @@ Lancer App.java
 |Thomas|Commentaires, javadoc, review du code|
 |Manon|Tests|
 |Nicolas|Devait aider pour le javafx mais soucis pour le faire marcher|
+
+
+### Jalon 2
+
+|Personne|Travail|
+|--------|-------|
+|Rayane|Ajout grenade pour chasseur, superjump pour monstre, refactoring|
+|Aymeri|Clean code, peaufinage, brouillard de guerre, algorithme labyrinthe, paramétrage de la partie|
+|Thomas|Lobby multijoueur (un joueur peut host une game et rejoindre une game)|
+|Manon|IA du monstre, clean code|
+|Nicolas|Menu en javaFX (UI), controllers|

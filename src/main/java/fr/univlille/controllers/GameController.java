@@ -5,7 +5,10 @@ import java.io.IOException;
 import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
+import fr.univlille.GameMode;
 import fr.univlille.GameParameters;
+import fr.univlille.HunterStrategy;
+import fr.univlille.MonsterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.views.GameView;
@@ -17,11 +20,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
-
 public class GameController {
-
-    @FXML
-    public Button stopGameButton;
 
     @FXML
     public ToggleButton grenadeButton;
@@ -35,14 +34,11 @@ public class GameController {
     @FXML
     public Button endTurnButton;
 
-
-
     @FXML
     public Label powerupEnabledLabel;
 
     @FXML
     public Label shootLeftLabel;
-
 
     @FXML
     public VBox mainVBox;
@@ -56,57 +52,82 @@ public class GameController {
     @FXML
     public Label errorLabel;
 
+    @FXML
+    public AnchorPane gameOverScreen;
+
+    @FXML
+    public Label winnerLabel;
 
     private GameView gameView;
     private GameModel game;
-    private App app;
-    
+    private GameParameters parameters;
+
+    private MonsterStrategy monsterStrategy;
+    private HunterStrategy hunterStrategy;
+
     /**
-     * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque rédemarrage du jeu.
+     * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque
+     * rédemarrage du jeu.
      */
     public void initGame() {
-        game = new GameModel();
-        GameParameters parameters = App.getApp().parameters;
-        game.generateMaze(parameters);
+        gameOverScreen.setVisible(false);
         
-        if(gameView != null) {
+        game = new GameModel();
+        this.parameters = App.getApp().parameters;
+        game.generateMaze(parameters);
+
+        if (gameView != null) {
             mainVBox.getChildren().remove(gameView);
         }
         gameView = new GameView(game, parameters);
+
         mainVBox.getChildren().add(2, gameView);
         gameView.draw();
-        gameView.mainPage = this;
-        grenadeButton.setVisible(false);
-        jumpButton.setVisible(true);
+        gameView.setMainPage(this);
         updateEntitiesLabel();
-
-        turnLabel.setText("Tour n°" + game.getTurn());
 
         // On ajoute la première position du monstre dans l'historique
         Coordinate monsterPosition = game.getMonster().getPosition();
 
-        // Cela peut paraître bizarre de récreer une coordonnée avec les mêmes coordonnées,
-        // mais c'est simplement car sinon les deux instances seront liés et cette position
-        // sera dans l'historique sera modifiée à chaque nouveau déplacement du monstre (ce qu'on ne veut pas!)
-        game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()), CellInfo.MONSTER, game.getTurn()));
-    }
+        // Cela peut paraître bizarre de récreer une coordonnée avec les mêmes
+        // coordonnées,
+        // mais c'est simplement car sinon les deux instances seront liés et cette
+        // position
+        // sera dans l'historique sera modifiée à chaque nouveau déplacement du monstre
+        // (ce qu'on ne veut pas!)
+        game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()),
+                CellInfo.MONSTER, game.getTurn()));
 
+        if (parameters.getGameMode() == GameMode.BOT) {
+            // On crée la MonsterStrategy ou la HunterStrategy en fonction du rôle que le
+            // joueur a pris.
+            if (parameters.isAiPlayerIsHunter()) {
+                monsterStrategy = new MonsterStrategy(game);
+                playTurn(); // Comme c'est toujours le monstre qui commence, on le laisse d'abord jouer.
+            } else {
+                hunterStrategy = new HunterStrategy();
+            }
+        }
+    }
 
     @FXML
     public void initialize() {
         initGame();
     }
 
-    /** Cette méthode permet de créer un Thread qui attends automatiquement le nombre de millisecondes données en paramètre, puis éxecute le code de l'argument continuation.
-     * @param millis Le nombre de millisecondes à attendre
+    /**
+     * Cette méthode permet de créer un Thread qui attends automatiquement le nombre
+     * de millisecondes données en paramètre, puis éxecute le code de l'argument
+     * continuation.
+     * 
+     * @param millis       Le nombre de millisecondes à attendre
      * @param continuation Le code à éxecuter à la fin du delay.
      */
     public static void delay(long millis, Runnable continuation) {
         Task<Void> sleeper = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                try { Thread.sleep(millis); }
-                catch (InterruptedException e) { }
+                Thread.sleep(millis);
                 return null;
             }
         };
@@ -114,107 +135,129 @@ public class GameController {
         new Thread(sleeper).start();
     }
 
-
     @FXML
-    public void playButtonPressed() throws InterruptedException {
+    public void playButtonPressed() {
+        playTurn();
+    }
 
-        if(game.isGameEnded()) {
-            return;
+    private boolean isBotTurn() {
+        return parameters.getGameMode() == GameMode.BOT
+                && ((gameView.isHunterTurn() && !parameters.isAiPlayerIsHunter()
+                        || !gameView.isHunterTurn() && parameters.isAiPlayerIsHunter()));
+    }
+
+    private void playTurn() {
+        if (isBotTurn()) {
+            if (parameters.isAiPlayerIsHunter()) {
+                gameView.setMovePosition(monsterStrategy.play()); // on fait jouer le monstre
+            } else {
+                while (game.getHunter().getShootsLeft() > 0) {
+                    gameView.setCursorPosition(game.randomPosition()); // on fait jouer le chasseur
+                    gameView.play();
+                }
+            }
         }
-        if(gameView.isHunterTurn || gameView.play()) {
+        if (gameView.isHunterTurn() || gameView.play()) {
             errorLabel.setText("");
             updateEntitiesLabel();
         } else {
             errorLabel.setText("Mouvement invalide!");
-            return;
         }
-        turnLabel.setText("Tour n°" + game.getTurn());
-        
-        if(game.monsterWon()) {
+
+        if (game.monsterWon()) {
             game.setGameEnded(true);
-            endTurnButton.setVisible(false);
-            errorLabel.setText("Le monstre a gagné!");
-            gameView.draw();
-            return;
+        }
+
+        if (game.isGameEnded()) {
+            if (game.monsterWon()) {
+                winnerLabel.setText("Le monstre a gagné!");
+            } else {
+                winnerLabel.setText("Le chasseur a gagné!");
+            }
+            gameOverScreen.setVisible(true);
         }
         swapScreen();
-        gameView.draw();
     }
 
     @FXML
-    public void grenadeButtonPressed() throws InterruptedException {
-        if(game.getHunter().grenadeLeft > 0){
-            if(game.getHunter().grenade){
-                powerupEnabledLabel.setVisible(false);
-                game.getHunter().grenade = false;
-            }
-            else{
-                powerupEnabledLabel.setVisible(true);
-                game.getHunter().grenade = true;
-            }
-        }
-        else{
+    public void grenadeButtonPressed() {
+        if (game.getHunter().getGrenadesLeft() > 0) {
+            boolean grenadeMode = game.getHunter().isGrenadeMode();
+            powerupEnabledLabel.setVisible(grenadeMode);
+            game.getHunter().setGrenadeMode(!grenadeMode);
+        } else {
             errorLabel.setText("Vous n'avez plu de grenade...");
         }
     }
 
     @FXML
-    public void jumpButtonPressed() throws InterruptedException {
-        if(game.getMonster().superJumpLeft > 0){
-            if(game.getMonster().superJump == true){
+    public void jumpButtonPressed() {
+        if (game.getMonster().superJumpLeft > 0) {
+            if (game.getMonster().superJump) {
                 powerupEnabledLabel.setVisible(false);
                 game.getMonster().superJump = false;
-            }
-            else{
+            } else {
                 powerupEnabledLabel.setVisible(true);
                 game.getMonster().superJump = true;
             }
-        }
-        else{
+        } else {
             errorLabel.setText("Vous n'avez plu de SuperJump...");
         }
     }
 
     private void swapScreen() {
-        // Animation de l'écran
-        switchPane.setVisible(true);
-        switchPaneCountdown.setText("Dans 3...");
-        delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
-        delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
-        delay(3000, () -> switchPane.setVisible(false));
+        if (parameters.getGameMode() == GameMode.TWO_PLAYERS) {
+            // Animation de l'écran
+            switchPane.setVisible(true);
+            switchPaneCountdown.setText("Dans 3...");
+            delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
+            delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
+            delay(3000, () -> switchPane.setVisible(false));
+        }
 
         // On échange les tours
-        gameView.isHunterTurn = !gameView.isHunterTurn;
-        updateEntitiesLabel();
-        if(gameView.isHunterTurn) {
+        gameView.setHunterTurn(!gameView.isHunterTurn());
+        if (gameView.isHunterTurn()) {
             game.getHunter().turnBegin();
-            game.getHunter().grenade = false;
+            game.getHunter().setGrenadeMode(false);
         } else {
             game.getMonster().superJump = false;
-            gameView.monsterView.turnStarted();
+            gameView.getMonsterView().turnStarted();
+        }
+
+        updateEntitiesLabel();
+        gameView.draw();
+
+        if (isBotTurn()) {
+            playTurn();
         }
     }
 
     @FXML
     public void restartGamePressed() {
+        System.out.println("restart");
         initGame();
     }
 
     @FXML
     public void menuButtonPressed() throws IOException {
-        app = App.getApp();
-        app.changeScene("menu");
-        System.out.println("co");
+        App.getApp().changeScene("menu");
     }
 
     public void updateEntitiesLabel() {
-        shootLeftLabel.setText("Il vous reste " + game.getHunter().shootLeft + " tir(s)!");
-        grenadeButton.setText("Grenade (" + game.getHunter().grenadeLeft + ")");
+        if (game.getHunter().getShootsLeft() == 1) {
+            shootLeftLabel.setText("Il vous reste " + game.getHunter().getShootsLeft() + " tir!");
+        } else {
+            shootLeftLabel.setText("Il vous reste " + game.getHunter().getShootsLeft() + " tirs!");
+
+        }
+        turnLabel.setText("Tour n°" + game.getTurn());
+        grenadeButton.setText("Grenade (" + game.getHunter().getGrenadesLeft() + ")");
         jumpButton.setText("SuperJump (" + game.getMonster().superJumpLeft + ")");
-        
-        grenadeButton.setVisible(gameView.isHunterTurn);
-        jumpButton.setVisible(!gameView.isHunterTurn);
-        powerupEnabledLabel.setVisible(game.getHunter().grenade || game.getMonster().superJump);
-        shootLeftLabel.setVisible(gameView.isHunterTurn);
+
+        grenadeButton.setVisible(gameView.isHunterTurn());
+        jumpButton.setVisible(!gameView.isHunterTurn());
+        powerupEnabledLabel.setVisible(game.getHunter().isGrenadeMode() || game.getMonster().superJump);
+        shootLeftLabel.setVisible(gameView.isHunterTurn());
     }
 }

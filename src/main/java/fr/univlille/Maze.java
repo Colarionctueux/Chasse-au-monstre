@@ -8,46 +8,47 @@ import java.util.Random;
 public class Maze {
     private int tailleX;
     private int tailleY;
-    private boolean[][] maze;
+    private boolean[][] mazeTile;
 
     public Maze(int tailleX, int tailleY) {
         this.tailleX = tailleX;
         this.tailleY = tailleY;
-        this.maze = new boolean[tailleY][tailleX];
+        this.mazeTile = new boolean[tailleY][tailleX];
         initializeMaze();
     }
 
     private void initializeMaze() {
-        for (boolean[] row : maze) {
+        for (boolean[] row : mazeTile) {
             Arrays.fill(row, true);
         }
     }
 
     public boolean[][] createMaze(double threshold) {
         recursiveBacktrack(0, 0);
-        
+
         Random random = new Random();
-        for (int y = 0; y < maze.length; y++) {
-            for (int x = 0; x < maze[0].length; x++) {
-                if(random.nextDouble() > threshold) {
-                    maze[y][x] = false;
+        for (int y = 0; y < mazeTile.length; y++) {
+            for (int x = 0; x < mazeTile[0].length; x++) {
+                if (random.nextDouble() > threshold) {
+                    mazeTile[y][x] = false;
                 }
             }
         }
-        return maze;
+        return mazeTile;
     }
 
     private void recursiveBacktrack(int currentX, int currentY) {
-        List<int[]> directions = Arrays.asList(new int[]{0, -2}, new int[]{0, 2}, new int[]{-2, 0}, new int[]{2, 0});
+        List<int[]> directions = Arrays.asList(new int[] { 0, -2 }, new int[] { 0, 2 }, new int[] { -2, 0 },
+                new int[] { 2, 0 });
         Collections.shuffle(directions);
 
         for (int[] direction : directions) {
             int newX = currentX + direction[0];
             int newY = currentY + direction[1];
 
-            if (isValidCell(newX, newY) && maze[newY][newX]) {
-                maze[currentY + direction[1] / 2][currentX + direction[0] / 2] = false; // Ouvre le mur
-                maze[newY][newX] = false; // Marque la nouvelle case comme visitée
+            if (isValidCell(newX, newY) && mazeTile[newY][newX]) {
+                mazeTile[currentY + direction[1] / 2][currentX + direction[0] / 2] = false; // Ouvre le mur
+                mazeTile[newY][newX] = false; // Marque la nouvelle case comme visitée
                 recursiveBacktrack(newX, newY); // Appel récursif pour la nouvelle case
             }
         }
@@ -58,7 +59,7 @@ public class Maze {
     }
 
     public boolean[][] getMaze() {
-        return maze;
+        return mazeTile;
     }
 
     public Coordinate getDimensions() {
@@ -68,10 +69,10 @@ public class Maze {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append("Maze " + tailleX + ", " + tailleY + "\n");
+        str.append("mazeTile " + tailleX + ", " + tailleY + "\n");
         for (int y = 0; y < tailleY; y++) {
             for (int x = 0; x < tailleX; x++) {
-                if(maze[y][x]) {
+                if (mazeTile[y][x]) {
                     str.append(' ');
                 } else {
                     str.append('#');
