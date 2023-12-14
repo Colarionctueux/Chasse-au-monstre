@@ -11,6 +11,7 @@ import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import javafx.application.Platform;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.fxml.FXML;
 
@@ -31,10 +32,22 @@ public class LobbyController extends AnchorPane {
     private Label client_role;
 
     @FXML
+    private Button button_start_game;
+
+    @FXML
     public void backButtonPressed() throws IOException {
         app = App.getApp();
         app.changeScene("menu");
         Server.getInstance().kill();
+    }
+
+    @FXML
+    public void startGame() throws IOException {
+        // The host is the only able to start the game.
+        // He cannot start it if there is no client.
+        if (Client.getInstance().isAlive()) {
+            System.out.println("starting game...");
+        }
     }
 
     @FXML
@@ -67,9 +80,15 @@ public class LobbyController extends AnchorPane {
         }
     }
 
+    private void hideStartGameButton() {
+        button_start_game.setDisable(true); 
+        button_start_game.setVisible(false);
+    }
+
     public void initialize() {
         this.model = new LobbyModel();
         if (Client.getInstance().isAlive()) {
+            hideStartGameButton(); // the client cannot launch the game
             Client client = Client.getInstance();
 
             // Will handle all messages from the server (in the lobby only)
