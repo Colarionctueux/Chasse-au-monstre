@@ -53,8 +53,8 @@ public class App extends Application {
     public void stop() throws Exception {
         super.stop();
         // making sure the server and the client are properly closed when exiting the app
-        Server.getInstance().kill();
-        Client.getInstance().kill();
+        Client.getInstance().kill(false);
+        Server.getInstance().kill(false);
     }
 
     public void changeScene(String name) throws IOException {

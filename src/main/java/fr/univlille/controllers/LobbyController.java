@@ -38,7 +38,15 @@ public class LobbyController extends AnchorPane {
     public void backButtonPressed() throws IOException {
         app = App.getApp();
         app.changeScene("menu");
-        Server.getInstance().kill();
+        try {
+            if (Server.getInstance().isAlive()) {
+                Server.getInstance().kill(true);
+            } else {
+                Client.getInstance().kill(true);
+            }
+        } catch (Exception e) {
+            System.err.println("Cannot kill the instance of multiplayer body : " + e.getMessage());
+        }
     }
 
     @FXML
@@ -105,12 +113,21 @@ public class LobbyController extends AnchorPane {
                                 model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
                                 applyModel();
                                 break;
+                            case SERVER_TERMINATION:
+                                try {
+                                    System.out.println("server termination, about to kill Client");
+                                    Client.getInstance().kill(false);
+                                    App.getApp().changeScene("menu");
+                                } catch (Exception e) {
+                                    System.out.println("Server termination led to error : " + e.getMessage());
+                                }
+                                break;
                             default:
                                 System.out.println("incoming communication from server was ignored by client : " + message);
                                 // ignored
                         }
                     } catch (Exception e) {
-                        System.err.println("An error occured while interpreting the communication of the server : ");
+                        System.err.println("An error occured while interpreting the communication of the server : " + message);
                         e.printStackTrace();
                     }
                 });
@@ -127,11 +144,19 @@ public class LobbyController extends AnchorPane {
                 // (so as soon as it can).
                 Platform.runLater(() -> {
                     MultiplayerCommunication announce = server.pollCommunication();
-                    if (announce.isCommand(MultiplayerCommand.JOIN) && announce.hasParameters()) {
-                        client_name.setText(announce.getParameter(0));
-                        // the server should not receive any other request
-                        server.stopIncomingCommunicationCallback();
-                        server.closeRequests();
+                    System.out.println("Server handling communication : " + announce);
+                    switch (announce.getCommand()) {
+                        case JOIN:
+                            client_name.setText(announce.getParameter(0));
+                            server.closeRequests();
+                            break;
+                        case DISCONNECTION:
+                            client_name.setText("???");
+                            server.reacceptRequests();
+                            break;
+                        default:
+                            System.out.println("incoming communication from server was ignored by client : " + announce);
+                            // ignored
                     }
                 });
             });

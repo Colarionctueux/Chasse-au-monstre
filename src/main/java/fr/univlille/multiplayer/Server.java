@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,26 +27,34 @@ public class Server extends MultiplayerBody {
 
 	/**
 	 * Creates a server socket and listens to client messages in non-blocking threads.
-	 * It will accept any incoming request as long as `Server.acceptingNewUsers` is `true` (which is its default value).
-	 * The clients will need the hostname (the name of the phsyical machine) that this function is returning.
+	 * It will accept any incoming request as long as `acceptingNewUsers` is `true`.
+	 * By default, this function will set `acceptingNewUsers` to `true`.
+	 * The clients will need the hostname (the name of the phsyical machine) in order to subscribe.
 	 * @param port The port that the server will use for its communications.
 	 */
 	public void host(int port) {
 		try {
 			server = new ServerSocket(port);
+			acceptingNewUsers = true; // just making sure it's `true` by default when creating the server (it wouldn't make sense to set it to `false` at this point)
 			new Thread(() -> {
 				try {
-					while (isAlive() && acceptingNewUsers) {
-						Socket clientSocket = server.accept();
-						welcomeIncomingClient(clientSocket);
-
-						new Thread(new ClientHandler(clientSocket)).start();
+					while (isAlive()) {
+						if (acceptingNewUsers) {
+							Socket clientSocket = server.accept();
+							System.out.println("accepted new user : " + clientSocket);
+							welcomeIncomingClient(clientSocket);
+							new Thread(new ClientHandler(clientSocket)).start();
+						}
 					}
 				} catch (IOException e) {
 					System.err.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
 					System.err.println(e.getMessage());
 				}
 			}).start();
+		} catch (SocketException e) {
+			System.err.println("SOCKET EXCEPTION in host() of Server : this.server = " + this.server);
+			System.err.println(e.getMessage());
+			System.err.println(e.getCause());
 		} catch (IOException e) {
 			System.err.println("Exception caught when trying to initialize the server on port " + port);
 			System.err.println(e.getMessage());
@@ -60,33 +69,45 @@ public class Server extends MultiplayerBody {
 	}
 
 	/**
-	 * Stops the server.
-	 * The server has to be restarted (by calling `host()`) if it needs to be used again.
-	 * This methods sets `this.server` to `null`.
-	 * @throws IOException
+	 * Re-allows new users from joining the server.
 	 */
-	@Override
-	public void kill() throws IOException {
-		if (!isAlive()) {
-			return;
-		}
-		super.kill();
-		for (Socket socket : clientSockets) {
-			socket.close();
-		}
-		clientSockets.clear();
-		server.close();
-		server = null;
+	public void reacceptRequests() {
+		acceptingNewUsers = true;
 	}
 
 	/**
-	 * Checks if the server is running.
-	 * If the server's running then the `ServerSocket` instance shouldn't be null.
+	 * Stops the server.
+	 * The server has to be restarted (by calling `host()`) if it needs to be used again.
+	 * This methods sets `this.server` to `null`.
+	 * 
+	 * This method will inform all the listeners of the server termination.
+	 * @throws IOException
+	 */
+	@Override
+	public void kill(boolean propagate) throws IOException {
+		if (!isAlive()) {
+			return;
+		}
+		super.kill(propagate);
+		if (propagate) {
+			broadcast(
+				new MultiplayerCommunication(
+					MultiplayerCommand.SERVER_TERMINATION
+				)
+			);
+		}
+		for (Socket socket : clientSockets) socket.close();
+		clientSockets.clear();
+		server.close();
+	}
+
+	/**
+	 * Checks if the server is running (the `ServerSocket` shouldn't be closed).
 	 * @return `true` if the server is running, `false` otherwise.
 	 */
 	@Override
 	public boolean isAlive() {
-		return server != null;
+		return server != null && !server.isClosed();
 	}
 
 	/**
@@ -120,6 +141,17 @@ public class Server extends MultiplayerBody {
 		}
 	}
 
+	/**
+	 * Removes any closed socket from the list of client sockets.
+	 */
+	private void filterOutDisconnectedClients() {
+		for (Socket clientSocket : clientSockets) {
+			if (clientSocket.isClosed()) {
+				clientSockets.remove(clientSocket);
+			}
+		}
+	}
+
 	private final class ClientHandler implements Runnable {
 		private Socket clientSocket;
 
@@ -134,7 +166,7 @@ public class Server extends MultiplayerBody {
 				BufferedReader in = MultiplayerUtils.getInputFromSocket(clientSocket);
 			) {
 				String inputLine;
-				while ((inputLine = in.readLine()) != null) {
+				while (isAlive() && (inputLine = in.readLine()) != null) {
 					System.out.println("Server received: " + inputLine);
 					try {
 						MultiplayerCommunication incoming = new MultiplayerCommunication(inputLine);
@@ -142,20 +174,22 @@ public class Server extends MultiplayerBody {
 						if (onIncomingCommunicationCallback != null) {
 							onIncomingCommunicationCallback.run();
 						}
+						// The client socket was closed client-side,
+						// therefore the socket must be removed from the list of subscribers
+						if (incoming.isCommand(MultiplayerCommand.DISCONNECTION)) {
+							filterOutDisconnectedClients();
+						}
 					} catch (InvalidCommunicationException e) {
 						// Invalid communications are ignored.
 						System.err.println("Server received invalid communication : " + inputLine);
 					}
 				}
+			} catch (SocketException e) {
+				System.err.println("SOCKET exception in Server ClientHandler (" + server + ")");
+				System.out.println(e.getMessage());
 			} catch (IOException e) {
 				System.err.println("Error handling client input");
 				e.printStackTrace();
-			} finally {
-				try {
-					clientSocket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 	}

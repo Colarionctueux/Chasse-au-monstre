@@ -80,7 +80,8 @@ public abstract class MultiplayerBody {
 
 	public abstract boolean isAlive();
 	
-	public void kill() throws IOException {
+	public void kill(boolean propagate) throws IOException {
+		stopIncomingCommunicationCallback();
 		dropCommunications();
 	}
 }
