@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -22,12 +23,16 @@
                   <Font size="32.0" />
                </font>
             </Label>
+            <Label text="Jouez une partie contre l'IA" />
+            <CheckBox mnemonicParsing="false" text="Jouer le monstre" />
             <GridPane vgap="8.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -36,18 +41,22 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Nombre de tirs chasseur" />
-                  <Spinner fx:id="hunterShootsSpinner" editable="true" GridPane.columnIndex="1" />
-                  <Label text="Nombre de grenade chasseur" GridPane.rowIndex="1" />
-                  <Spinner fx:id="hunterGrenadesSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="Taille X" GridPane.rowIndex="2" />
-                  <Spinner fx:id="mazeSizeXSpinner" editable="true" layoutX="302.0" layoutY="72.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Label layoutX="10.0" layoutY="16.0" text="Taille Y" GridPane.rowIndex="3" />
-                  <Spinner fx:id="mazeSizeYSpinner" editable="true" layoutX="10.0" layoutY="12.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <CheckBox fx:id="fogOfWarCheckBox" mnemonicParsing="false" onAction="#fogChecked" text="Brouillard de guerre" GridPane.rowIndex="4" />
-                  <Label text="Pourcentage de mur" GridPane.rowIndex="5" />
-                  <Spinner fx:id="wallPercentageSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Spinner fx:id="fogOfWarSpinner" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label text="Nombre de tirs chasseur" GridPane.rowIndex="2" />
+                  <Spinner fx:id="hunterShootsSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Nombre de grenade chasseur" GridPane.rowIndex="3" />
+                  <Spinner fx:id="hunterGrenadesSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label text="Taille X" GridPane.rowIndex="4" />
+                  <Spinner fx:id="mazeSizeXSpinner" editable="true" layoutX="302.0" layoutY="72.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label layoutX="10.0" layoutY="16.0" text="Taille Y" GridPane.rowIndex="5" />
+                  <Spinner fx:id="mazeSizeYSpinner" editable="true" layoutX="10.0" layoutY="12.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <CheckBox fx:id="fogOfWarCheckBox" mnemonicParsing="false" onAction="#fogChecked" text="Brouillard de guerre" GridPane.rowIndex="6" />
+                  <Label text="Pourcentage de mur" GridPane.rowIndex="7" />
+                  <Spinner fx:id="wallPercentageSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <Spinner fx:id="fogOfWarSpinner" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Label text="Nom du monstre" />
+                  <Label text="Nom du chasseur" GridPane.rowIndex="1" />
+                  <TextField GridPane.columnIndex="1" />
+                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <Separator prefWidth="200.0" />
