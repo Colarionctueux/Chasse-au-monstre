@@ -77,6 +77,15 @@ public class Server extends MultiplayerBody {
 	}
 
 	/**
+	 * Checks if the server has clients.
+	 * A server must be alive to have clients.
+	 * @return `true` if the server has clients, `false` otherwise.
+	 */
+	public boolean hasClients() {
+		return isAlive() && !clientSockets.isEmpty();
+	}
+
+	/**
 	 * Stops the server.
 	 * The server has to be restarted (by calling `host()`) if it needs to be used again.
 	 * This methods sets `this.server` to `null`.

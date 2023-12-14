@@ -53,9 +53,19 @@ public class LobbyController extends AnchorPane {
     public void startGame() throws IOException {
         // The host is the only able to start the game.
         // He cannot start it if there is no client.
-        if (Client.getInstance().isAlive()) {
+        if (Server.getInstance().hasClients()) {
             System.out.println("starting game...");
         }
+    }
+
+    @FXML
+    public void startGameMouseEntered() {
+        button_start_game.setText("PAS ENCORE DISPO");
+    }
+
+    @FXML
+    public void startGameMouseExited() {
+        button_start_game.setText("Lancer la partie");
     }
 
     @FXML

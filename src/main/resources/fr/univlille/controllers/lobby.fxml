@@ -50,7 +50,7 @@
             <Image url="@../../../images/fleche.png" />
          </image>
       </ImageView>
-      <Button fx:id="button_start_game" onAction="#startGame" layoutX="456.0" layoutY="577.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="390.0" styleClass="buttons" stylesheets="@style.css" text="Lancer la partie" textFill="WHITE">
+      <Button fx:id="button_start_game" onMouseEntered="#startGameMouseEntered" onMouseExited="#startGameMouseExited" onAction="#startGame" layoutX="456.0" layoutY="577.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="390.0" styleClass="buttons" stylesheets="@style.css" text="Lancer la partie" textFill="WHITE">
          <font>
             <Font name="System Bold" size="32.0" />
          </font>
