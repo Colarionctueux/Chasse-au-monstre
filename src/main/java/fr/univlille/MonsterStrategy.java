@@ -13,6 +13,7 @@ public class MonsterStrategy implements IMonsterStrategy{
 
     int exitCol;
     int exitRow;
+    
 
     int mazeHeight;
     int mazeWidth;
