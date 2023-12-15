@@ -21,6 +21,9 @@ public class MultiplayerCommunication {
       command = MultiplayerCommand.values()[Integer.parseInt(matcher.group(1))];
       if (matcher.group(2).length() >= 1) {
         parameters = matcher.group(2).split(";");
+        if (parameters.length == 0) {
+          throw new InvalidCommunicationException(message, "Empty argument was given.");
+        }
       }
     } catch (IllegalStateException e) {
       throw new InvalidCommunicationException(message, "The format isn't right.");
