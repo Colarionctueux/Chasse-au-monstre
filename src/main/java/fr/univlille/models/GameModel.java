@@ -40,6 +40,10 @@ public class GameModel extends Subject {
         return parameters;
     }
 
+    public boolean[][] getMaze() {
+        return maze;
+    }
+
     public void setParameters(GameParameters parameters) {
         this.parameters = parameters;
     }

@@ -27,10 +27,8 @@ public class HunterView {
         this.gameModel = gameModel;
         this.model = gameModel.getHunter();
     }
-
+    
     public void draw() {
-        ICoordinate dimensions = gameModel.getMazeDimensions();
-        initMazeWithDimensions(dimensions);
         graphicStyle();
         drawBoard();
         
@@ -46,7 +44,24 @@ public class HunterView {
         ViewUtils.drawSimpleTexture(gc, new Coordinate(64, 256), gameView.getMovePosition()); // Le mouvement
     }
 
+    private void drawCheckboard() {
+        ICoordinate dimensions = gameModel.getMazeDimensions();
+        gc.drawImage(
+            GameView.spritesheet, 192, 192, 64, 64, 0, 0,
+            (double) dimensions.getRow() * GameView.TILE_SIZE,
+            (double) dimensions.getCol() * GameView.TILE_SIZE
+        );
+        for (int y = 0; y < dimensions.getRow(); y++) {
+            for (int x = 0; x < dimensions.getCol(); x++) {
+                if (x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
+                    ViewUtils.drawSimpleTexture(gc, 192, 128, x, y);
+                }
+            }
+        }
+    }
+
     private void drawBoard() {
+        drawCheckboard();
         for (ICellEvent cellEvent : gameModel.getHunter().getShootsHistory()) {
             Coordinate coord = (Coordinate) cellEvent.getCoord();
             if (cellEvent.getState() == CellInfo.WALL) {
@@ -75,18 +90,6 @@ public class HunterView {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         gc.setFont(new Font("Comic Sans MS", 16));
-    }
-
-    private void initMazeWithDimensions(ICoordinate dimensions) {
-        for (int y = 0; y < dimensions.getRow(); y++) {
-            for (int x = 0; x < dimensions.getCol(); x++) {
-                if (x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
-                    ViewUtils.drawSimpleTexture(gc, 192, 128, x, y);
-                } else {
-                    ViewUtils.drawSimpleTexture(gc, 192, 192, x, y);
-                }
-            }
-        }
     }
 
     public boolean playMove() {

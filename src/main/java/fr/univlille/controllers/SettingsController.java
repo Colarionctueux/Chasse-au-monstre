@@ -38,8 +38,6 @@ public class SettingsController {
     @FXML
     public Spinner<Integer> wallPercentageSpinner;
 
-    @FXML
-    public TextField nameTextField;
 
     @FXML
     public Label gameModeLabel;
@@ -60,7 +58,6 @@ public class SettingsController {
         bindFactory(fogOfWarSpinner, 1, 10, 1);
         GameMode gameMode = App.getApp().parameters.getGameMode();
         playerRoleCheckBox.setVisible(gameMode == GameMode.BOT);
-        nameTextField.setVisible(gameMode == GameMode.BOT);
         switch (gameMode) {
             case BOT:
                 gameModeLabel.setText("Jouer contre un robot");

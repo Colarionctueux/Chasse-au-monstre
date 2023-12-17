@@ -139,15 +139,27 @@ public class MonsterView {
         }
     }
 
-    private void drawBoard() {
+    private void drawCheckboard() {
         ICoordinate dimensions = gameModel.getMazeDimensions();
+        gc.drawImage(
+            GameView.spritesheet, 192, 64, 64, 64, 0, 0,
+            (double) dimensions.getRow() * GameView.TILE_SIZE,
+            (double) dimensions.getCol() * GameView.TILE_SIZE
+        );
         for (int y = 0; y < dimensions.getRow(); y++) {
             for (int x = 0; x < dimensions.getCol(); x++) {
                 if (x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
                     ViewUtils.drawSimpleTexture(gc, 192, 0, x, y);
-                } else {
-                    ViewUtils.drawSimpleTexture(gc, 192, 64, x, y);
                 }
+            }
+        }
+    }
+
+    private void drawBoard() {
+        ICoordinate dimensions = gameModel.getMazeDimensions();
+        drawCheckboard();
+        for (int y = 0; y < dimensions.getRow(); y++) {
+            for (int x = 0; x < dimensions.getCol(); x++) {
                 if (gameModel.isWallAt(x, y)) {
                     ViewUtils.drawSimpleTexture(gc, 0, 64, x, y); // Arbre
                 } else {

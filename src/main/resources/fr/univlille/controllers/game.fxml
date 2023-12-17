@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -23,13 +22,8 @@
                </font>
             </Label>
             <Label fx:id="errorLabel" textFill="RED" />
-            <HBox alignment="CENTER" prefHeight="32.0" prefWidth="768.0">
-               <children>
-                  <ToggleButton fx:id="grenadeButton" mnemonicParsing="false" onAction="#grenadeButtonPressed" text="Grenade" />
-                  <ToggleButton fx:id="jumpButton" mnemonicParsing="false" onAction="#jumpButtonPressed" text="SuperJump" />
-               </children>
-            </HBox>
-            <Label fx:id="powerupEnabledLabel" prefHeight="16.0" prefWidth="40.0" text="[Actif]" textAlignment="CENTER" textFill="LIME" />
+            <ToggleButton fx:id="powerupButton" mnemonicParsing="false" onAction="#powerupButtonPressed" text="PowerupButton" />
+            <Label fx:id="powerupEnabledLabel" prefHeight="16.0" prefWidth="40.0" text="[Actif]" textAlignment="CENTER" textFill="#007c00" />
             <Button fx:id="endTurnButton" mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
          </children>
       </VBox>

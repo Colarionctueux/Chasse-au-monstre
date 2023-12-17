@@ -3,6 +3,7 @@ package fr.univlille.views;
 import fr.univlille.Theme;
 import fr.univlille.controllers.GameController;
 import fr.univlille.Coordinate;
+import fr.univlille.GameMode;
 import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
@@ -74,14 +75,12 @@ public class GameView extends Canvas implements Observer {
      */
     public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
 
-    /**
-     * The game allows the player to choose a custom theme.
-     * Each theme has its own set of graphics.
-     */
-    private Theme theme;
+    private GameParameters parameters;
+
 
     public GameView(GameModel model, GameParameters parameters) {
         this.model = model;
+        this.parameters = parameters;
 
         this.gc = getGraphicsContext2D();
 
@@ -115,6 +114,8 @@ public class GameView extends Canvas implements Observer {
             } else {
                 handleMousePressedMonster();
             }
+            draw();
+            mainPage.updateEntitiesLabel();
         });
 
         // on attache la vue au hunter
@@ -122,8 +123,7 @@ public class GameView extends Canvas implements Observer {
     }
 
     public void handleMousePressedHunter() {
-        if (model.isGameEnded()
-                || (model.getHunter().getShootsLeft() <= 0 && model.getHunter().getGrenadesLeft() <= 0)) {
+        if (model.isGameEnded() || (model.getHunter().getShootsLeft() <= 0 && model.getHunter().getGrenadesLeft() <= 0)) {
             return;
         }
         if (model.getHunter().isGrenadeMode()) {
@@ -132,8 +132,6 @@ public class GameView extends Canvas implements Observer {
         if (model.getHunter().isHunterShootValid(cursorPosition)) {
             play();
         }
-        draw();
-        mainPage.updateEntitiesLabel();
     }
 
     public void handleMousePressedMonster() {
@@ -144,8 +142,11 @@ public class GameView extends Canvas implements Observer {
         } else if (model.getMonster().isMonsterMovementValid(cursorPosition, 1.0)) {
             movePosition = cursorPosition;
         }
-        draw();
-        mainPage.jumpButton.setText("SuperJump (" + model.getMonster().superJumpLeft + ")");
+
+        // Si le joueur joue contre un robot, alors on termine immédiatement le tour (pour éviter qu'il ait a déplacer sa souris le bouton en bas)
+        if (parameters.getGameMode() == GameMode.BOT && !parameters.isAiPlayerIsHunter()) {
+            mainPage.playTurn();
+        }
     }
 
     public ICoordinate getCursorPosition() {
@@ -239,7 +240,6 @@ public class GameView extends Canvas implements Observer {
             default:
                 return;
         }
-        this.theme = theme;
         draw();
     }
 
@@ -276,7 +276,7 @@ public class GameView extends Canvas implements Observer {
             model.setGameEnded(true);
         } else {
             mainPage.errorLabel
-                    .setText("Le monstre est passé ici il y a " + (model.getTurn() - cellEvent.getTurn()) + " tours.");
+                    .setText("Le monstre est passé ici au tour n° " + cellEvent.getTurn() + ".");
         }
     }
 }

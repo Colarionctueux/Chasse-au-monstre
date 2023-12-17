@@ -9,6 +9,7 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.utils.Subject;
+import javafx.scene.control.skin.CheckBoxSkin;
 
 public class HunterModel extends Subject {
     private ArrayList<ICellEvent> shootsHistory;
@@ -16,7 +17,6 @@ public class HunterModel extends Subject {
     private GameModel gameModel;
 
     private int maxShoots;
-    private int maxGrenades;
 
     private int shootsLeft;
     private int grenadesLeft;
@@ -55,21 +55,16 @@ public class HunterModel extends Subject {
         return maxShoots;
     }
 
-    public int getMaxGrenades() {
-        return maxGrenades;
-    }
-
     public HunterModel(GameModel gameModel) {
         this.gameModel = gameModel;
         this.maxShoots = gameModel.getParameters().getHunterShoots();
-        this.maxGrenades = gameModel.getParameters().getHunterGrenades();
         this.shootsLeft = this.maxShoots;
-        this.grenadesLeft = this.maxGrenades;
+        this.grenadesLeft = gameModel.getParameters().getHunterGrenades();
         shootsHistory = new ArrayList<>();
     }
 
     public void turnBegin() {
-        this.shootsLeft = gameModel.getParameters().getHunterShoots();
+        this.shootsLeft = maxShoots;
     }
 
     /**
@@ -81,8 +76,8 @@ public class HunterModel extends Subject {
      */
     public boolean isHunterShootValid(ICoordinate shoot) {
         ICoordinate mazeDimensions = gameModel.getMazeDimensions();
-        return shoot.getCol() >= 0 && shoot.getCol() < mazeDimensions.getCol() && shoot.getRow() >= 0
-                && shoot.getRow() < mazeDimensions.getRow();
+        return shoot.getCol() >= 0 && shoot.getCol() < mazeDimensions.getCol()
+            && shoot.getRow() >= 0 && shoot.getRow() < mazeDimensions.getRow();
     }
 
     /**
@@ -97,7 +92,16 @@ public class HunterModel extends Subject {
             state = CellInfo.WALL;
         }
 
-        for (ICellEvent cellEvent : gameModel.getHistory()) {
+        // remove other shoots history with the same position
+        for (int i = shootsHistory.size() - 1; i >= 0; i--) {
+            if (shootsHistory.get(i).getCoord().equals(shootPosition)) {
+                shootsHistory.remove(i);
+            }
+        }
+        
+        // l'historique de déplacement du monstre
+        for (int i = gameModel.getHistory().size() - 1; i >= 0; i--) {
+            ICellEvent cellEvent = gameModel.getHistory().get(i);
             if (cellEvent.getCoord().equals(shootPosition)) {
                 shootsHistory.add(cellEvent);
                 notifyObservers(cellEvent);
@@ -106,12 +110,6 @@ public class HunterModel extends Subject {
         }
         CellEvent cellEvent = new CellEvent(shootPosition, state, gameModel.getTurn());
 
-        // remove other shoots history with the same position
-        for (int i = shootsHistory.size() - 1; i > 0; i--) {
-            if (shootsHistory.get(i).getCoord().equals(shootPosition)) {
-                shootsHistory.remove(i);
-            }
-        }
         shootsHistory.add(cellEvent);
         notifyObservers(cellEvent);
     }
