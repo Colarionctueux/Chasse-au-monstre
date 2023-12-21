@@ -77,7 +77,7 @@ public class MultiplayerCommunication {
    * @return The requested parameter as a string, or `null` if the index isn't valid.
    */
   public String getParameter(int index) {
-    if (index >= parameters.length) {
+    if (index < 0 || index >= parameters.length) {
       return null;
     }
     return parameters[index];
@@ -89,6 +89,12 @@ public class MultiplayerCommunication {
    */
   public boolean hasParameters() { return parameters != null; }
 
+  /**
+   * Transforms this communication into a string
+   * that another instance of `MultiplayerCommunication` can parse.
+   * 
+   * Create your own communication and send it via a socket by using this method.
+   */
   @Override
   public String toString() {
     if (hasParameters()) {

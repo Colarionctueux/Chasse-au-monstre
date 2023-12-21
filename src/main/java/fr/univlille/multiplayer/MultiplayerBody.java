@@ -1,6 +1,5 @@
 package fr.univlille.multiplayer;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -60,7 +59,7 @@ public abstract class MultiplayerBody {
 	 * @param callback
 	 */
 	public void setIncomingCommunicationCallback(Runnable callback) {
-		// WARNING: cannot use while(hasPendingRequests()) { callback.run(); }
+		// WARNING: cannot use `while(hasPendingRequests()) { callback.run(); }`
 		// because even tough the callback is ran, the actual code is ran using Platform.runLater()
 		// and as a consequence, the very first callback is actually executed when the loop is over,
 		// and so it would lead to infinite loop.
@@ -80,7 +79,7 @@ public abstract class MultiplayerBody {
 
 	public abstract boolean isAlive();
 	
-	public void kill(boolean propagate) throws IOException {
+	protected void kill() {
 		stopIncomingCommunicationCallback();
 		dropCommunications();
 	}

@@ -10,15 +10,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 
 public class JoinController extends AnchorPane {
-    private App app;
-
     @FXML
     public TextArea textarea;
 
     @FXML
     public void backButtonPressed() throws IOException {
-        app = App.getApp();
-        app.changeScene("menu");
+        App.getApp().changeScene("menu");
     }
 
     @FXML

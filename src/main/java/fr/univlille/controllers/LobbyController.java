@@ -17,7 +17,6 @@ import javafx.fxml.FXML;
 
 public class LobbyController extends AnchorPane {
     private LobbyModel model;
-    private App app;
 
     @FXML
     private Label hostname_label;
@@ -36,7 +35,7 @@ public class LobbyController extends AnchorPane {
 
     @FXML
     public void backButtonPressed() throws IOException {
-        app = App.getApp();
+        App app = App.getApp();
         app.changeScene("menu");
         try {
             if (Server.getInstance().isAlive()) {
@@ -115,70 +114,79 @@ public class LobbyController extends AnchorPane {
         this.model = new LobbyModel();
         if (Client.getInstance().isAlive()) {
             hideStartGameButton(); // the client cannot launch the game
-            Client client = Client.getInstance();
-
-            // Will handle all messages from the server (in the lobby only)
-            client.setIncomingCommunicationCallback(() -> {
-                Platform.runLater(() -> {
-                    MultiplayerCommunication message = Client.getInstance().pollCommunication();
-                    switch (message.getCommand()) {
-                        case HOST:
-                            hostname_label.setText(message.getParameter(0));
-                            client_name.setText(MultiplayerUtils.getHostname());
-                            break;
-                        case SET_GAME_ROLES:
-                            System.out.println("the client was told that the roles were changed :" + message);
-                            model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
-                            applyModel();
-                            break;
-                        case SERVER_TERMINATION:
-                            try {
-                                Client.getInstance().kill(false);
-                                App.getApp().changeScene("menu");
-                            } catch (Exception e) {
-                                System.out.println("Server termination led to error : " + e.getMessage());
-                            }
-                            break;
-                        default:
-                            System.out.println("incoming communication from server was ignored by client : " + message);
-                            // ignored
-                    }
-                });
-            });
+            handleClientSide();
         } else {
-            Server server = Server.getInstance();
-            // The server listens to the client's arrival
-            // in a non-blocking way for the main thread.
-            // Indeed we don't know when he's going to arrive, or if he's going to arrive at all.
-            server.setIncomingCommunicationCallback(() -> {
-                // Because we cannot update the JavaFX UI outside of the main thread,
-                // as it would cause synchronization issues,
-                // we tell it to run it "later"
-                // (so as soon as it can).
-                Platform.runLater(() -> {
-                    MultiplayerCommunication announce = server.pollCommunication();
-                    System.out.println("Server handling communication : " + announce);
-                    switch (announce.getCommand()) {
-                        case JOIN:
-                            System.out.println("a new player has joined the game : " + announce);
-                            client_name.setText(announce.getParameter(0));
-                            server.closeRequests();
-                            if (model.hasChanged()) {
-                                System.out.println("The model has changed, broadcasting this information...");
-                                broadcastRoles();
-                            }
-                            break;
-                        case DISCONNECTION:
-                            client_name.setText("???");
-                            server.reacceptRequests();
-                            break;
-                        default:
-                            System.out.println("incoming communication from server was ignored by server : " + announce);
-                            // ignored
-                    }
-                });
-            });
+            handleServerSide();
             hostname_label.setText(MultiplayerUtils.getHostname());
         }
+    }
+
+    private void handleClientSide() {
+        Client client = Client.getInstance();
+
+        // Will handle all messages from the server (in the lobby only)
+        client.setIncomingCommunicationCallback(() -> {
+            Platform.runLater(() -> {
+                MultiplayerCommunication message = Client.getInstance().pollCommunication();
+                switch (message.getCommand()) {
+                    case HOST:
+                        hostname_label.setText(message.getParameter(0));
+                        client_name.setText(MultiplayerUtils.getHostname());
+                        break;
+                    case SET_GAME_ROLES:
+                        System.out.println("the client was told that the roles were changed :" + message);
+                        model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
+                        applyModel();
+                        break;
+                    case SERVER_TERMINATION:
+                        try {
+                            Client.getInstance().kill(false);
+                            App.getApp().changeScene("menu");
+                        } catch (Exception e) {
+                            System.out.println("Server termination led to error : " + e.getMessage());
+                        }
+                        break;
+                    default:
+                        System.out.println("incoming communication from server was ignored by client : " + message);
+                        // ignored
+                }
+            });
+        });
+    }
+
+    private void handleServerSide() {
+        Server server = Server.getInstance();
+        
+        // The server listens to the client's arrival
+        // in a non-blocking way for the main thread.
+        // Indeed we don't know when he's going to arrive, or if he's going to arrive at all.
+        server.setIncomingCommunicationCallback(() -> {
+            // Because we cannot update the JavaFX UI outside of the main thread,
+            // as it would cause synchronization issues,
+            // we tell it to run it "later"
+            // (so as soon as it can).
+            Platform.runLater(() -> {
+                MultiplayerCommunication announce = server.pollCommunication();
+                System.out.println("Server handling communication : " + announce);
+                switch (announce.getCommand()) {
+                    case JOIN:
+                        System.out.println("a new player has joined the game : " + announce);
+                        client_name.setText(announce.getParameter(0));
+                        server.closeRequests();
+                        if (model.hasChanged()) {
+                            System.out.println("The model has changed, broadcasting this information...");
+                            broadcastRoles();
+                        }
+                        break;
+                    case DISCONNECTION:
+                        client_name.setText("???");
+                        server.reacceptRequests();
+                        break;
+                    default:
+                        System.out.println("incoming communication from server was ignored by server : " + announce);
+                        // ignored
+                }
+            });
+        });
     }
 }

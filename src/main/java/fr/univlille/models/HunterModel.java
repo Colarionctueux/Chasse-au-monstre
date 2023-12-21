@@ -9,7 +9,6 @@ import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.utils.Subject;
-import javafx.scene.control.skin.CheckBoxSkin;
 
 public class HunterModel extends Subject {
     private ArrayList<ICellEvent> shootsHistory;

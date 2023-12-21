@@ -5,12 +5,23 @@ import java.io.BufferedReader;
 import java.net.UnknownHostException;
 import java.net.Socket;
 
+/**
+ * A player that's not hosting the game, but joining the game created by a host.
+ * The host uses the `Server` class, but a client doesn't have a server socket initialized.
+ */
 public class Client extends MultiplayerBody {
 	private static Client instance = null;
 	private Socket socket;
 	
+	// This class cannot get instantiated outside of the class itself.
 	private Client() {}
 
+	/**
+	 * This class is a singleton.
+	 * In order to use the methods of this class,
+	 * you need to get the unique instance.
+	 * @return The unique instance of the `Client` class.
+	 */
 	public static Client getInstance() {
 		if (instance == null) {
 			instance = new Client();
@@ -36,40 +47,58 @@ public class Client extends MultiplayerBody {
 				String serverMessage = "";
 				BufferedReader in = MultiplayerUtils.getInputFromSocket(socket);
 				while (isAlive() && (serverMessage = in.readLine()) != null) {
-					MultiplayerCommunication incoming;
-					try {
-						incoming = new MultiplayerCommunication(serverMessage);
-						System.out.println("Client is reading communication from server : " + incoming);
-						incomingBuffer.add(incoming);
-						if (onIncomingCommunicationCallback != null) {
-							onIncomingCommunicationCallback.run();
-						}
-						System.out.println("client analysed communication from server : " + incoming.toString());
-					} catch (InvalidCommunicationException e) {
-						// An invalid communication is ignored.
-						System.err.println("Server received invalid communication: " + serverMessage);
-					}
+					handleCommunicationOfServer(serverMessage);
 				}
 			} catch (IOException e) {
 				// When `kill()` is executed,
 				// an IOException ("socket closed") is thrown here.
-				// We catch and we don't want to do anything with it.
+				// We catch it and we don't want to do anything with it.
 			}
 		}).start();
 	}
 
 	/**
-	 * Terminates the client socket and informs the server about it.
+	 * Handles the incoming communication of the server.
+	 * This methods takes the stringified command read from the input stream of the socket. 
+	 * 
+	 * The communication is parsed into an instance of `MultiplayerCommunication`
+	 * and added into the incoming buffer.
+	 * 
+	 * If defined, `onIncomingCommunicationCallback` is called.
+	 * 
+	 * An invalid communication is ignored.
+	 * @param serverMessage The raw command as a string read from the input stream of the socket.
+	 */
+	private void handleCommunicationOfServer(String serverMessage) {
+		try {
+			MultiplayerCommunication incoming = new MultiplayerCommunication(serverMessage);
+			System.out.println("Client is reading communication from server : " + incoming);
+			incomingBuffer.add(incoming);
+			if (onIncomingCommunicationCallback != null) {
+				onIncomingCommunicationCallback.run();
+			}
+			System.out.println("client analysed communication from server : " + incoming.toString());
+		} catch (InvalidCommunicationException e) {
+			// An invalid communication is ignored.
+			System.err.println("Server received invalid communication: " + serverMessage);
+		}
+	}
+
+	/**
+	 * Terminates the client socket and informs the server about it
+	 * by sending a communication whose command is `MultiplayerCommand.DISCONNECTION`.
+	 * The communication also holds the local address of the socket so that the Server can recognize this client.
+	 * 
+	 * The `onIncomingCommunicationCallback` is deleted and the incoming buffer is cleared.
 	 * @throws IOException
 	 */
-	@Override
 	public void kill(boolean propagate) throws IOException {
 		if (!isAlive()) {
 			System.out.println("trying to kill the client whereas it's not alive.");
 			System.out.println("Buffer : " + incomingBuffer);
 			return;
 		}
-		super.kill(propagate);
+		super.kill();
 		if (propagate) {
 			sendMessageToServer(
 				new MultiplayerCommunication(
@@ -102,6 +131,7 @@ public class Client extends MultiplayerBody {
 
 	/**
 	 * Sends a message to the server announcing the successfull connection of the client.
+	 * The server needs the hostname of the client so as to display a name in the UI of the lobby.
 	 * @throws IOException
 	 */
 	private void announcePresence() throws IOException {

@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This class holds the server socket and is responsible
+ * of the communications between the host and the player(s).
+ */
 public class Server extends MultiplayerBody {
 	private static Server instance = null;
 
@@ -17,8 +21,15 @@ public class Server extends MultiplayerBody {
 	private boolean acceptingNewUsers = true;
 	private List<Socket> clientSockets = new ArrayList<>();
 
+	// This class cannot get instantiated outside of the class itself.
 	private Server() { }
 
+	/**
+	 * This class is a singleton.
+	 * In order to use the methods of this class,
+	 * you need to get the unique instance.
+	 * @return The unique instance of the `Server` class.
+	 */
 	public static Server getInstance() {
 		if (instance == null) {
 			instance = new Server();
@@ -86,19 +97,20 @@ public class Server extends MultiplayerBody {
 	}
 
 	/**
-	 * Stops the server.
-	 * The server has to be restarted (by calling `host()`) if it needs to be used again.
-	 * This methods sets `this.server` to `null`.
+	 * Stops the server, closes all client sockets, deletes the `onIncomingCommunicationCallback`
+	 * and drops all the communications currently waiting to be read in the buffer.
 	 * 
-	 * This method will inform all the listeners of the server termination.
+	 * The server has to be restarted (by calling `host()`) if it needs to be used again.
+	 * 
+	 * This method will inform all the listeners of the server termination
+	 * by broadcasting a `MultiplayerCommand.SERVER_TERMINATION`.
 	 * @throws IOException
 	 */
-	@Override
 	public void kill(boolean propagate) throws IOException {
 		if (!isAlive()) {
 			return;
 		}
-		super.kill(propagate);
+		super.kill();
 		if (propagate) {
 			broadcast(
 				new MultiplayerCommunication(
@@ -117,14 +129,14 @@ public class Server extends MultiplayerBody {
 	 */
 	@Override
 	public boolean isAlive() {
-		return server != null && !server.isClosed();
+		return server != null && !server.isClosed(); // `server` can be null if the instance is created, but `host()` has never been called.
 	}
 
 	/**
-	 * Sends a message to a client of the server using its output stream.
+	 * Sends a message to a client using its output stream.
 	 * @param socket  The socket instance of the client.
 	 * @param message The message to send to the client.
-	 * @throws IOException If, for some reason, the output stream of the client socket led to an Exception.
+	 * @throws IOException If the output stream of the client socket led to an Exception.
 	 */
 	public void writeToClient(Socket clientSocket, MultiplayerCommunication message) throws IOException {
 		MultiplayerUtils.getOutputFromSocket(clientSocket).println(message.toString());
@@ -173,6 +185,11 @@ public class Server extends MultiplayerBody {
 		return false;
 	}
 
+	/**
+	 * Handles the communications of a client to the server.
+	 * This class should not be used in the main thread
+	 * because its `run` method is blocking.
+	 */
 	private final class ClientHandler implements Runnable {
 		private Socket clientSocket;
 
@@ -189,21 +206,7 @@ public class Server extends MultiplayerBody {
 				String inputLine;
 				while (isAlive() && (inputLine = in.readLine()) != null) {
 					System.out.println("Server received: " + inputLine);
-					try {
-						MultiplayerCommunication incoming = new MultiplayerCommunication(inputLine);
-						incomingBuffer.add(incoming);
-						if (onIncomingCommunicationCallback != null) {
-							onIncomingCommunicationCallback.run();
-						}
-						// The client socket was closed client-side,
-						// therefore the socket must be removed from the list of subscribers
-						if (incoming.isCommand(MultiplayerCommand.DISCONNECTION)) {
-							removeClientSocket(incoming.getParameter(0));
-						}
-					} catch (InvalidCommunicationException e) {
-						// Invalid communications are ignored.
-						System.err.println("Server received invalid communication : " + inputLine);
-					}
+					handle(inputLine);
 				}
 			} catch (SocketException e) {
 				System.err.println("SOCKET exception in Server ClientHandler (" + server + ")");
@@ -211,6 +214,38 @@ public class Server extends MultiplayerBody {
 			} catch (IOException e) {
 				System.err.println("Error handling client input");
 				e.printStackTrace();
+			}
+		}
+
+		/**
+		 * Handles an incoming transmission from a user to the server.
+		 * The transmission is a string that this method is going to parse
+		 * into an instance of `MultiplayerCommunication`.
+		 * 
+		 * The communication, if valid, is added to the `incomingBuffer`.
+		 * If defined, the `onIncomingCommunicationCallback` is runned.
+		 * 
+		 * If the communication command is `MultiplayerCommand.DISCONNECTION`,
+		 * then the clientSocket is removed by calling `removeClientSocket`.
+		 * 
+		 * An invalid communication is ignored.
+		 * @param input The line read from the input stream of the client socket.
+		 */
+		private void handle(String input) {
+			try {
+				MultiplayerCommunication incoming = new MultiplayerCommunication(input);
+				incomingBuffer.add(incoming);
+				if (onIncomingCommunicationCallback != null) {
+					onIncomingCommunicationCallback.run();
+				}
+				// The client socket was closed client-side,
+				// therefore the socket must be removed from the list of subscribers
+				if (incoming.isCommand(MultiplayerCommand.DISCONNECTION)) {
+					removeClientSocket(incoming.getParameter(0));
+				}
+			} catch (InvalidCommunicationException e) {
+				// Invalid communications are ignored.
+				System.err.println("Server received invalid communication : " + input);
 			}
 		}
 	}
