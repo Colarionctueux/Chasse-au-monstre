@@ -244,6 +244,11 @@ public class GameController {
         App.getApp().changeScene("menu");
     }
 
+    @FXML
+    public void saveButtonPressed() throws IOException {
+        App.getApp().changeScene("save");
+    }
+
     public void updateEntitiesLabel() {
         turnLabel.setText("Tour n°" + game.getTurn());
         if (gameView.isHunterTurn()) {
