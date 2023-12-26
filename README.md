@@ -45,7 +45,7 @@ Lancer [App.java](./src/main/java/fr/univlille/App.java)
 ### Fonctionnalités éventuelles :
 
 - Thèmes (pour les graphismes)
-- De nouvells écaniques de gameplay
+- De nouvells mécaniques de gameplay
 
 ### Multijoueur :
 
