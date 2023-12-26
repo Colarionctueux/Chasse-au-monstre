@@ -84,12 +84,24 @@ public class GameController {
 
     @FXML
     public void menuButtonPressed() throws IOException {
-        // TODO: quit the game (SERVER_TERMINATION or CLIENT_DISCONNECTION)
+        try {
+            if (Server.getInstance().isAlive()) {
+                Server.getInstance().kill(true);
+            } else {
+                Client.getInstance().kill(true);
+            }
+        } catch (IOException e) {
+            System.err.println("Could not kill the instance of multiplayer body : " + e.getMessage());
+        }
+        leaveGame();
+    }
+
+    private void leaveGame() throws IOException {
         App.getApp().changeScene("menu");
     }
 
     /**
-     * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque
+     * Cette méthode permet d'initialiser la partie. Elle est appellée à chaque
      * rédemarrage du jeu.
      */
     public void initGame() {
@@ -191,7 +203,6 @@ public class GameController {
      */
     private void handleMultiplayerExchange(MultiplayerBody body) {
         MultiplayerCommunication message = body.pollCommunication();
-        System.out.println("Received communication = " + message);
         if (message.isCommand(MultiplayerCommand.HUNTER_PLAYED) || message.isCommand(MultiplayerCommand.MONSTER_PLAYED)) {
             // In both cases, the first parameter is the position of the other:
             // If the hunter is playing, then it receives the coordinates of the monster,
@@ -219,6 +230,21 @@ public class GameController {
             // When playing, the buttons get disabled,
             // so we know that the other's buttons are disabled.
             enableInteractions();
+        } else {
+            // Handling the "expected" disconnection of the other player from the game
+            try {
+                if (message.isCommand(MultiplayerCommand.SERVER_TERMINATION)) {
+                    // Meaning that the body is the client,
+                    // and the host has left the game.
+                    leaveGame();
+                    Client.getInstance().kill(false);
+                } else if (message.isCommand(MultiplayerCommand.DISCONNECTION)) {
+                    // Meaning the body is the host,
+                    // and the client has left the game.
+                    leaveGame();
+                    Server.getInstance().kill(false);
+                }
+            } catch (IOException ignore) { }
         }
     }
 
