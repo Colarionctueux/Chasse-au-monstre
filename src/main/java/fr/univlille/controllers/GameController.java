@@ -96,7 +96,7 @@ public class GameController {
         gameOverScreen.setVisible(false);
 
         game = new GameModel();
-        game.setParameters(App.getApp().parameters);
+        game.setParameters(App.getApp().getGameParameters());
         game.generateMaze(game.getParameters());
 
         if (gameView != null) {
@@ -200,7 +200,7 @@ public class GameController {
             boolean usedPowerup = Boolean.parseBoolean(message.getParameter(1));
             if (body.isHunter()) {
                 // the given coordinates are those of the monster
-                game.getMonster().superJump = usedPowerup;
+                game.getMonster().setSuperJump(usedPowerup);
                 game.getMonster().play(coordinates);
                 System.out.println("updated monster's position to " + coordinates);
             } else {
@@ -331,7 +331,7 @@ public class GameController {
                 body.broadcast(
                     new MultiplayerCommunication(
                         MultiplayerCommand.MONSTER_PLAYED,
-                        targetCoordinates + ";" + game.getMonster().superJump
+                        targetCoordinates + ";" + game.getMonster().isUsingSuperJump()
                     )
                 );
             }
@@ -353,9 +353,9 @@ public class GameController {
             }
         } else {
             // Toggling powerup, if possible
-            if (game.getMonster().superJumpLeft > 0) {
-                powerupEnabledLabel.setVisible(!game.getMonster().superJump);
-                game.getMonster().superJump = !game.getMonster().superJump;
+            if (game.getMonster().hasEnoughSuperJumpsLeft()) {
+                powerupEnabledLabel.setVisible(!game.getMonster().isUsingSuperJump());
+                game.getMonster().toggleSuperJump();
             } else {
                 errorLabel.setText("Vous n'avez plu de SuperJump...");
             }
@@ -389,7 +389,7 @@ public class GameController {
             game.getHunter().turnBegin();
             game.getHunter().setGrenadeMode(false);
         } else {
-            game.getMonster().superJump = false;
+            game.getMonster().setSuperJump(false);
             gameView.getMonsterView().turnStarted();
         }
     }
@@ -438,10 +438,10 @@ public class GameController {
      * Handles the labels to display or hide when the monster is playing.
      */
     private void showMonsterLabels() {
-        powerupButton.setDisable(game.getMonster().superJumpLeft <= 0);
-        boolean superjump = game.getMonster().superJump;
+        powerupButton.setDisable(!game.getMonster().hasEnoughSuperJumpsLeft());
+        boolean superjump = game.getMonster().isUsingSuperJump();
         shootLeftLabel.setVisible(false);
-        powerupButton.setText("SuperJump (" + game.getMonster().superJumpLeft + ")");
+        powerupButton.setText("SuperJump (" + game.getMonster().getSuperJumpsLeft() + ")");
         powerupEnabledLabel.setVisible(superjump);
         
         if(!superjump) {

@@ -55,7 +55,7 @@ public class SettingsController {
         bindFactory(mazeSizeYSpinner, 5, 19, 7);
         bindFactory(wallPercentageSpinner, 50, 100, 100);
         bindFactory(fogOfWarSpinner, 1, 10, 1);
-        GameMode gameMode = App.getApp().parameters.getGameMode();
+        GameMode gameMode = App.getApp().getGameParameters().getGameMode();
         playerRoleCheckBox.setVisible(gameMode == GameMode.BOT);
         switch (gameMode) {
             case BOT:
@@ -72,7 +72,7 @@ public class SettingsController {
 
     @FXML
     public void startGamePressed() throws IOException {
-        GameParameters parameters = App.getApp().parameters;
+        GameParameters parameters = App.getApp().getGameParameters();
         parameters.setMazeWidth(mazeSizeXSpinner.getValue());
         parameters.setMazeHeight(mazeSizeYSpinner.getValue());
         parameters.setHunterShoots(hunterShootsSpinner.getValue());

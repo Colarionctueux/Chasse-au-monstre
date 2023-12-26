@@ -15,21 +15,29 @@ import javafx.scene.image.Image;
 
 public class GameView extends Canvas implements Observer {
     /**
-     * A reference to the instance of "Game" containing the hunter and monster
-     * models, as well as the maze itself.
-     */
-    public final GameModel model;
-
-    /**
-     * The context that allows us to draw stuff into.
-     */
-    public final GraphicsContext gc;
-
-    /**
      * A tile is one image from the tileset (spritesheet).
      * Each tile is 32 pixels wide.
      */
     public static final int TILE_SIZE = 32;
+
+    /**
+     * Each image in the game is contained in a spritesheet.
+     * A spritesheet is a set of fixed-size images, and each image is a
+     * "decoration".
+     * Each decoration has a unique index, just like an array.
+     */
+    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
+
+    /**
+     * A reference to the instance of "Game" containing the hunter and monster
+     * models, as well as the maze itself.
+     */
+    private final GameModel model;
+
+    /**
+     * The context that allows us to draw stuff into.
+     */
+    private final GraphicsContext gc;
 
     /**
      * In a multiplayer game,
@@ -57,14 +65,6 @@ public class GameView extends Canvas implements Observer {
     private HunterView hunterView;
 
     /**
-     * Each image in the game is contained in a spritesheet.
-     * A spritesheet is a set of fixed-size images, and each image is a
-     * "decoration".
-     * Each decoration has a unique index, just like an array.
-     */
-    public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
-
-    /**
      * Is the turn of the hunter?
      * In the case of a multiplayer game, the logic is completely different.
      * That's why this method must be used over the `hunterTurn` property.
@@ -86,16 +86,8 @@ public class GameView extends Canvas implements Observer {
         this.hunterTurn = hunterTurn;
     }
 
-    public GameController getMainPage() {
-        return mainPage;
-    }
-
     public void setMainPage(GameController mainPage) {
         this.mainPage = mainPage;
-    }
-
-    public HunterView getHunterView() {
-        return hunterView;
     }
 
     public MonsterView getMonsterView() {
@@ -171,7 +163,7 @@ public class GameView extends Canvas implements Observer {
         model.getHunter().attach(this);
     }
 
-    public void handleMousePressedHunter() {
+    private void handleMousePressedHunter() {
         if (model.getHunter().isTurnValid(cursorPosition)) {
             // If two players are playing on the same computer,
             // then they will have to use the button dedicated to end the turn.
@@ -188,7 +180,7 @@ public class GameView extends Canvas implements Observer {
      * Handles the logic of the monster's move when the player clicks on the cell.
      * If the movement isn't valid, then nothing happens.
      */
-    public void handleMousePressedMonster() {
+    private void handleMousePressedMonster() {
         if (model.getMonster().isTurnValid(cursorPosition)) {
             movePosition = cursorPosition;
             if (model.isSplitScreen()) {
@@ -283,12 +275,12 @@ public class GameView extends Canvas implements Observer {
      * It's because the move of the distant player has to be replicated on the other's instance.
      * If it's not the hunter's turn, then this function won't do a thing.
      */
-    public void updateHunterErrorLabel(ICellEvent cellEvent) {
+    private void updateHunterErrorLabel(ICellEvent cellEvent) {
         if (isHunterTurn()) {
             if (cellEvent.getState() == CellInfo.WALL) {
                 mainPage.errorLabel.setText("Vous avez touché un arbre.");
             } else if (cellEvent.getState() == CellInfo.MONSTER) {
-                monsterCase(cellEvent);
+                monsterCell(cellEvent);
             } else {
                 mainPage.errorLabel.setText("Vous n'avez rien touché...");
             }
@@ -297,12 +289,11 @@ public class GameView extends Canvas implements Observer {
         }
     }
 
-    private void monsterCase(ICellEvent cellEvent) {
-        if (cellEvent.getTurn() == model.getTurn()) { // Si le monstre est actuellement sur cette case
+    private void monsterCell(ICellEvent cellEvent) {
+        if (cellEvent.getTurn() == model.getTurn()) { // Si le monstre est sur cette case à ce tour-ci
             model.setGameEnded(true);
         } else {
-            mainPage.errorLabel
-                    .setText("Le monstre est passé ici au tour n° " + cellEvent.getTurn() + ".");
+            mainPage.errorLabel.setText("Le monstre est passé ici au tour n° " + cellEvent.getTurn() + ".");
         }
     }
 }

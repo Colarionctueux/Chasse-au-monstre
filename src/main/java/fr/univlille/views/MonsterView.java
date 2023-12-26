@@ -3,11 +3,9 @@ package fr.univlille.views;
 import java.util.List;
 import java.util.Random;
 
-import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
-import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
 import fr.univlille.models.MonsterModel;
 import javafx.geometry.VPos;
@@ -48,7 +46,7 @@ public class MonsterView {
 
         addDecorations(mazeDimensions);
         if (fogEnabled) {
-            model.fogOfWar = new boolean[mazeDimensions.getRow()][mazeDimensions.getCol()];
+            model.setFogOfWar(new boolean[mazeDimensions.getRow()][mazeDimensions.getCol()]);
             updateFog(this.gameModel.getMonster().getPosition());
         }
     }
@@ -65,7 +63,7 @@ public class MonsterView {
      * @param mazeDimensions The dimensions of the maze as an instance of
      *                       `Coordinate`.
      */
-    public void addDecorations(ICoordinate mazeDimensions) {
+    private void addDecorations(ICoordinate mazeDimensions) {
         Random random = new Random();
         decorations = new int[mazeDimensions.getRow()][mazeDimensions.getCol()];
         for (int y = 0; y < mazeDimensions.getRow(); y++) {
@@ -174,37 +172,14 @@ public class MonsterView {
                             break;
                     }
                 }
-                if (fogEnabled && !model.fogOfWar[y][x]) {
+                if (fogEnabled && !model.getFogOfWar()[y][x]) {
                     ViewUtils.drawSimpleTexture(gc, 256, 0, x, y);
                 }
             }
         }
     }
 
-    public boolean playMove() {
-        if (gameModel.getMonster().shouldUseSuperJump()) {
-            if (model.isMonsterMovementValid(gameView.getMovePosition())) {
-                gameModel.incrementTurn();
-                gameModel.getMonster().move(gameView.getMovePosition());
-                gameModel.addToHistory(new CellEvent(
-                        ((Coordinate)gameView.getMovePosition()).clone(),
-                        CellInfo.MONSTER, gameModel.getTurn()));
-            }
-        } else if (model.isMonsterMovementValid(gameView.getMovePosition())) {
-            gameModel.incrementTurn();
-            gameModel.getMonster().move(gameView.getMovePosition());
-            gameModel.addToHistory(new CellEvent(
-                    ((Coordinate)gameView.getMovePosition()).clone(),
-                    CellInfo.MONSTER, gameModel.getTurn()));    
-        } else {
-            return false;
-        }
-        gameView.setMovePosition(new Coordinate(-1, -1));
-        gameView.setCursorPosition(new Coordinate(-1, -1));
-        return true;
-    }
-
-    public void updateFog(ICoordinate coordinate) {
+    private void updateFog(ICoordinate coordinate) {
         ICoordinate mazeDimensions = gameModel.getMazeDimensions();
         for (int y = -fogRadius; y < fogRadius + 1; y++) {
             for (int x = -fogRadius; x < fogRadius + 1; x++) {
@@ -212,7 +187,7 @@ public class MonsterView {
                     int posX = coordinate.getCol() + x;
                     int posY = coordinate.getRow() + y;
                     if (posX >= 0 && posX < mazeDimensions.getCol() && posY >= 0 && posY < mazeDimensions.getRow()) {
-                        model.fogOfWar[posY][posX] = true;
+                        model.getFogOfWar()[posY][posX] = true;
                     }
                 }
             }

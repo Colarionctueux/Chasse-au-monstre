@@ -13,11 +13,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class App extends Application {
-
     private static final int DEFAULT_MULTIPLAYER_PORT = 6666;
-    public GameParameters parameters;
     private static Scene scene;
     private static App app;
+
+    private GameParameters parameters;
 
     public static int getDefaultMultiplayerPort() {
         return DEFAULT_MULTIPLAYER_PORT;
@@ -28,6 +28,18 @@ public class App extends Application {
             app = new App();
         }
         return app;
+    }
+
+    public GameParameters getGameParameters() {
+        return parameters;
+    }
+
+    public void overwriteGameParameters(GameParameters params) {
+        this.parameters = params;
+    }
+
+    public void resetGameParameters() {
+        this.parameters = new GameParameters();
     }
 
     private static Parent loadFXML(String filename) throws IOException {

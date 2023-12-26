@@ -58,9 +58,9 @@ public class LobbyController extends AnchorPane {
         if (Server.getInstance().hasClient()) {
             Server server = Server.getInstance();
             App app = App.getApp();
-            app.parameters = new GameParameters();
-            app.parameters.setGameMode(GameMode.ONLINE); // will update the UI accordingly
-            app.parameters.setSeed(System.currentTimeMillis()); // will set a common seed shared with the client for maze generation
+            app.resetGameParameters();
+            app.getGameParameters().setGameMode(GameMode.ONLINE); // will update the UI accordingly
+            app.getGameParameters().setSeed(System.currentTimeMillis()); // will set a common seed shared with the client for maze generation
             app.changeScene("settings");
             server.setIsHunter(model.isHostHunter());
             server.closeRequests();
@@ -142,7 +142,7 @@ public class LobbyController extends AnchorPane {
                             client.stopIncomingCommunicationCallback();
                             client.setIsHunter(!model.isHostHunter());
 
-                            App.getApp().parameters = GameParameters.readParameters(message.getParameter(0));
+                            App.getApp().overwriteGameParameters(GameParameters.readParameters(message.getParameter(0)));
                             App.getApp().changeScene("game");
                         } catch (InvalidGameDataException e) {
                             System.err.println("The given game parameters are invalid: " + message);

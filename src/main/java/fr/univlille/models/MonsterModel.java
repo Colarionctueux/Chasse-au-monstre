@@ -7,17 +7,23 @@ import fr.univlille.utils.Subject;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 
 public class MonsterModel extends Subject {
-
     private Coordinate position;
-    public GameModel model;
-    public int superJumpLeft = 1;
-    public boolean superJump = false;
-
-    public boolean[][] fogOfWar;
+    private GameModel model;
+    private int superJumpLeft = 1;
+    private boolean superJump = false;
+    private boolean[][] fogOfWar;
 
     public MonsterModel(GameModel model, ICoordinate startPosition) {
         this.model = model;
         position = (Coordinate) startPosition;
+    }
+
+    public boolean[][] getFogOfWar() {
+        return fogOfWar;
+    }
+
+    public void setFogOfWar(boolean[][] fog) {
+        this.fogOfWar = fog;
     }
 
     public Coordinate getPosition() {
@@ -30,18 +36,11 @@ public class MonsterModel extends Subject {
         return position;
     }
 
-    public boolean play(ICoordinate movePosition) {
+    public void play(ICoordinate movePosition) {
         if (shouldUseSuperJump()) {
-            if (isMonsterMovementValid(movePosition)) {
-                superJumpLeft -= 1;
-                changePosition(movePosition);
-                return true;
-            }
-        } else if (isMonsterMovementValid(movePosition)) {
-            changePosition(movePosition);
-            return true;
+            superJumpLeft -= 1;
         }
-        return false;
+        changePosition(movePosition);
     }
 
     private void changePosition(ICoordinate movePosition) {
@@ -56,7 +55,27 @@ public class MonsterModel extends Subject {
      * @return `true` if the monster will use the super jump on the next movement.
      */
     public boolean shouldUseSuperJump() {
-        return superJump && superJumpLeft > 0;
+        return isUsingSuperJump() && hasEnoughSuperJumpsLeft();
+    }
+
+    public void setSuperJump(boolean useSuperJump) {
+        this.superJump = useSuperJump;
+    }
+
+    public void toggleSuperJump() {
+        this.superJump = !this.superJump;
+    }
+
+    public boolean isUsingSuperJump() {
+        return superJump;
+    }
+
+    public boolean hasEnoughSuperJumpsLeft() {
+        return superJumpLeft > 0;
+    }
+
+    public int getSuperJumpsLeft() {
+        return superJumpLeft;
     }
 
     /**
@@ -68,7 +87,7 @@ public class MonsterModel extends Subject {
      * @return `true` if the monster can complete his turn, `false` if he has to retry.
      */
     public boolean isTurnValid(ICoordinate target) {
-        return superJump ? superJumpLeft > 0 : isMonsterMovementValid(target);
+        return isUsingSuperJump() ? superJumpLeft > 0 : isMonsterMovementValid(target);
     }
 
     /**

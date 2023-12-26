@@ -12,14 +12,10 @@ import fr.univlille.utils.Subject;
 
 public class HunterModel extends Subject {
     private ArrayList<ICellEvent> shootsHistory;
-
     private GameModel gameModel;
-
     private int maxShoots;
-
     private int shootsLeft;
     private int grenadesLeft;
-
     private boolean grenadeMode;
 
     public boolean isGrenadeMode() {
