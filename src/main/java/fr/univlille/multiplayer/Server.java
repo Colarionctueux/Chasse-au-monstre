@@ -4,22 +4,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.net.Socket;
 
 /**
  * This class holds the server socket and is responsible
  * of the communications between the host and the player(s).
  */
 public class Server extends MultiplayerBody {
-	private static Server instance = null;
-
+	private static Server instance;
 	private ServerSocket server;
 	private boolean acceptingNewUsers = true;
-	private List<Socket> clientSockets = new ArrayList<>();
+	private Socket clientSocket;
 
 	// This class cannot get instantiated outside of the class itself.
 	private Server() { }
@@ -88,22 +84,22 @@ public class Server extends MultiplayerBody {
 	}
 
 	/**
-	 * Checks if the server has clients.
-	 * A server must be alive to have clients.
-	 * @return `true` if the server has clients, `false` otherwise.
+	 * Checks if the server has a player.
+	 * A server must be alive to have a player.
+	 * @return `true` if the server has a player, `false` otherwise.
 	 */
-	public boolean hasClients() {
-		return isAlive() && !clientSockets.isEmpty();
+	public boolean hasClient() {
+		return isAlive() && clientSocket != null && !clientSocket.isClosed();
 	}
 
 	/**
-	 * Stops the server, closes all client sockets, deletes the `onIncomingCommunicationCallback`
+	 * Stops the server, closes the client socket, deletes the `onIncomingCommunicationCallback`
 	 * and drops all the communications currently waiting to be read in the buffer.
 	 * 
 	 * The server has to be restarted (by calling `host()`) if it needs to be used again.
 	 * 
-	 * This method will inform all the listeners of the server termination
-	 * by broadcasting a `MultiplayerCommand.SERVER_TERMINATION`.
+	 * This method will inform all the listener of the server termination
+	 * by broadcasting a communication of type `MultiplayerCommand.SERVER_TERMINATION`.
 	 * @throws IOException
 	 */
 	public void kill(boolean propagate) throws IOException {
@@ -118,8 +114,7 @@ public class Server extends MultiplayerBody {
 				)
 			);
 		}
-		for (Socket socket : clientSockets) socket.close();
-		clientSockets.clear();
+		clientSocket.close();
 		server.close();
 	}
 
@@ -138,7 +133,7 @@ public class Server extends MultiplayerBody {
 	 * @param message The message to send to the client.
 	 * @throws IOException If the output stream of the client socket led to an Exception.
 	 */
-	public void writeToClient(Socket clientSocket, MultiplayerCommunication message) throws IOException {
+	private void writeToClient(Socket clientSocket, MultiplayerCommunication message) throws IOException {
 		MultiplayerUtils.getOutputFromSocket(clientSocket).println(message.toString());
 	}
 
@@ -148,41 +143,18 @@ public class Server extends MultiplayerBody {
 	 * @param clientSocket The socket of the incoming client.
 	 * @throws IOException
 	 */
-	private void welcomeIncomingClient(Socket clientSocket) throws IOException {
-		writeToClient(clientSocket, new MultiplayerCommunication(MultiplayerCommand.HOST, MultiplayerUtils.getHostname()));
-		clientSockets.add(clientSocket);
+	private void welcomeIncomingClient(Socket client) throws IOException {
+		writeToClient(client, new MultiplayerCommunication(MultiplayerCommand.HOST, MultiplayerUtils.getHostname()));
+		this.clientSocket = client;
 	}
 
 	/**
-	 * Sends a message to all users that are listening to this server.
+	 * Sends a message to the user that's listening to this server.
 	 * @param message The message to broadcast.
 	 */
+	@Override
 	public void broadcast(MultiplayerCommunication message) throws IOException {
-		for (Socket client : clientSockets) {
-			writeToClient(client, message);
-		}
-	}
-
-	/**
-	 * Removes a socket whose local address is equal to the given address.
-	 * It's necessary to use something that can identity a unique socket,
-	 * because when this method is executed, the client's socket hasn't been closed yet.
-	 * @param localAddress The local address of the socket to remove.
-	 * @return `true` it the socket was removed, `false` otherwise.
-	 */
-	public boolean removeClientSocket(String localAddress) {
-		if (clientSockets.isEmpty()) {
-			return false;
-		}
-		Iterator<Socket> iter = clientSockets.iterator();
-		while (iter.hasNext()) {
-			Socket clientSocket = iter.next();
-			if (clientSocket.getLocalAddress().toString().equals(localAddress)) {
-				iter.remove();
-				return true;
-			}
-		}
-		return false;
+		writeToClient(clientSocket, message);
 	}
 
 	/**
@@ -239,9 +211,9 @@ public class Server extends MultiplayerBody {
 					onIncomingCommunicationCallback.run();
 				}
 				// The client socket was closed client-side,
-				// therefore the socket must be removed from the list of subscribers
+				// therefore the socket must be removed
 				if (incoming.isCommand(MultiplayerCommand.DISCONNECTION)) {
-					removeClientSocket(incoming.getParameter(0));
+					clientSocket = null;
 				}
 			} catch (InvalidCommunicationException e) {
 				// Invalid communications are ignored.

@@ -1,5 +1,6 @@
 package fr.univlille.multiplayer;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -22,6 +23,30 @@ public abstract class MultiplayerBody {
 	 * The callback to execute when the body is receiving a message (optional).
 	 */
 	protected Runnable onIncomingCommunicationCallback;
+
+	/**
+	 * There is only two possible states:
+	 * - The host is a hunter, therefore the client is the monster.
+	 * - The host is not a hunter, therefore the client is the hunter.
+	 * This information has to be saved on both bodies (host & client).
+	 */
+	protected boolean ishunter = false;
+
+	/**
+	 * Is the multiplayer body a hunter? If true, it means that the other is the monster.
+	 * @return `true` if the body is a hunter, `false` if it's the monster.
+	 */
+	public boolean isHunter() {
+		return ishunter;
+	}
+
+	/**
+	 * Sets whether or not this multiplayer body is the hunter or not.
+	 * @param hunter `true` if this body should be the hunter, `false` if it should be the monster.
+	 */
+	public void setIsHunter(boolean hunter) {
+		this.ishunter = hunter;
+	}
 
 	/**
 	 * Checks if the buffer holding the pending requests isn't empty.
@@ -78,6 +103,8 @@ public abstract class MultiplayerBody {
 	}
 
 	public abstract boolean isAlive();
+
+	public abstract void broadcast(MultiplayerCommunication communication) throws IOException;
 	
 	protected void kill() {
 		stopIncomingCommunicationCallback();

@@ -3,6 +3,9 @@ package fr.univlille.controllers;
 import java.io.IOException;
 
 import fr.univlille.App;
+import fr.univlille.GameMode;
+import fr.univlille.GameParameters;
+import fr.univlille.InvalidGameDataException;
 import fr.univlille.models.LobbyModel;
 import fr.univlille.multiplayer.Client;
 import fr.univlille.multiplayer.MultiplayerCommand;
@@ -43,7 +46,7 @@ public class LobbyController extends AnchorPane {
             } else {
                 Client.getInstance().kill(true);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Cannot kill the instance of multiplayer body : " + e.getMessage());
         }
     }
@@ -52,19 +55,17 @@ public class LobbyController extends AnchorPane {
     public void startGame() throws IOException {
         // The host is the only able to start the game.
         // He cannot start it if there is no client.
-        if (Server.getInstance().hasClients()) {
-            System.out.println("starting game...");
+        if (Server.getInstance().hasClient()) {
+            Server server = Server.getInstance();
+            App app = App.getApp();
+            app.parameters = new GameParameters();
+            app.parameters.setGameMode(GameMode.ONLINE); // will update the UI accordingly
+            app.parameters.setSeed(System.currentTimeMillis()); // will set a common seed shared with the client for maze generation
+            app.changeScene("settings");
+            server.setIsHunter(model.isHostHunter());
+            server.closeRequests();
+            server.stopIncomingCommunicationCallback();
         }
-    }
-
-    @FXML
-    public void startGameMouseEntered() {
-        button_start_game.setText("PAS ENCORE DISPO");
-    }
-
-    @FXML
-    public void startGameMouseExited() {
-        button_start_game.setText("Lancer la partie");
     }
 
     @FXML
@@ -82,7 +83,6 @@ public class LobbyController extends AnchorPane {
      */
     private void broadcastRoles() {
         try {
-            System.out.println("broadcasting roles information");
             Server.getInstance().broadcast(
                 new MultiplayerCommunication(
                     MultiplayerCommand.SET_GAME_ROLES,
@@ -125,7 +125,7 @@ public class LobbyController extends AnchorPane {
         Client client = Client.getInstance();
 
         // Will handle all messages from the server (in the lobby only)
-        client.setIncomingCommunicationCallback(() -> {
+        client.setIncomingCommunicationCallback(() ->
             Platform.runLater(() -> {
                 MultiplayerCommunication message = Client.getInstance().pollCommunication();
                 switch (message.getCommand()) {
@@ -134,9 +134,22 @@ public class LobbyController extends AnchorPane {
                         client_name.setText(MultiplayerUtils.getHostname());
                         break;
                     case SET_GAME_ROLES:
-                        System.out.println("the client was told that the roles were changed :" + message);
                         model.setIsHostHunter(Integer.parseInt(message.getParameter(0)) == 1);
                         applyModel();
+                        break;
+                    case CREATING_GAME:
+                        try {
+                            client.stopIncomingCommunicationCallback();
+                            client.setIsHunter(!model.isHostHunter());
+
+                            App.getApp().parameters = GameParameters.readParameters(message.getParameter(0));
+                            App.getApp().changeScene("game");
+                        } catch (InvalidGameDataException e) {
+                            System.err.println("The given game parameters are invalid: " + message);
+                        } catch (IOException e) {
+                            System.err.println("The client was unable to load the game page.");
+                            e.printStackTrace();
+                        }
                         break;
                     case SERVER_TERMINATION:
                         try {
@@ -150,8 +163,8 @@ public class LobbyController extends AnchorPane {
                         System.out.println("incoming communication from server was ignored by client : " + message);
                         // ignored
                 }
-            });
-        });
+            })
+        );
     }
 
     private void handleServerSide() {
@@ -160,7 +173,7 @@ public class LobbyController extends AnchorPane {
         // The server listens to the client's arrival
         // in a non-blocking way for the main thread.
         // Indeed we don't know when he's going to arrive, or if he's going to arrive at all.
-        server.setIncomingCommunicationCallback(() -> {
+        server.setIncomingCommunicationCallback(() -> 
             // Because we cannot update the JavaFX UI outside of the main thread,
             // as it would cause synchronization issues,
             // we tell it to run it "later"
@@ -170,11 +183,9 @@ public class LobbyController extends AnchorPane {
                 System.out.println("Server handling communication : " + announce);
                 switch (announce.getCommand()) {
                     case JOIN:
-                        System.out.println("a new player has joined the game : " + announce);
                         client_name.setText(announce.getParameter(0));
                         server.closeRequests();
                         if (model.hasChanged()) {
-                            System.out.println("The model has changed, broadcasting this information...");
                             broadcastRoles();
                         }
                         break;
@@ -186,7 +197,7 @@ public class LobbyController extends AnchorPane {
                         System.out.println("incoming communication from server was ignored by server : " + announce);
                         // ignored
                 }
-            });
-        });
+            })
+        );
     }
 }

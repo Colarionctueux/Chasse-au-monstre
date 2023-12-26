@@ -1,7 +1,6 @@
 package fr.univlille.views;
 
 import fr.univlille.Coordinate;
-import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
@@ -15,11 +14,10 @@ import javafx.scene.text.TextAlignment;
 
 public class HunterView {
 
-    public GameView gameView;
     private GraphicsContext gc;
     public GameModel gameModel;
+    public GameView gameView;
     public HunterModel model;
-
 
     public HunterView(GraphicsContext gc, GameView gameView, GameModel gameModel) {
         this.gc = gc;

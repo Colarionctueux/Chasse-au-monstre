@@ -5,13 +5,22 @@ import java.util.List;
 import java.util.Random;
 
 import fr.univlille.Coordinate;
+import fr.univlille.GameMode;
 import fr.univlille.GameParameters;
 import fr.univlille.Maze;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
+import fr.univlille.multiplayer.Client;
+import fr.univlille.multiplayer.Server;
 import fr.univlille.utils.Subject;
 
 public class GameModel extends Subject {
+    /**
+     * Shared random generator using the seed of the game parameters.
+     * This instance must be used for any random generation to ensure
+     * that the client and the host are playing on the same maze.
+     */
+    private Random random;
 
     /**
      * The current turn of the game.
@@ -40,12 +49,17 @@ public class GameModel extends Subject {
         return parameters;
     }
 
-    public boolean[][] getMaze() {
-        return maze;
-    }
-
     public void setParameters(GameParameters parameters) {
         this.parameters = parameters;
+        if (parameters.getSeed() == -1) {
+            this.random = new Random();
+        } else {
+            this.random = new Random(parameters.getSeed());
+        }
+    }
+
+    public boolean[][] getMaze() {
+        return maze;
     }
 
     /**
@@ -162,7 +176,6 @@ public class GameModel extends Subject {
             }
         }
 
-        Random random = new Random();
         return availableCoordinates.get(random.nextInt(availableCoordinates.size()));
     }
 
@@ -176,7 +189,7 @@ public class GameModel extends Subject {
     public void generateMaze(GameParameters parameters) {
         this.parameters = parameters;
         Maze laby = new Maze(parameters.getMazeWidth(), parameters.getMazeHeight());
-        maze = laby.createMaze(parameters.getWallsPercentage());
+        maze = laby.createMaze(parameters.getWallsPercentage(), this.random);
 
         this.hunter = new HunterModel(this);
         this.monster = new MonsterModel(this, randomPosition());
@@ -198,4 +211,57 @@ public class GameModel extends Subject {
         history.add(cellEvent);
     }
 
+    /**
+     * Checks whether or not the player is playing against a BOT.
+     * @return `true` if the game mode is `GameMode.BOT`.
+     */
+    public boolean isPlayerAgainstAI() {
+        return parameters.getGameMode() == GameMode.BOT;
+    }
+
+    /**
+     * Is the game mode multiplayer?
+     * @return `true` if the player is playing with someone else located on another computer.
+     */
+    public boolean isMultiplayer() {
+        return parameters.getGameMode() == GameMode.ONLINE;
+    }
+
+    /**
+     * Is the game being played on the same instance?
+     * Two players can play on the same computer, on the same instance,
+     * and a dark screen will appear at the end of each turn,
+     * so that one doesn't see the other's move.
+     * @return `true` if the game mode is `TWO_PLAYERS`.
+     */
+    public boolean isSplitScreen() {
+        return parameters.getGameMode() == GameMode.TWO_PLAYERS;
+    }
+
+    /**
+     * Considering it's a multiplayer game,
+     * is the host of the game the hunter?
+     * @return `true` if the host is the hunter.
+     */
+    private boolean isMultiplayerHostHunter() {
+        return Server.getInstance().isAlive() && Server.getInstance().isHunter();
+    }
+
+    /**
+     * Considering it's a multiplayer game,
+     * is the client (so the player not hosting the game) the hunter?
+     * @return `true` if the client is the hunter.
+     */
+    private boolean isMultiplayerClientHunter() {
+        return Client.getInstance().isAlive() && Client.getInstance().isHunter();
+    }
+
+    /**
+     * Considering it's a multiplayer game,
+     * is the client, or the server, the hunter?
+     * @return `true` if the current multiplayer body is the hunter.
+     */
+    public boolean isMultiplayerBodyPlayingHunter() {
+        return isMultiplayerClientHunter() || isMultiplayerHostHunter();
+    }
 }

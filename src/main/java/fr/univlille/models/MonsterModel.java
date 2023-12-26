@@ -31,13 +31,13 @@ public class MonsterModel extends Subject {
     }
 
     public boolean play(ICoordinate movePosition) {
-        if (superJump && superJumpLeft > 0) {
-            if (isMonsterMovementValid(movePosition, 2.0)) {
+        if (shouldUseSuperJump()) {
+            if (isMonsterMovementValid(movePosition)) {
                 superJumpLeft -= 1;
                 changePosition(movePosition);
                 return true;
             }
-        } else if (isMonsterMovementValid(movePosition, 1.0)) {
+        } else if (isMonsterMovementValid(movePosition)) {
             changePosition(movePosition);
             return true;
         }
@@ -47,8 +47,28 @@ public class MonsterModel extends Subject {
     private void changePosition(ICoordinate movePosition) {
         model.incrementTurn();
         move(movePosition);
-        model.addToHistory(new CellEvent(new Coordinate(movePosition.getCol(), movePosition.getRow()), CellInfo.MONSTER,
-                model.getTurn()));
+        model.addToHistory(new CellEvent(((Coordinate)movePosition).clone(), CellInfo.MONSTER, model.getTurn()));
+    }
+
+    /**
+     * Checks if the monster is using a super jump
+     * and if it has enough super jumps left.
+     * @return `true` if the monster will use the super jump on the next movement.
+     */
+    public boolean shouldUseSuperJump() {
+        return superJump && superJumpLeft > 0;
+    }
+
+    /**
+     * Checks if the monster is making a valid turn.
+     * If he wants to use a super jump, then we check if it's possible,
+     * otherwise we just check if the movement is valid.
+     * Use this function to make sure that a turn is never completed with invalid game decisions.
+     * @param target The cell the monster wants to go to.
+     * @return `true` if the monster can complete his turn, `false` if he has to retry.
+     */
+    public boolean isTurnValid(ICoordinate target) {
+        return superJump ? superJumpLeft > 0 : isMonsterMovementValid(target);
     }
 
     /**
@@ -60,7 +80,8 @@ public class MonsterModel extends Subject {
      * @param movement The desired movement of the monster.
      * @return `true` if the movement is valid, `false` otherwise.
      */
-    public boolean isMonsterMovementValid(ICoordinate movement, double max) {
+    public boolean isMonsterMovementValid(ICoordinate movement) {
+        double max = shouldUseSuperJump() ? 2.0 : 1.0;
         ICoordinate mazeDimensions = model.getMazeDimensions();
 
         // On vérifie déjà si le déplacement est dans la grille du jeu

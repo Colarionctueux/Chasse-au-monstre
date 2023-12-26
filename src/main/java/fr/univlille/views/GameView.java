@@ -3,8 +3,6 @@ package fr.univlille.views;
 import fr.univlille.Theme;
 import fr.univlille.controllers.GameController;
 import fr.univlille.Coordinate;
-import fr.univlille.GameMode;
-import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
@@ -33,39 +31,30 @@ public class GameView extends Canvas implements Observer {
      */
     public static final int TILE_SIZE = 32;
 
+    /**
+     * In a multiplayer game,
+     * one must wait for the other to complete its turn,
+     * and in the meantime, he should not be able to interact with the canvas.
+     * This property is used only in `GameMode.ONLINE` (multiplayer).
+     */
+    private boolean disabledView = false;
+
+    /**
+     * Is the turn of the hunter?
+     */
     private boolean hunterTurn;
 
-    public boolean isHunterTurn() {
-        return hunterTurn;
-    }
-
-    public void setHunterTurn(boolean hunterTurn) {
-        this.hunterTurn = hunterTurn;
-    }
-
+    /**
+     * The current position of the cursor
+     * represented as an instance of `Coordinate`.
+     */
     private Coordinate cursorPosition;
+
     private Coordinate movePosition;
 
     private GameController mainPage;
-
-    public GameController getMainPage() {
-        return mainPage;
-    }
-
-    public void setMainPage(GameController mainPage) {
-        this.mainPage = mainPage;
-    }
-
-    private HunterView hunterView;
-    public HunterView getHunterView() {
-        return hunterView;
-    }
-
     private MonsterView monsterView;
-
-    public MonsterView getMonsterView() {
-        return monsterView;
-    }
+    private HunterView hunterView;
 
     /**
      * Each image in the game is contained in a spritesheet.
@@ -75,17 +64,75 @@ public class GameView extends Canvas implements Observer {
      */
     public static Image spritesheet = new Image(GameView.class.getResourceAsStream("/images/spritesheet.png"));
 
-    private GameParameters parameters;
+    /**
+     * Is the turn of the hunter?
+     * In the case of a multiplayer game, the logic is completely different.
+     * That's why this method must be used over the `hunterTurn` property.
+     * 
+     * Multiplayer-only logic:
+     * If the host, or the client, are playing as the hunter, then it will ALWAYS be his turn,
+     * but he will not be able to play as long as the monster didn't complete his turn.
+     * The hunter cannot play as long as he didn't receive a communication from the other.
+     * @return `true` if it's the turn of the hunter, or if it's a multiplayer game and that the player is the hunter.
+     */
+    public boolean isHunterTurn() {
+        if (model.isMultiplayer()) {
+            return model.isMultiplayerBodyPlayingHunter();
+        }
+        return hunterTurn;
+    }
 
+    public void setHunterTurn(boolean hunterTurn) {
+        this.hunterTurn = hunterTurn;
+    }
 
-    public GameView(GameModel model, GameParameters parameters) {
+    public GameController getMainPage() {
+        return mainPage;
+    }
+
+    public void setMainPage(GameController mainPage) {
+        this.mainPage = mainPage;
+    }
+
+    public HunterView getHunterView() {
+        return hunterView;
+    }
+
+    public MonsterView getMonsterView() {
+        return monsterView;
+    }
+
+    /**
+     * Disables any interaction with the game's canvas.
+     */
+    public void disableCanvas() {
+        this.disabledView = true;
+    }
+
+    /**
+     * Allows the player to interact with the game's canvas.
+     */
+    public void enableCanvas() {
+        this.disabledView = false;
+    }
+
+    /**
+     * Is the user allowed to interact with the game's canvas?
+     * The user may not be allowed to do that in a multiplayer game,
+     * when the other is playing his turn.
+     * @return `true` if any interaction with the canvas is currently forbidden.
+     */
+    public boolean isCanvasDisabled() {
+        return this.disabledView;
+    }
+
+    public GameView(GameModel model) {
         this.model = model;
-        this.parameters = parameters;
 
         this.gc = getGraphicsContext2D();
 
         hunterView = new HunterView(gc, this, model);
-        monsterView = new MonsterView(gc, this, model, parameters);
+        monsterView = new MonsterView(gc, this, model);
 
         ICoordinate mazeDimensions = model.getMazeDimensions();
         setWidth((double) TILE_SIZE * mazeDimensions.getCol());
@@ -94,7 +141,7 @@ public class GameView extends Canvas implements Observer {
         cursorPosition = new Coordinate(0, 0);
         movePosition = new Coordinate(-1, -1);
         setOnMouseMoved(e -> {
-            if (model.isGameEnded() || (hunterTurn && model.getHunter().getShootsLeft() <= 0
+            if (model.isGameEnded() || (isHunterTurn() && model.getHunter().getShootsLeft() <= 0
                     && model.getHunter().getGrenadesLeft() <= 0)) {
                 return;
             }
@@ -109,13 +156,15 @@ public class GameView extends Canvas implements Observer {
         });
 
         setOnMousePressed(e -> {
-            if (hunterTurn) {
+            if (model.isGameEnded() || isCanvasDisabled()) {
+                return;
+            }
+            if (isHunterTurn()) {
                 handleMousePressedHunter();
             } else {
                 handleMousePressedMonster();
             }
             draw();
-            mainPage.updateEntitiesLabel();
         });
 
         // on attache la vue au hunter
@@ -123,29 +172,34 @@ public class GameView extends Canvas implements Observer {
     }
 
     public void handleMousePressedHunter() {
-        if (model.isGameEnded() || (model.getHunter().getShootsLeft() <= 0 && model.getHunter().getGrenadesLeft() <= 0)) {
-            return;
-        }
-        if (model.getHunter().isGrenadeMode()) {
-            playGrenade();
-        }
-        if (model.getHunter().isHunterShootValid(cursorPosition)) {
-            play();
+        if (model.getHunter().isTurnValid(cursorPosition)) {
+            // If two players are playing on the same computer,
+            // then they will have to use the button dedicated to end the turn.
+            if (model.isSplitScreen()) {
+                play();
+            } else {
+                // Otherwise, end the turn immediately 
+                mainPage.playTurn();
+            }
         }
     }
 
+    /**
+     * Handles the logic of the monster's move when the player clicks on the cell.
+     * If the movement isn't valid, then nothing happens.
+     */
     public void handleMousePressedMonster() {
-        if (model.getMonster().superJump && model.getMonster().superJumpLeft > 0) {
-            if (model.getMonster().isMonsterMovementValid(cursorPosition, 2.0)) {
-                movePosition = cursorPosition;
-            }
-        } else if (model.getMonster().isMonsterMovementValid(cursorPosition, 1.0)) {
+        if (model.getMonster().isTurnValid(cursorPosition)) {
             movePosition = cursorPosition;
-        }
-
-        // Si le joueur joue contre un robot, alors on termine immédiatement le tour (pour éviter qu'il ait a déplacer sa souris le bouton en bas)
-        if (parameters.getGameMode() == GameMode.BOT && !parameters.isAiPlayerIsHunter()) {
-            mainPage.playTurn();
+            if (model.isSplitScreen()) {
+                // The player has to confirm the end of turn
+                // so as to give time for the other player to prepare his turn
+                // on the same computer.
+                play();
+            } else {
+                // ends the turn immediately
+                mainPage.playTurn();
+            }
         }
     }
 
@@ -170,57 +224,25 @@ public class GameView extends Canvas implements Observer {
      * appellée à chaque mouvement de souris ou à chaque action.
      */
     public void draw() {
-        if (hunterTurn) {
+        if (isHunterTurn()) {
             hunterView.draw();
         } else {
             monsterView.draw();
         }
     }
 
-    public boolean playHunterMove() {
-        if (model.getHunter().getShootsLeft() <= 0) {
-            return false;
-        }
-        model.getHunter().shoot(cursorPosition);
-        model.getHunter().setShootsLeft(model.getHunter().getShootsLeft() - 1);
-        return true;
-    }
-
-    public boolean play() {
-        boolean isValid = false;
+    public void play() {
         if (isHunterTurn()) {
-            isValid = playHunterMove();
+            if (model.getHunter().isGrenadeMode()) {
+                model.getHunter().playHunterGrenade(cursorPosition);
+            } else {
+                model.getHunter().playHunterMove(cursorPosition);
+            }
         } else {
-            isValid = model.getMonster().play(movePosition);
+            model.getMonster().play(movePosition);
         }
-        if (isValid) {
-            cursorPosition = new Coordinate(-1, -1);
-            movePosition = new Coordinate(-1, -1);
-        }
-        return isValid;
-    }
-
-    public boolean playHunterGrenade() {
-        if (model.getHunter().getGrenadesLeft() <= 0) {
-            return false;
-        }
-        model.getHunter().grenade(cursorPosition);
-        model.getHunter().setGrenadesLeft(model.getHunter().getGrenadesLeft() - 1);
-        return true;
-    }
-
-    public boolean playGrenade() {
-        boolean isValid = false;
-        if (hunterTurn) {
-            isValid = playHunterGrenade();
-        } else {
-            isValid = model.getMonster().play(movePosition);
-        }
-        if (isValid) {
-            cursorPosition = new Coordinate(-1, -1);
-            movePosition = new Coordinate(-1, -1);
-        }
-        return isValid;
+        cursorPosition = new Coordinate(-1, -1);
+        movePosition = new Coordinate(-1, -1);
     }
 
     /**
@@ -246,29 +268,33 @@ public class GameView extends Canvas implements Observer {
     @Override
     public void update(Subject subj) {
         ICellEvent cellEvent = (ICellEvent) subj;
-        if (cellEvent.getState() == CellInfo.WALL) {
-            mainPage.errorLabel.setText("Vous avez touché un arbre.");
-        } else if (cellEvent.getState() == CellInfo.MONSTER) {
-            monsterCase(cellEvent);
-        } else {
-            mainPage.errorLabel.setText("Vous n'avez rien touché...");
-        }
-        mainPage.updateEntitiesLabel();
-        draw();
+        updateHunterErrorLabel(cellEvent);
     }
 
     @Override
     public void update(Subject subj, Object data) {
         ICellEvent cellEvent = (ICellEvent) data;
-        if (cellEvent.getState() == CellInfo.WALL) {
-            mainPage.errorLabel.setText("Vous avez touché un arbre.");
-        } else if (cellEvent.getState() == CellInfo.MONSTER) {
-            monsterCase(cellEvent);
-        } else {
-            mainPage.errorLabel.setText("Vous n'avez rien touché...");
+        updateHunterErrorLabel(cellEvent);
+    }   
+
+    /**
+     * Updates the error label of the hunter after a shot.
+     * In a multiplayer game, it will get called even though the user is the monster.
+     * It's because the move of the distant player has to be replicated on the other's instance.
+     * If it's not the hunter's turn, then this function won't do a thing.
+     */
+    public void updateHunterErrorLabel(ICellEvent cellEvent) {
+        if (isHunterTurn()) {
+            if (cellEvent.getState() == CellInfo.WALL) {
+                mainPage.errorLabel.setText("Vous avez touché un arbre.");
+            } else if (cellEvent.getState() == CellInfo.MONSTER) {
+                monsterCase(cellEvent);
+            } else {
+                mainPage.errorLabel.setText("Vous n'avez rien touché...");
+            }
+            mainPage.updateEntitiesLabel();
+            draw();
         }
-        mainPage.updateEntitiesLabel();
-        draw();
     }
 
     private void monsterCase(ICellEvent cellEvent) {

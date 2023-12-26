@@ -67,8 +67,6 @@ public class SettingsController {
             case TWO_PLAYERS:
                 gameModeLabel.setText("Jouer à deux joueurs sur une même machine");
                 break;
-            default:
-                break;
         }
     }
 

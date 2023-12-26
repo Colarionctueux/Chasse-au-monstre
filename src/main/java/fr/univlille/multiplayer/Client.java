@@ -10,9 +10,9 @@ import java.net.Socket;
  * The host uses the `Server` class, but a client doesn't have a server socket initialized.
  */
 public class Client extends MultiplayerBody {
-	private static Client instance = null;
+	private static Client instance;
 	private Socket socket;
-	
+
 	// This class cannot get instantiated outside of the class itself.
 	private Client() {}
 
@@ -72,12 +72,10 @@ public class Client extends MultiplayerBody {
 	private void handleCommunicationOfServer(String serverMessage) {
 		try {
 			MultiplayerCommunication incoming = new MultiplayerCommunication(serverMessage);
-			System.out.println("Client is reading communication from server : " + incoming);
 			incomingBuffer.add(incoming);
 			if (onIncomingCommunicationCallback != null) {
 				onIncomingCommunicationCallback.run();
 			}
-			System.out.println("client analysed communication from server : " + incoming.toString());
 		} catch (InvalidCommunicationException e) {
 			// An invalid communication is ignored.
 			System.err.println("Server received invalid communication: " + serverMessage);
@@ -94,21 +92,17 @@ public class Client extends MultiplayerBody {
 	 */
 	public void kill(boolean propagate) throws IOException {
 		if (!isAlive()) {
-			System.out.println("trying to kill the client whereas it's not alive.");
-			System.out.println("Buffer : " + incomingBuffer);
 			return;
 		}
 		super.kill();
 		if (propagate) {
-			sendMessageToServer(
+			broadcast(
 				new MultiplayerCommunication(
-					MultiplayerCommand.DISCONNECTION,
-					socket.getLocalAddress().toString()
+					MultiplayerCommand.DISCONNECTION
 				)
 			);
 		}
 		socket.close();
-		System.out.println("client was killed.");
 	}
 
 	/**
@@ -125,7 +119,8 @@ public class Client extends MultiplayerBody {
 	 * @param message The message to send to the server.
 	 * @throws IOException
 	 */
-	public void sendMessageToServer(MultiplayerCommunication message) throws IOException {
+	@Override
+	public void broadcast(MultiplayerCommunication message) throws IOException {
 		MultiplayerUtils.getOutputFromSocket(socket).println(message.toString());
 	}
 
@@ -135,7 +130,7 @@ public class Client extends MultiplayerBody {
 	 * @throws IOException
 	 */
 	private void announcePresence() throws IOException {
-		sendMessageToServer(
+		broadcast(
 			new MultiplayerCommunication(
 				MultiplayerCommand.JOIN,
 				MultiplayerUtils.getHostname()

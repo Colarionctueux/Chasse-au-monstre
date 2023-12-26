@@ -62,14 +62,17 @@ public class HunterModel extends Subject {
         shootsHistory = new ArrayList<>();
     }
 
+    /**
+     * Sets the amount of shots left as the maximum amount allowed by the game parameters.
+     * Use this function at the beginning of each turn.
+     */
     public void turnBegin() {
         this.shootsLeft = maxShoots;
     }
 
     /**
      * Makes sure that the given hunter's target is valid.
-     * The hunter cannot shoot outside of the maze and cannot shoot the borders.
-     * 
+     * The hunter cannot shoot outside of the maze.
      * @param shoot The target's position.
      * @return `true` if the target's position is valid, `false` otherwise.
      */
@@ -80,8 +83,36 @@ public class HunterModel extends Subject {
     }
 
     /**
+     * Checks if the hunter has at least one shot left.
+     * @return `true` if the hunter can shoot.
+     */
+    public boolean canShoot() {
+        return getShootsLeft() > 0;
+    }
+
+    /**
+     * Checks if the hunter has at least one grenade left.
+     * @return `true` if the hunter can ue a grenade.
+     */
+    public boolean canUseGrenade() {
+        return getGrenadesLeft() > 0;
+    }
+
+    /**
+     * Checks if the turn of the hunter is valid.
+     * The hunter selects his powerups and selects a cell to target.
+     * If the powerup cannot be used, or if the targeted cell isn't valid,
+     * then this function will return `false`.
+     * Use this function to make sure that a turn is never completed with invalid game decisions.
+     * @param shot The coordinates of the cell to shoot.
+     * @return `true` if the hunter can complete his turn, `false` if he did something wrong and need to retry.
+     */
+    public boolean isTurnValid(ICoordinate shot) {
+        return (isGrenadeMode() ? canUseGrenade() : canShoot()) && isHunterShootValid(shot);
+    }
+
+    /**
      * Gets information about the cell that the hunter is targeting.
-     * 
      * @param shootPosition The coordinates of the hunter's target.
      * @return The type of cell that the hunter has shot.
      */
@@ -113,19 +144,64 @@ public class HunterModel extends Subject {
         notifyObservers(cellEvent);
     }
 
-    public void grenade(Coordinate greandePosition) {
-        shoot(greandePosition);
-        if (isHunterShootValid(new Coordinate(greandePosition.getCol() + 1, greandePosition.getRow()))) {
-            shoot(new Coordinate(greandePosition.getCol() + 1, greandePosition.getRow()));
+    /**
+     * Checks if the hunter can shoot,and he if can
+     * then it shoots at the given coordinates.
+     * @param coordinates The coordinates of the target.
+     * @return `true` if the hunter successfully shot the target, or `false` if the hunter isn't allowed to shoot.
+     */
+    public boolean playHunterMove(ICoordinate coordinates) {
+        if (!canShoot()) {
+            return false;
         }
-        if (isHunterShootValid(new Coordinate(greandePosition.getCol() - 1, greandePosition.getRow()))) {
-            shoot(new Coordinate(greandePosition.getCol() - 1, greandePosition.getRow()));
+        shoot(coordinates);
+        setShootsLeft(getShootsLeft() - 1);
+        return true;
+    }
+
+    /**
+     * Checks if the hunter is allowed to use a grenade,
+     * and if he is, then it throws a grenade,
+     * and remove one from the hunter's inventory.
+     * @param coordinates The coordinates where the grenade should explode.
+     * @return `true` if the grenade was successfully triggered, or `false` if the hunter cannot throw a grenade.
+     */
+    public boolean playHunterGrenade(ICoordinate coordinates) {
+        if (!canUseGrenade()) {
+            return false;
         }
-        if (isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow() + 1))) {
-            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow() + 1));
+        grenade(coordinates);
+        setGrenadesLeft(getGrenadesLeft() - 1);
+        return true;
+    }
+
+    /**
+     * Simulates the explosion of a grenade following this pattern:
+     * ```
+     *  +
+     * +++
+     *  +
+     * ```
+     * The `shoot` function is used for each mark of this pattern.
+     * @param grenadePosition
+     */
+    private void grenade(ICoordinate grenadePosition) {
+        shoot(grenadePosition);
+        ICoordinate t = new Coordinate(grenadePosition.getCol() + 1, grenadePosition.getRow()); // top
+        ICoordinate r = new Coordinate(grenadePosition.getCol(), grenadePosition.getRow() + 1); // right
+        ICoordinate b = new Coordinate(grenadePosition.getCol() - 1, grenadePosition.getRow()); // bottom
+        ICoordinate l = new Coordinate(grenadePosition.getCol(), grenadePosition.getRow() - 1); // left
+        if (isHunterShootValid(t)) {
+            shoot(t);
         }
-        if (isHunterShootValid(new Coordinate(greandePosition.getCol(), greandePosition.getRow() - 1))) {
-            shoot(new Coordinate(greandePosition.getCol(), greandePosition.getRow() - 1));
+        if (isHunterShootValid(b)) {
+            shoot(b);
+        }
+        if (isHunterShootValid(r)) {
+            shoot(r);
+        }
+        if (isHunterShootValid(l)) {
+            shoot(l);
         }
     }
 }

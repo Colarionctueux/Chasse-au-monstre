@@ -3,6 +3,8 @@ package fr.univlille;
 import java.io.IOException;
 
 import fr.univlille.multiplayer.Client;
+import fr.univlille.multiplayer.MultiplayerCommand;
+import fr.univlille.multiplayer.MultiplayerCommunication;
 import fr.univlille.multiplayer.Server;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -67,6 +69,14 @@ public class App extends Application {
     }
 
     public void startGame(GameParameters parameters) throws IOException {
+        if (Server.getInstance().hasClient()) {
+            Server.getInstance().broadcast(
+                new MultiplayerCommunication(
+                    MultiplayerCommand.CREATING_GAME,
+                    parameters.toString()
+                )
+            );
+        }
         this.parameters = parameters;
         scene.setRoot(loadFXML("game"));
     }

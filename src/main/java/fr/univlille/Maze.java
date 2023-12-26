@@ -23,10 +23,9 @@ public class Maze {
         }
     }
 
-    public boolean[][] createMaze(double threshold) {
-        recursiveBacktrack(0, 0);
+    public boolean[][] createMaze(double threshold, Random random) {
+        recursiveBacktrack(0, 0, random);
 
-        Random random = new Random();
         for (int y = 0; y < mazeTile.length; y++) {
             for (int x = 0; x < mazeTile[0].length; x++) {
                 if (random.nextDouble() > threshold) {
@@ -37,10 +36,9 @@ public class Maze {
         return mazeTile;
     }
 
-    private void recursiveBacktrack(int currentX, int currentY) {
-        List<int[]> directions = Arrays.asList(new int[] { 0, -2 }, new int[] { 0, 2 }, new int[] { -2, 0 },
-                new int[] { 2, 0 });
-        Collections.shuffle(directions);
+    private void recursiveBacktrack(int currentX, int currentY, Random random) {
+        List<int[]> directions = Arrays.asList(new int[] { 0, -2 }, new int[] { 0, 2 }, new int[] { -2, 0 }, new int[] { 2, 0 });
+        Collections.shuffle(directions, random);
 
         for (int[] direction : directions) {
             int newX = currentX + direction[0];
@@ -49,7 +47,7 @@ public class Maze {
             if (isValidCell(newX, newY) && mazeTile[newY][newX]) {
                 mazeTile[currentY + direction[1] / 2][currentX + direction[0] / 2] = false; // Ouvre le mur
                 mazeTile[newY][newX] = false; // Marque la nouvelle case comme visitée
-                recursiveBacktrack(newX, newY); // Appel récursif pour la nouvelle case
+                recursiveBacktrack(newX, newY, random); // Appel récursif pour la nouvelle case
             }
         }
     }

@@ -5,7 +5,6 @@ import java.util.Random;
 
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
-import fr.univlille.GameParameters;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
@@ -37,16 +36,15 @@ public class MonsterView {
      */
     private int[][] decorations;
 
-    public MonsterView(GraphicsContext gc, GameView gameView, fr.univlille.models.GameModel gameModel,
-            GameParameters parameters) {
+    public MonsterView(GraphicsContext gc, GameView gameView, GameModel gameModel) {
         this.gc = gc;
         this.gameView = gameView;
         this.gameModel = gameModel;
         this.model = gameModel.getMonster();
         ICoordinate mazeDimensions = gameModel.getMazeDimensions();
 
-        fogEnabled = parameters.isFogOfWar();
-        fogRadius = parameters.getFogOfWarRadius();
+        fogEnabled = gameModel.getParameters().isFogOfWar();
+        fogRadius = gameModel.getParameters().getFogOfWarRadius();
 
         addDecorations(mazeDimensions);
         if (fogEnabled) {
@@ -103,21 +101,19 @@ public class MonsterView {
                 (double) exitPosition.getCol() * GameView.TILE_SIZE,
                 (double) exitPosition.getRow() * GameView.TILE_SIZE - GameView.TILE_SIZE,
                 GameView.TILE_SIZE, GameView.TILE_SIZE * 2.0); // La sortie
-        if (gameModel.getMonster().superJump && gameModel.getMonster().superJumpLeft > 0) {
-            if (!model.isMonsterMovementValid(gameView.getCursorPosition(), 2.0)) {
-                ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si
-                                                                                         // mouvement impossible)
-            } else {
-                ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement
-                                                                                       // possible)
+        
+        if (gameModel.getMonster().shouldUseSuperJump()) {
+            if (!model.isMonsterMovementValid(gameView.getCursorPosition())) { // Position souris (si mouvement impossible)
+                ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition());
+            } else { // Position souris (si mouvement possible)
+                ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition());
             }
-        } else if (!model.isMonsterMovementValid(gameView.getCursorPosition(), 1.0)) {
-            ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition()); // Position souris (si mouvement
-                                                                                     // impossible)
-        } else {
-            ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition()); // Position souris (si mouvement
-                                                                                   // possible)
+        } else if (!model.isMonsterMovementValid(gameView.getCursorPosition())) { // Position souris (si mouvement impossible)
+            ViewUtils.drawSimpleTexture(gc, 128, 192, gameView.getCursorPosition());
+        } else { // Position souris (si mouvement possible)
+            ViewUtils.drawSimpleTexture(gc, 0, 192, gameView.getCursorPosition());
         }
+
         ViewUtils.drawSimpleTexture(gc, 64, 192, gameView.getMovePosition()); // Le mouvement
 
         drawHunterShoots();
@@ -186,20 +182,20 @@ public class MonsterView {
     }
 
     public boolean playMove() {
-        if (gameModel.getMonster().superJump && gameModel.getMonster().superJumpLeft > 0) {
-            if (model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
+        if (gameModel.getMonster().shouldUseSuperJump()) {
+            if (model.isMonsterMovementValid(gameView.getMovePosition())) {
                 gameModel.incrementTurn();
                 gameModel.getMonster().move(gameView.getMovePosition());
                 gameModel.addToHistory(new CellEvent(
-                        new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()),
+                        ((Coordinate)gameView.getMovePosition()).clone(),
                         CellInfo.MONSTER, gameModel.getTurn()));
             }
-        } else if (model.isMonsterMovementValid(gameView.getMovePosition(), 1.0)) {
+        } else if (model.isMonsterMovementValid(gameView.getMovePosition())) {
             gameModel.incrementTurn();
             gameModel.getMonster().move(gameView.getMovePosition());
             gameModel.addToHistory(new CellEvent(
-                    new Coordinate(gameView.getMovePosition().getCol(), gameView.getMovePosition().getRow()),
-                    CellInfo.MONSTER, gameModel.getTurn()));
+                    ((Coordinate)gameView.getMovePosition()).clone(),
+                    CellInfo.MONSTER, gameModel.getTurn()));    
         } else {
             return false;
         }

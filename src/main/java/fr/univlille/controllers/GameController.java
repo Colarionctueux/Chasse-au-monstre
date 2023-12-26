@@ -5,13 +5,18 @@ import java.io.IOException;
 import fr.univlille.App;
 import fr.univlille.CellEvent;
 import fr.univlille.Coordinate;
-import fr.univlille.GameMode;
-import fr.univlille.GameParameters;
 import fr.univlille.HunterStrategy;
 import fr.univlille.MonsterStrategy;
+import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent.CellInfo;
 import fr.univlille.models.GameModel;
+import fr.univlille.multiplayer.Client;
+import fr.univlille.multiplayer.MultiplayerBody;
+import fr.univlille.multiplayer.MultiplayerCommand;
+import fr.univlille.multiplayer.MultiplayerCommunication;
+import fr.univlille.multiplayer.Server;
 import fr.univlille.views.GameView;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -57,10 +62,31 @@ public class GameController {
 
     private GameView gameView;
     private GameModel game;
-    private GameParameters parameters;
 
     private MonsterStrategy monsterStrategy;
     private HunterStrategy hunterStrategy;
+
+    @FXML
+    public void initialize() {
+        initGame();
+    }
+
+    @FXML
+    public void playButtonPressed() {
+        playTurn();
+    }
+
+    @FXML
+    public void restartGamePressed() {
+        // TODO: tell the other player
+        initGame();
+    }
+
+    @FXML
+    public void menuButtonPressed() throws IOException {
+        // TODO: quit the game (SERVER_TERMINATION or CLIENT_DISCONNECTION)
+        App.getApp().changeScene("menu");
+    }
 
     /**
      * Cette méthode permet d'initialiser la partie. Elle est appellé à chaque
@@ -70,13 +96,13 @@ public class GameController {
         gameOverScreen.setVisible(false);
 
         game = new GameModel();
-        this.parameters = App.getApp().parameters;
-        game.generateMaze(parameters);
+        game.setParameters(App.getApp().parameters);
+        game.generateMaze(game.getParameters());
 
         if (gameView != null) {
             mainVBox.getChildren().remove(gameView);
         }
-        gameView = new GameView(game, parameters);
+        gameView = new GameView(game);
 
         mainVBox.getChildren().add(2, gameView);
         gameView.draw();
@@ -86,32 +112,114 @@ public class GameController {
         // On ajoute la première position du monstre dans l'historique
         Coordinate monsterPosition = game.getMonster().getPosition();
 
-        // Cela peut paraître bizarre de récreer une coordonnée avec les mêmes
-        // coordonnées,
-        // mais c'est simplement car sinon les deux instances seront liés et cette
-        // position
-        // sera dans l'historique sera modifiée à chaque nouveau déplacement du monstre
-        // (ce qu'on ne veut pas!)
-        game.addToHistory(new CellEvent(new Coordinate(monsterPosition.getCol(), monsterPosition.getRow()),
-                CellInfo.MONSTER, game.getTurn()));
+        // Cloner les coordonnées du monstre est nécessaire
+        // car l'historique doit contenir une deep copy de la position.
+        game.addToHistory(new CellEvent(monsterPosition.clone(), CellInfo.MONSTER, game.getTurn()));
 
-        if (parameters.getGameMode() == GameMode.BOT) {
-            // On crée la MonsterStrategy ou la HunterStrategy en fonction du rôle que le
-            // joueur a pris.
-            if (parameters.isAiPlayerIsHunter()) {
+        if (game.isPlayerAgainstAI()) {
+            // On crée la MonsterStrategy ou la HunterStrategy en fonction du rôle que le joueur a pris.
+            if (game.getParameters().isAiPlayerIsHunter()) {
                 monsterStrategy = new MonsterStrategy();
                 monsterStrategy.initialize(game.getMaze());
                 playTurn(); // Comme c'est toujours le monstre qui commence, on le laisse d'abord jouer.
             } else {
                 hunterStrategy = new HunterStrategy();
-                hunterStrategy.initialize(parameters.getMazeWidth(), parameters.getMazeHeight());
+                hunterStrategy.initialize(game.getParameters().getMazeWidth(), game.getParameters().getMazeHeight());
             }
+        }
+        
+        if (game.isMultiplayer()) {
+            if (game.isMultiplayerBodyPlayingHunter()) {
+                // the monster always start,
+                // so if the player is the hunter disable the buttons,
+                // client-side as well as server-side
+                disableInteractions();
+            }
+            initMultiplayerListeners();
+        }
+
+        // The end turn button is useful 
+        // ONLY when two players play on the same computer.
+        if (!game.isSplitScreen()) {
+            // We hide and disable it
+            disableEndTurnButton();
         }
     }
 
-    @FXML
-    public void initialize() {
-        initGame();
+    /**
+     * Gets the multiplayer instance that's currently alive.
+     * If the player is the host, then it will return the instance of the `Server` class,
+     * if not, then it means that the player is the client, so the instance of `Client` is returned.
+     */
+    private MultiplayerBody getMultiplayerInstance() {
+        return Server.getInstance().isAlive() ? Server.getInstance() : Client.getInstance();
+    }
+
+    /**
+     * Initializes the listeners for both server-side and client-side communications.
+     */
+    private void initMultiplayerListeners() {
+        MultiplayerBody body = getMultiplayerInstance();
+        body.setIncomingCommunicationCallback(() ->
+            Platform.runLater(() -> {
+                handleMultiplayerExchange(body);
+            })
+        );
+    }
+
+    /**
+     * When one player is telling the other about the completion of his turn,
+     * he sends information along with the communication.
+     * This first parameter of this communication is coordinates.
+     * This method reads these coordinates and creates an instance of `ICoordinate`.
+     * @param communication The communication that was sent by the other after the completion of his turn.
+     * @return The coordinates of the other's move.
+     */
+    private ICoordinate readCoordinatesFromMultiplayerCommunication(MultiplayerCommunication communication) {
+        int[] coordinates = new int[2];
+        String[] strCoordinates = communication.getParameter(0).split("-");
+        coordinates[0] = Integer.parseInt(strCoordinates[0]);
+        coordinates[1] = Integer.parseInt(strCoordinates[1]);
+        return new Coordinate(coordinates);
+    }
+
+    /**
+     * Server-side or client-side, it doesn't matter, in both cases the logic is the same.
+     * Indeed, the host and the client both receive a communication from the other at the end of each turn,
+     * and depending on their role, the game will update accordingly.
+     * @param body The client's instance, or the server's instance.
+     */
+    private void handleMultiplayerExchange(MultiplayerBody body) {
+        MultiplayerCommunication message = body.pollCommunication();
+        System.out.println("Received communication = " + message);
+        if (message.isCommand(MultiplayerCommand.HUNTER_PLAYED) || message.isCommand(MultiplayerCommand.MONSTER_PLAYED)) {
+            // In both cases, the first parameter is the position of the other:
+            // If the hunter is playing, then it receives the coordinates of the monster,
+            // and vice-versa.
+            ICoordinate coordinates = readCoordinatesFromMultiplayerCommunication(message);
+            boolean usedPowerup = Boolean.parseBoolean(message.getParameter(1));
+            if (body.isHunter()) {
+                // the given coordinates are those of the monster
+                game.getMonster().superJump = usedPowerup;
+                game.getMonster().play(coordinates);
+                System.out.println("updated monster's position to " + coordinates);
+            } else {
+                // The player is the monster and
+                // the given coordinates are those of the hunter's shot
+                if (usedPowerup) {
+                    game.getHunter().playHunterGrenade(coordinates);
+                } else {
+                    game.getHunter().playHunterMove(coordinates);
+                }
+                System.out.println("the hunter shot the position " + coordinates);
+            }
+            updateEntitiesLabel();
+            // if we are receiving word that the other has played his turn
+            // then it means its our turn, therefore we enable the buttons.
+            // When playing, the buttons get disabled,
+            // so we know that the other's buttons are disabled.
+            enableInteractions();
+        }
     }
 
     /**
@@ -123,7 +231,7 @@ public class GameController {
      * @param continuation Le code à éxecuter à la fin du delay.
      */
     public static void delay(long millis, Runnable continuation) {
-        Task<Void> sleeper = new Task<Void>() {
+        Task<Void> sleeper = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 Thread.sleep(millis);
@@ -134,22 +242,16 @@ public class GameController {
         new Thread(sleeper).start();
     }
 
-    @FXML
-    public void playButtonPressed() {
-        playTurn();
-    }
-
     private boolean isBotTurn() {
-        return parameters.getGameMode() == GameMode.BOT
-                && (gameView.isHunterTurn() && !parameters.isAiPlayerIsHunter()
-                        || !gameView.isHunterTurn() && parameters.isAiPlayerIsHunter());
+        return game.isPlayerAgainstAI()
+                && (gameView.isHunterTurn() && !game.getParameters().isAiPlayerIsHunter()
+                        || !gameView.isHunterTurn() && game.getParameters().isAiPlayerIsHunter());
     }
 
     public void playTurn() {
         if (isBotTurn()) {
-            if (parameters.isAiPlayerIsHunter()) {
-                monsterStrategy
-                        .update(new CellEvent(game.getMonster().getPosition(), CellInfo.MONSTER, game.getTurn()));
+            if (game.getParameters().isAiPlayerIsHunter()) {
+                monsterStrategy.update(new CellEvent(game.getMonster().getPosition(), CellInfo.MONSTER, game.getTurn()));
                 gameView.setMovePosition(monsterStrategy.play()); // on fait jouer le monstre
             } else {
                 while (game.getHunter().getShootsLeft() > 0) {
@@ -158,11 +260,19 @@ public class GameController {
                 }
             }
         }
-        if (gameView.isHunterTurn() || gameView.play()) {
-            errorLabel.setText("");
-            updateEntitiesLabel();
-        } else {
-            errorLabel.setText("Mouvement invalide!");
+
+        // `GameMode.TWO_PLAYERS` is the only game mode that doesn't end the turn as soon as the player decided his move.
+        // Therefore, in this game mode, `play` was already called, and the player used the "end turn" button to call this function.
+        // Use `play()` only when it's NOT split screen mode.
+        if (!game.isSplitScreen()) {
+            // For some reason, "movePosition" is used only with the monster,
+            // however "cursorPosition" must be used for the hunter's shot.
+            // We need to save it first because it gets reset within `gameView.play()`
+            ICoordinate targetPosition = ((Coordinate)(gameView.isHunterTurn() ? gameView.getCursorPosition() : gameView.getMovePosition())).clone();
+            gameView.play();
+            if (game.isMultiplayer()) {
+                broadcastEndOfTurn(targetPosition);
+            }
         }
 
         if (game.monsterWon()) {
@@ -177,7 +287,58 @@ public class GameController {
             }
             gameOverScreen.setVisible(true);
         }
-        swapScreen();
+
+        if (game.isSplitScreen()) {
+            swapScreen();
+        }
+
+        // On échange les tours
+        // et on update les labels
+        // ainsi que le canvas
+        swapTurn();
+        updateEntitiesLabel();
+        gameView.draw();
+
+        if (isBotTurn()) {
+            playTurn();
+        }
+
+        if (game.isMultiplayer()) {
+            disableInteractions();
+        }
+    }
+
+    /**
+     * In the case of a multiplayer game, at the end of each turn, 
+     * the player must inform the other about the completion of his turn,
+     * and transmit the data necessary to the duplication of the move
+     * on the other's instance.
+     */
+    private void broadcastEndOfTurn(ICoordinate targetPosition) {
+        try {
+            String targetCoordinates = targetPosition.getCol() + "-" + targetPosition.getRow();
+            MultiplayerBody body = getMultiplayerInstance();
+            if (body.isHunter()) {
+                System.out.println("The body is the hunter, sending HUNTER_PLAYED");
+                body.broadcast(
+                    new MultiplayerCommunication(
+                        MultiplayerCommand.HUNTER_PLAYED,
+                        targetCoordinates + ";" + game.getHunter().isGrenadeMode()
+                    )
+                );
+            } else {
+                System.out.println("The body is the hunter, sending MONSTER_PLAYED");
+                body.broadcast(
+                    new MultiplayerCommunication(
+                        MultiplayerCommand.MONSTER_PLAYED,
+                        targetCoordinates + ";" + game.getMonster().superJump
+                    )
+                );
+            }
+        } catch (IOException e) {
+            System.err.println("Caught an IOException when trying to send HUNTER_PLAYED or MONSTER_PLAYED:");
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -185,38 +346,45 @@ public class GameController {
         if (gameView.isHunterTurn()) {
             if (game.getHunter().getGrenadesLeft() > 0) {
                 boolean grenadeMode = game.getHunter().isGrenadeMode();
-                powerupEnabledLabel.setVisible(grenadeMode);
+                powerupEnabledLabel.setVisible(grenadeMode); // TODO: check if this should be "!grenableMode" instead
                 game.getHunter().setGrenadeMode(!grenadeMode);
             } else {
                 errorLabel.setText("Vous n'avez plu de grenade...");
             }
         } else {
+            // Toggling powerup, if possible
             if (game.getMonster().superJumpLeft > 0) {
-                if (game.getMonster().superJump) {
-                    powerupEnabledLabel.setVisible(false);
-                    game.getMonster().superJump = false;
-                } else {
-                    powerupEnabledLabel.setVisible(true);
-                    game.getMonster().superJump = true;
-                }
+                powerupEnabledLabel.setVisible(!game.getMonster().superJump);
+                game.getMonster().superJump = !game.getMonster().superJump;
             } else {
                 errorLabel.setText("Vous n'avez plu de SuperJump...");
             }
         }
     }
 
+    /**
+     * Two players are playing on the same game instance (the same computer).
+     * A dark screen will appear for 3 seconds.
+     */
     private void swapScreen() {
-        if (parameters.getGameMode() == GameMode.TWO_PLAYERS) {
-            // Animation de l'écran
-            switchPane.setVisible(true);
-            switchPaneCountdown.setText("Dans 3...");
-            delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
-            delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
-            delay(3000, () -> switchPane.setVisible(false));
+        switchPane.setVisible(true);
+        switchPaneCountdown.setText("Dans 3...");
+        delay(1000, () -> switchPaneCountdown.setText("Dans 2.."));
+        delay(2000, () -> switchPaneCountdown.setText("Dans 1."));
+        delay(3000, () -> switchPane.setVisible(false));
+    }
+
+    /**
+     * Swaps the turn (if it's the turn of the hunter, then it's now the turn of the monster, or vice-versa).
+     * The powerups are reset.
+     * The fog is reset within the monster view.
+     */
+    private void swapTurn() {
+        // `hunterTurn` property should not be changed in a multiplayer game
+        if (!game.isMultiplayer()) {
+            gameView.setHunterTurn(!gameView.isHunterTurn());
         }
 
-        // On échange les tours
-        gameView.setHunterTurn(!gameView.isHunterTurn());
         if (gameView.isHunterTurn()) {
             game.getHunter().turnBegin();
             game.getHunter().setGrenadeMode(false);
@@ -224,54 +392,82 @@ public class GameController {
             game.getMonster().superJump = false;
             gameView.getMonsterView().turnStarted();
         }
-
-        updateEntitiesLabel();
-        gameView.draw();
-
-        if (isBotTurn()) {
-            playTurn();
-        }
-    }
-
-    @FXML
-    public void restartGamePressed() {
-        System.out.println("restart");
-        initGame();
-    }
-
-    @FXML
-    public void menuButtonPressed() throws IOException {
-        App.getApp().changeScene("menu");
     }
 
     public void updateEntitiesLabel() {
         turnLabel.setText("Tour n°" + game.getTurn());
+        // Do not invert the condition,
+        // keep in mind that if it's a multiplayer game,
+        // then, if the current multiplayer body is the hunter,
+        // the below condition will always evaluate to true.
         if (gameView.isHunterTurn()) {
-            powerupButton.setDisable(game.getHunter().getGrenadesLeft() <= 0);
-            boolean grenade = game.getHunter().isGrenadeMode();
-            if (game.getHunter().getShootsLeft() == 1) {
-                shootLeftLabel.setText("Il vous reste " + game.getHunter().getShootsLeft() + " tir!");
-            } else {
-                shootLeftLabel.setText("Il vous reste " + game.getHunter().getShootsLeft() + " tirs!");
-            }
-            
-            powerupButton.setText("Grenade (" + game.getHunter().getGrenadesLeft() + ")");
-            powerupEnabledLabel.setVisible(grenade);
-            
-            if(!grenade) {
-                powerupButton.setSelected(false);
-            }
+            showHunterLabels();
         } else {
-            boolean superjump = game.getMonster().superJump;
-            powerupButton.setDisable(game.getMonster().superJumpLeft <= 0);
-            
-            powerupButton.setText("SuperJump (" + game.getMonster().superJumpLeft + ")");
-            powerupEnabledLabel.setVisible(superjump);
-            if(!superjump) {
-                powerupButton.setSelected(false);
-            }
+            showMonsterLabels();
+        }
+    }
+
+    /**
+     * Handles the labels to display or hide when the hunter is playing.
+     */
+    private void showHunterLabels() {
+        powerupButton.setDisable(!game.getHunter().canUseGrenade());
+        boolean grenade = game.getHunter().isGrenadeMode();
+        if (game.getHunter().getShootsLeft() == 1) {
+            shootLeftLabel.setText("Il vous reste " + game.getHunter().getShootsLeft() + " tir!");
+        } else {
+            shootLeftLabel.setText("Il vous reste " + game.getHunter().getShootsLeft() + " tirs!");
         }
         
-        shootLeftLabel.setVisible(gameView.isHunterTurn());
+        powerupButton.setText("Grenade (" + game.getHunter().getGrenadesLeft() + ")");
+        powerupEnabledLabel.setVisible(grenade);
+        
+        if (!grenade) {
+            powerupButton.setSelected(false);
+        }
+
+        shootLeftLabel.setVisible(true);
+    }
+
+    /**
+     * Handles the labels to display or hide when the monster is playing.
+     */
+    private void showMonsterLabels() {
+        powerupButton.setDisable(game.getMonster().superJumpLeft <= 0);
+        boolean superjump = game.getMonster().superJump;
+        shootLeftLabel.setVisible(false);
+        powerupButton.setText("SuperJump (" + game.getMonster().superJumpLeft + ")");
+        powerupEnabledLabel.setVisible(superjump);
+        
+        if(!superjump) {
+            powerupButton.setSelected(false);
+        }
+    }
+
+    /**
+     * In multiplayer mode, the view is never changed,
+     * and one player must WAIT for the other to complete his turn,
+     * therefore the awaiting player should not be able to click on any button.
+     */
+    private void disableInteractions() {
+        powerupButton.setDisable(true);
+        gameView.disableCanvas();
+    }
+
+    /**
+     * Same as `disableInteractions()` but this time the player is allowed to play.
+     */
+    private void enableInteractions() {
+        powerupButton.setDisable(false);
+        gameView.enableCanvas();
+    }
+
+    /**
+     * In the case of a multiplayer game or against an AI,
+     * the end turn button will always be disabled.
+     */
+    private void disableEndTurnButton() {
+        endTurnButton.setDisable(true);
+        endTurnButton.setVisible(false);
     }
 }
