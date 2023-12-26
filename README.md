@@ -20,29 +20,32 @@ Chaque tour, le monstre bouge et essaie de se frayer un chemin vers la sortie, e
 
 ### Comment lancer le jeu :
 
-Lancer App.java
+Lancer [App.java](./src/main/java/fr/univlille/App.java)
 
 ### Fonctionnalités actuelles :
 
-- Génération d'un labyrinthe généré à l'aide d'un algorithme. (Recursive Backtracing)
+- Menu principal
+- Possibilité pour deux joueurs de jouer sur le même PC
+- Génération d'un labyrinthe à l'aide d'un algorithme (Recursive Backtracing)
 - Affichage de l'historique de déplacement du monstre pour le chasseur
-- Placement du monstre/de la sortie aléatoirement
-- Vue monstre/chasseur différente
+- Placement aléatoires du monstre et de la sortie
 - Condition de victoire monstre/chasseur
-- Thèmes
+- Règles du jeu personnalisables
+- Vue monstre/chasseur différente
+- Brouillard pour le monstre au-delà de 2/3 de distance
+- Utiliser des grenades pour le chasseur
+- Utiliser un "super jump" pour le monstre
+- Possibilité de jouer sur 2 PC différents à l'IUT (Multijoueur)
 
 ### Fonctionnalités futures :
 
-- Menu principal
-- IA pour le monstre et le chasseur, pour pouvoir jouer en solo
-- Possibilité de jouer sur 2 PC différents à l'IUT
-- Règles du jeu personnalisables
+- Meilleure IA pour le monstre et le chasseur, pour pouvoir jouer en solo
 - Créer un JAR pour lancer le jeu
 
 ### Fonctionnalités éventuelles :
 
-- Brouillard pour le monstre au-delà de 2/3 de distance
-- Mécaniques de gameplay et de jeu additionnelles
+- Thèmes (pour les graphismes)
+- De nouvells écaniques de gameplay
 
 ### Multijoueur :
 
@@ -62,7 +65,6 @@ Le nom de l'hôte est également affiché dans la console de debug de l'instance
 > NOTE: en local, il est également possible d'utiliser `127.0.0.1` dans le champ de texte, lorsque l'on rejoint une partie.
 
 ### Jalon 1
-
 
 |Personne|Travail|
 |--------|-------|
