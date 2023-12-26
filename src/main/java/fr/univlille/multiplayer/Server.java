@@ -102,6 +102,7 @@ public class Server extends MultiplayerBody {
 	 * by broadcasting a communication of type `MultiplayerCommand.SERVER_TERMINATION`.
 	 * @throws IOException
 	 */
+	@Override
 	public void kill(boolean propagate) throws IOException {
 		if (!isAlive()) {
 			return;

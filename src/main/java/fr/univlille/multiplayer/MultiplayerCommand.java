@@ -9,5 +9,6 @@ public enum MultiplayerCommand {
   CREATING_GAME, // the host started the game and is now transmitting the seed used to generate any random event
   MONSTER_PLAYED, // the monster has played and is transmitting information about his play to the client's instance (the position of the monster: "command=..;x-y;boolean" for position (x;y) and a boolean to say if a super jump was used)
   HUNTER_PLAYED, // the hunter has played and is transmitting information about his play to the host's instance (the position of the hunter's shot: "command=..;x-y" for position (x;y) and a boolean to say if a grenade was used)
+  GAME_RESTARTED, // the client, or the server, decided to restart the game. The game parameters stay the same.
   // TODO: add GAME_ENDED to tell the other about the end of a game
 }

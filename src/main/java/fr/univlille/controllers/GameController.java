@@ -77,21 +77,26 @@ public class GameController {
     }
 
     @FXML
-    public void restartGamePressed() {
-        // TODO: tell the other player
+    public void restartGamePressed() throws IOException {
+        if (game.isMultiplayer()) {
+            MultiplayerBody body = getMultiplayerInstance();
+            body.broadcast(
+                new MultiplayerCommunication(
+                    MultiplayerCommand.GAME_RESTARTED
+                )
+            );
+        }
         initGame();
     }
 
     @FXML
     public void menuButtonPressed() throws IOException {
-        try {
-            if (Server.getInstance().isAlive()) {
-                Server.getInstance().kill(true);
-            } else {
-                Client.getInstance().kill(true);
+        if (game.isMultiplayer()) {
+            try {
+                getMultiplayerInstance().kill(true);
+            } catch (IOException e) {
+                System.err.println("Could not kill the instance of multiplayer body : " + e.getMessage());
             }
-        } catch (IOException e) {
-            System.err.println("Could not kill the instance of multiplayer body : " + e.getMessage());
         }
         leaveGame();
     }
@@ -213,7 +218,6 @@ public class GameController {
                 // the given coordinates are those of the monster
                 game.getMonster().setSuperJump(usedPowerup);
                 game.getMonster().play(coordinates);
-                System.out.println("updated monster's position to " + coordinates);
             } else {
                 // The player is the monster and
                 // the given coordinates are those of the hunter's shot
@@ -222,7 +226,6 @@ public class GameController {
                 } else {
                     game.getHunter().playHunterMove(coordinates);
                 }
-                System.out.println("the hunter shot the position " + coordinates);
             }
             updateEntitiesLabel();
             // if we are receiving word that the other has played his turn
@@ -230,6 +233,11 @@ public class GameController {
             // When playing, the buttons get disabled,
             // so we know that the other's buttons are disabled.
             enableInteractions();
+        } else if (message.isCommand(MultiplayerCommand.GAME_RESTARTED)) {
+            // The other asked to restart the game,
+            // the game parameters are the same,
+            // so just init a new game:
+            initGame();
         } else {
             // Handling the "expected" disconnection of the other player from the game
             try {

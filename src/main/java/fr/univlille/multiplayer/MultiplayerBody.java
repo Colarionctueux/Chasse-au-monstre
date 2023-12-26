@@ -110,4 +110,6 @@ public abstract class MultiplayerBody {
 		stopIncomingCommunicationCallback();
 		dropCommunications();
 	}
+
+	public abstract void kill(boolean propagate) throws IOException;
 }

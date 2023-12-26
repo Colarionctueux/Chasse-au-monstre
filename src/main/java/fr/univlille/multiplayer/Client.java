@@ -90,6 +90,7 @@ public class Client extends MultiplayerBody {
 	 * The `onIncomingCommunicationCallback` is deleted and the incoming buffer is cleared.
 	 * @throws IOException
 	 */
+	@Override
 	public void kill(boolean propagate) throws IOException {
 		if (!isAlive()) {
 			return;
