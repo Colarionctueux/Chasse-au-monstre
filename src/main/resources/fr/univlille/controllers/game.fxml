@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.GameController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.univlille.controllers.GameController">
    <children>
       <VBox fx:id="mainVBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
@@ -25,6 +25,7 @@
             <ToggleButton fx:id="powerupButton" mnemonicParsing="false" onAction="#powerupButtonPressed" text="PowerupButton" />
             <Label fx:id="powerupEnabledLabel" prefHeight="16.0" prefWidth="40.0" text="[Actif]" textAlignment="CENTER" textFill="#007c00" />
             <Button fx:id="endTurnButton" mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
+            <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Sauvegarder la partie" />
          </children>
       </VBox>
       <Button mnemonicParsing="false" onAction="#menuButtonPressed" text="Retourner au menu" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="16.0" />

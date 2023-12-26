@@ -394,6 +394,11 @@ public class GameController {
         }
     }
 
+    @FXML
+    public void saveButtonPressed() throws IOException {
+        App.getApp().changeScene("save");
+    }
+
     public void updateEntitiesLabel() {
         turnLabel.setText("Tour n°" + game.getTurn());
         // Do not invert the condition,
