@@ -42,6 +42,14 @@ public class MultiplayerUtils {
   }
 
   /**
+   * Checks if one multiplayer instance is alive.
+   * @return `true` if there is a multiplayer instance (meaning that we are playing a game in multiplayer mode, or a lobby has just been created).
+   */
+  public static boolean hasMultiplayerInstance() {
+    return Server.getInstance().isAlive() || Client.getInstance().isAlive();
+  }
+
+  /**
 	 * Gets the name of the host that's running the server.
 	 * It's the name of the physical machine running this code.
 	 * @return The name of the physical machine, or "???" if it's unknown.

@@ -41,11 +41,7 @@ public class LobbyController extends AnchorPane {
         App app = App.getApp();
         app.changeScene("menu");
         try {
-            if (Server.getInstance().isAlive()) {
-                Server.getInstance().kill(true);
-            } else {
-                Client.getInstance().kill(true);
-            }
+            MultiplayerUtils.getMultiplayerInstance().kill();
         } catch (IOException e) {
             System.err.println("Cannot kill the instance of multiplayer body : " + e.getMessage());
         }
@@ -63,8 +59,10 @@ public class LobbyController extends AnchorPane {
             app.getGameParameters().setSeed(System.currentTimeMillis()); // will set a common seed shared with the client for maze generation
             app.changeScene("settings");
             server.setIsHunter(model.isHostHunter());
-            server.closeRequests();
-            server.stopIncomingCommunicationCallback();
+        } else {
+            // If the client quit the app unexpectedly
+            // then we make sure that his hostname is no longer displayed
+            removeClientHostname();
         }
     }
 
@@ -91,7 +89,6 @@ public class LobbyController extends AnchorPane {
             );
         } catch (IOException e) {
             System.err.println("Broadcast of inverted roles failed : " + e.getMessage());
-            // TODO: handle error message
         }
     }
 
@@ -111,13 +108,32 @@ public class LobbyController extends AnchorPane {
     }
 
     public void initialize() {
-        this.model = new LobbyModel();
-        if (Client.getInstance().isAlive()) {
-            hideStartGameButton(); // the client cannot launch the game
-            handleClientSide();
-        } else {
-            handleServerSide();
+        // At this point of the program,
+        // there is a multiplayer instance,
+        // therefore `MultiplayerUtils.getMultiplayerInstance()` cannot be null.
+        if (MultiplayerUtils.getMultiplayerInstance().hasIncomingCommunicationCallback()) {
+            // the lobby has already been created before,
+            // and the host has decided to come back to it.
+            // It's possible when using the "cancel" button from the settings controller.
+            // As a consequence, we need to make sure that the lobby model has the right value.
+            // Note that in such scenario the client hasn't moved from the lobby,
+            // so in this condition, the Client cannot be alive.
+            this.model = new LobbyModel();
+            this.model.setIsHostHunter(Server.getInstance().isHunter());
             hostname_label.setText(MultiplayerUtils.getHostname());
+            client_name.setText(Server.getInstance().getSavedClientHostname());
+            applyModel();
+        } else {
+            // The lobby has never been created before,
+            // therefore we initialize everything.
+            this.model = new LobbyModel();
+            if (Client.getInstance().isAlive()) {
+                hideStartGameButton(); // the client cannot launch the game
+                handleClientSide();
+            } else {
+                handleServerSide();
+                hostname_label.setText(MultiplayerUtils.getHostname());
+            }
         }
     }
 
@@ -153,7 +169,7 @@ public class LobbyController extends AnchorPane {
                         break;
                     case SERVER_TERMINATION:
                         try {
-                            Client.getInstance().kill(false);
+                            Client.getInstance().kill();
                             App.getApp().changeScene("menu");
                         } catch (Exception e) {
                             System.out.println("Server termination led to error : " + e.getMessage());
@@ -183,15 +199,14 @@ public class LobbyController extends AnchorPane {
                 System.out.println("Server handling communication : " + announce);
                 switch (announce.getCommand()) {
                     case JOIN:
-                        client_name.setText(announce.getParameter(0));
-                        server.closeRequests();
+                        server.setClientHostname(announce.getParameter(0));
+                        client_name.setText(server.getSavedClientHostname());
                         if (model.hasChanged()) {
                             broadcastRoles();
                         }
                         break;
                     case DISCONNECTION:
-                        client_name.setText("???");
-                        server.reacceptRequests();
+                        removeClientHostname();
                         break;
                     default:
                         System.out.println("incoming communication from server was ignored by server : " + announce);
@@ -199,5 +214,9 @@ public class LobbyController extends AnchorPane {
                 }
             })
         );
+    }
+
+    private void removeClientHostname() {
+        client_name.setText("???");
     }
 }

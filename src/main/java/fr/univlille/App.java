@@ -2,9 +2,9 @@ package fr.univlille;
 
 import java.io.IOException;
 
-import fr.univlille.multiplayer.Client;
 import fr.univlille.multiplayer.MultiplayerCommand;
 import fr.univlille.multiplayer.MultiplayerCommunication;
+import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -66,8 +66,7 @@ public class App extends Application {
     public void stop() throws Exception {
         super.stop();
         // making sure the server and the client are properly closed when exiting the app
-        Client.getInstance().kill(false);
-        Server.getInstance().kill(false);
+        MultiplayerUtils.getMultiplayerInstance().kill();
     }
 
     public void showParameters(GameMode gameMode) throws IOException {

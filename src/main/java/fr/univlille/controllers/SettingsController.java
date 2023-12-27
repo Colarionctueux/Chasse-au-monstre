@@ -5,6 +5,8 @@ import java.io.IOException;
 import fr.univlille.App;
 import fr.univlille.GameMode;
 import fr.univlille.GameParameters;
+import fr.univlille.multiplayer.MultiplayerUtils;
+import fr.univlille.multiplayer.Server;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -72,6 +74,12 @@ public class SettingsController {
 
     @FXML
     public void startGamePressed() throws IOException {
+        // We make sure that the lobby is no longer
+        // handling any incoming communication
+        if (Server.getInstance().isAlive()) {
+            Server.getInstance().stopIncomingCommunicationCallback();
+        }
+        
         GameParameters parameters = App.getApp().getGameParameters();
         parameters.setMazeWidth(mazeSizeXSpinner.getValue());
         parameters.setMazeHeight(mazeSizeYSpinner.getValue());
@@ -91,7 +99,11 @@ public class SettingsController {
 
     @FXML
     public void cancelPressed() throws IOException {
-        App.getApp().changeScene("menu");
+        if (MultiplayerUtils.hasMultiplayerInstance()) {
+            App.getApp().changeScene("lobby");
+        } else {
+            App.getApp().changeScene("menu");
+        }
     }
 
     @FXML

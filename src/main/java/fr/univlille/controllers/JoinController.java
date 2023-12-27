@@ -29,10 +29,8 @@ public class JoinController extends AnchorPane {
             success = true;
         } catch (UnknownHostException e) {
             System.err.println("Cannot join host " + e.getMessage());
-            // TODO: display error message
         } catch (IOException e) {
             System.err.println("Oh no " + e.getMessage());
-            // TODO: display error message
         }
         // The IOException of `changeScene` should be propagated
         if (success) {

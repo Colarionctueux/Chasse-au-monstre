@@ -91,18 +91,17 @@ public class Client extends MultiplayerBody {
 	 * @throws IOException
 	 */
 	@Override
-	public void kill(boolean propagate) throws IOException {
+	public void kill() throws IOException {
 		if (!isAlive()) {
 			return;
 		}
 		super.kill();
-		if (propagate) {
-			broadcast(
-				new MultiplayerCommunication(
-					MultiplayerCommand.DISCONNECTION
-				)
-			);
-		}
+		// Broadcast the disconnection even if the server has already been terminated
+		broadcast(
+			new MultiplayerCommunication(
+				MultiplayerCommand.DISCONNECTION
+			)
+		);
 		socket.close();
 	}
 

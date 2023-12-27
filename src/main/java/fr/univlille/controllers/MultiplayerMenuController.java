@@ -41,11 +41,21 @@ public class MultiplayerMenuController extends AnchorPane {
 
     @FXML
     public void hostButtonPressed() throws IOException {
-        app = App.getApp();
-        app.changeScene("lobby");
-        if (!Server.getInstance().isAlive()) {
-            Server.getInstance().host(App.getDefaultMultiplayerPort());
-            System.out.println("Server is running at '" + MultiplayerUtils.getHostname() + "'");
+        // We make sure that the lobby cannot be displayed
+        // if the creation of the server fails.
+        boolean success = false;
+        try {
+            if (!Server.getInstance().isAlive()) {
+                Server.getInstance().host(App.getDefaultMultiplayerPort());
+                System.out.println("Server is running at '" + MultiplayerUtils.getHostname() + "'");
+            }
+            success = true;
+        } catch (IOException e) {
+			System.err.println("Exception caught when trying to initialize the server on port " + App.getDefaultMultiplayerPort());
+			System.err.println(e.getMessage());
+		}
+        if (success) {
+            App.getApp().changeScene("lobby");
         }
     }
 

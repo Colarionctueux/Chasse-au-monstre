@@ -94,7 +94,7 @@ public class GameController {
     public void menuButtonPressed() throws IOException {
         if (game.isMultiplayer()) {
             try {
-                MultiplayerUtils.getMultiplayerInstance().kill(true);
+                MultiplayerUtils.getMultiplayerInstance().kill();
             } catch (IOException e) {
                 System.err.println("Could not kill the instance of multiplayer body : " + e.getMessage());
             }
@@ -246,12 +246,12 @@ public class GameController {
                     // Meaning that the body is the client,
                     // and the host has left the game.
                     leaveGame();
-                    Client.getInstance().kill(false);
+                    Client.getInstance().kill();
                 } else if (message.isCommand(MultiplayerCommand.DISCONNECTION)) {
                     // Meaning the body is the host,
                     // and the client has left the game.
                     leaveGame();
-                    Server.getInstance().kill(false);
+                    Server.getInstance().kill();
                 }
             } catch (IOException ignore) { }
         }
@@ -353,6 +353,17 @@ public class GameController {
         try {
             String targetCoordinates = targetPosition.getCol() + "-" + targetPosition.getRow();
             MultiplayerBody body = MultiplayerUtils.getMultiplayerInstance();
+            if (Server.getInstance().isAlive() && !Server.getInstance().hasClient()) {
+                // If the server is alive,
+                // but there is no client,
+                // then end the game immediately.
+                // It happens if the client quits the java program unexpectedly.
+                try {
+                    leaveGame();
+                    Server.getInstance().kill();
+                    return;
+                } catch (IOException ignore) { }
+            }
             if (body.isHunter()) {
                 System.out.println("The body is the hunter, sending HUNTER_PLAYED");
                 body.broadcast(

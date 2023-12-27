@@ -102,14 +102,20 @@ public abstract class MultiplayerBody {
 		onIncomingCommunicationCallback = null;
 	}
 
+	/**
+	 * Checks if the multiplayer body is currently able to handle communications.
+	 * @return `true` if a callback was defined.
+	 */
+	public boolean hasIncomingCommunicationCallback() {
+		return onIncomingCommunicationCallback != null;
+	}
+
 	public abstract boolean isAlive();
 
 	public abstract void broadcast(MultiplayerCommunication communication) throws IOException;
 	
-	protected void kill() {
+	public void kill() throws IOException {
 		stopIncomingCommunicationCallback();
 		dropCommunications();
 	}
-
-	public abstract void kill(boolean propagate) throws IOException;
 }

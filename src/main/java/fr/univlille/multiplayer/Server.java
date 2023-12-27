@@ -14,8 +14,8 @@ import java.net.Socket;
 public class Server extends MultiplayerBody {
 	private static Server instance;
 	private ServerSocket server;
-	private boolean acceptingNewUsers = true;
 	private Socket clientSocket;
+	private String clientHostname;
 
 	// This class cannot get instantiated outside of the class itself.
 	private Server() { }
@@ -40,14 +40,15 @@ public class Server extends MultiplayerBody {
 	 * The clients will need the hostname (the name of the phsyical machine) in order to subscribe.
 	 * @param port The port that the server will use for its communications.
 	 */
-	public void host(int port) {
+	public void host(int port) throws IOException {
 		try {
 			server = new ServerSocket(port);
-			acceptingNewUsers = true; // just making sure it's `true` by default when creating the server (it wouldn't make sense to set it to `false` at this point)
 			new Thread(() -> {
 				try {
 					while (isAlive()) {
-						if (acceptingNewUsers) {
+						// the server will accept requests
+						// as long as there is no client.
+						if (!hasClient()) {
 							Socket clientSocket = server.accept();
 							System.out.println("accepted new user : " + clientSocket);
 							welcomeIncomingClient(clientSocket);
@@ -63,24 +64,7 @@ public class Server extends MultiplayerBody {
 			System.err.println("SOCKET EXCEPTION in host() of Server : this.server = " + this.server);
 			System.err.println(e.getMessage());
 			System.err.println(e.getCause());
-		} catch (IOException e) {
-			System.err.println("Exception caught when trying to initialize the server on port " + port);
-			System.err.println(e.getMessage());
 		}
-	}
-
-	/**
-	 * Stops new users from joining the server.
-	 */
-	public void closeRequests() {
-		acceptingNewUsers = false;
-	}
-
-	/**
-	 * Re-allows new users from joining the server.
-	 */
-	public void reacceptRequests() {
-		acceptingNewUsers = true;
 	}
 
 	/**
@@ -89,7 +73,32 @@ public class Server extends MultiplayerBody {
 	 * @return `true` if the server has a player, `false` otherwise.
 	 */
 	public boolean hasClient() {
-		return isAlive() && clientSocket != null && !clientSocket.isClosed();
+		// just making sure that if the client's socket is closed
+		// then we delete its reference, as it is no longer needed
+		if (clientSocket != null && clientSocket.isClosed()) {
+			clientSocket = null;
+			clientHostname = null;
+		}
+		return isAlive() && clientSocket != null;
+	}
+
+	/**
+	 * Returns the hostname of the client that was previously saved by the server.
+	 * It's useful when the host wants to go back to the LobbyController.
+	 * @return The name of the client to be displayed in the lobby.
+	 */
+	public String getSavedClientHostname() {
+		return clientHostname;
+	}
+
+	/**
+	 * Sets the hostname of the client
+	 * so as to make sure the host never forgets it
+	 * when he decides to go back to the lobby.
+	 * @param hostname The hostname of the client.
+	 */
+	public void setClientHostname(String hostname) {
+		this.clientHostname = hostname;
 	}
 
 	/**
@@ -103,19 +112,21 @@ public class Server extends MultiplayerBody {
 	 * @throws IOException
 	 */
 	@Override
-	public void kill(boolean propagate) throws IOException {
+	public void kill() throws IOException {
 		if (!isAlive()) {
 			return;
 		}
 		super.kill();
-		if (propagate) {
+		if (hasClient()) {
 			broadcast(
 				new MultiplayerCommunication(
 					MultiplayerCommand.SERVER_TERMINATION
 				)
 			);
+			clientSocket.close();
+			clientSocket = null;
+			clientHostname = null;
 		}
-		clientSocket.close();
 		server.close();
 	}
 
@@ -125,6 +136,8 @@ public class Server extends MultiplayerBody {
 	 */
 	@Override
 	public boolean isAlive() {
+		// the server socket will never be null,
+		// unless `host` was never called.
 		return server != null && !server.isClosed(); // `server` can be null if the instance is created, but `host()` has never been called.
 	}
 
