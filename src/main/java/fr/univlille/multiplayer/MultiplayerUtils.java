@@ -33,6 +33,15 @@ public class MultiplayerUtils {
   }
 
   /**
+   * Gets the multiplayer instance that's currently alive.
+   * If the player is the host, then it will return the instance of the `Server` class,
+   * if not, then it means that the player is the client, so the instance of `Client` is returned.
+   */
+  public static MultiplayerBody getMultiplayerInstance() {
+    return Server.getInstance().isAlive() ? Server.getInstance() : Client.getInstance();
+  }
+
+  /**
 	 * Gets the name of the host that's running the server.
 	 * It's the name of the physical machine running this code.
 	 * @return The name of the physical machine, or "???" if it's unknown.

@@ -1,5 +1,6 @@
 package fr.univlille.models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,6 +12,10 @@ import fr.univlille.Maze;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.multiplayer.Client;
+import fr.univlille.multiplayer.MultiplayerBody;
+import fr.univlille.multiplayer.MultiplayerCommand;
+import fr.univlille.multiplayer.MultiplayerCommunication;
+import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import fr.univlille.utils.Subject;
 
@@ -97,6 +102,16 @@ public class GameModel extends Subject {
     }
 
     public void setGameEnded(boolean gameEnded) {
+        if (gameEnded && isMultiplayer()) {
+            try {
+                MultiplayerBody body = MultiplayerUtils.getMultiplayerInstance();
+                body.broadcast(
+                    new MultiplayerCommunication(
+                        MultiplayerCommand.GAME_ENDED
+                    )
+                );
+            } catch (IOException ignore) { }
+        }
         this.gameEnded = gameEnded;
     }
 

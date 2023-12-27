@@ -14,6 +14,7 @@ import fr.univlille.multiplayer.Client;
 import fr.univlille.multiplayer.MultiplayerBody;
 import fr.univlille.multiplayer.MultiplayerCommand;
 import fr.univlille.multiplayer.MultiplayerCommunication;
+import fr.univlille.multiplayer.MultiplayerUtils;
 import fr.univlille.multiplayer.Server;
 import fr.univlille.views.GameView;
 import javafx.application.Platform;
@@ -79,7 +80,7 @@ public class GameController {
     @FXML
     public void restartGamePressed() throws IOException {
         if (game.isMultiplayer()) {
-            MultiplayerBody body = getMultiplayerInstance();
+            MultiplayerBody body = MultiplayerUtils.getMultiplayerInstance();
             body.broadcast(
                 new MultiplayerCommunication(
                     MultiplayerCommand.GAME_RESTARTED
@@ -93,7 +94,7 @@ public class GameController {
     public void menuButtonPressed() throws IOException {
         if (game.isMultiplayer()) {
             try {
-                getMultiplayerInstance().kill(true);
+                MultiplayerUtils.getMultiplayerInstance().kill(true);
             } catch (IOException e) {
                 System.err.println("Could not kill the instance of multiplayer body : " + e.getMessage());
             }
@@ -164,19 +165,10 @@ public class GameController {
     }
 
     /**
-     * Gets the multiplayer instance that's currently alive.
-     * If the player is the host, then it will return the instance of the `Server` class,
-     * if not, then it means that the player is the client, so the instance of `Client` is returned.
-     */
-    private MultiplayerBody getMultiplayerInstance() {
-        return Server.getInstance().isAlive() ? Server.getInstance() : Client.getInstance();
-    }
-
-    /**
      * Initializes the listeners for both server-side and client-side communications.
      */
     private void initMultiplayerListeners() {
-        MultiplayerBody body = getMultiplayerInstance();
+        MultiplayerBody body = MultiplayerUtils.getMultiplayerInstance();
         body.setIncomingCommunicationCallback(() ->
             Platform.runLater(() -> {
                 handleMultiplayerExchange(body);
@@ -238,6 +230,15 @@ public class GameController {
             // the game parameters are the same,
             // so just init a new game:
             initGame();
+        } else if (message.isCommand(MultiplayerCommand.GAME_ENDED)) {
+            // The other player won the game,
+            // so the role that won the game is the opposite of the current one.
+            if (body.isHunter()) {
+                winnerLabel.setText("Le monstre a gagné!");
+            } else {
+                winnerLabel.setText("Le chasseur a gagné!");
+            }
+            gameOverScreen.setVisible(true);
         } else {
             // Handling the "expected" disconnection of the other player from the game
             try {
@@ -351,7 +352,7 @@ public class GameController {
     private void broadcastEndOfTurn(ICoordinate targetPosition) {
         try {
             String targetCoordinates = targetPosition.getCol() + "-" + targetPosition.getRow();
-            MultiplayerBody body = getMultiplayerInstance();
+            MultiplayerBody body = MultiplayerUtils.getMultiplayerInstance();
             if (body.isHunter()) {
                 System.out.println("The body is the hunter, sending HUNTER_PLAYED");
                 body.broadcast(
