@@ -1,11 +1,11 @@
 package fr.univlille;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import fr.univlille.iutinfo.cam.player.monster.IMonsterStrategy;
 import fr.univlille.iutinfo.cam.player.perception.ICellEvent;
 import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
+import fr.univlille.models.GameModel;
 
 public class MonsterStrategy implements IMonsterStrategy {
  
@@ -14,25 +14,132 @@ public class MonsterStrategy implements IMonsterStrategy {
     private int mazeWidth;
     private int mazeHeight;
 
-    private ICoordinate monsterPosition;
+    private int monsterX;
+    private int monsterY;
+
+    private int exitX;
+    private int exitY;
+
+    static final int INFINITY = Integer.MAX_VALUE;
+
+    public boolean containsFalse(boolean[][] array){
+        for (int i = 0; i<array.length; i++){
+            for (int j = 0; j<array[0].length; j++){
+                if (!array[i][j]) return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public ICoordinate play() {
-        ArrayList<ICoordinate> directions = new ArrayList<>();
+        int[][] distances = new int[mazeHeight][mazeWidth];
+        boolean[][] visited = new boolean[mazeHeight][mazeWidth];
+        ICoordinate[][] visitedFrom = new ICoordinate[mazeHeight][mazeWidth];
 
-        Random random = new Random();
-        if(!isWallAt(monsterPosition.getCol() + 1, monsterPosition.getRow())) directions.add(new Coordinate(1, 0));
-        if(!isWallAt(monsterPosition.getCol() - 1, monsterPosition.getRow())) directions.add(new Coordinate(-1, 0));
-        if(!isWallAt(monsterPosition.getCol(), monsterPosition.getRow() + 1)) directions.add(new Coordinate(0, 1));
-        if(!isWallAt(monsterPosition.getCol(), monsterPosition.getRow() - 1)) directions.add(new Coordinate(0, -1));
+        for (int i = 0; i<mazeHeight; i++){
+            for (int j = 0; j<mazeWidth; j++){
+                distances[i][j] = INFINITY;
+            }
+        }
         
-        
-        ICoordinate direction = directions.get(random.nextInt(directions.size()));
+        for (int i = 0; i<mazeHeight; i++){
+            for (int j = 0; j<mazeWidth; j++){
+                if (isWallAt(j,i)) visited[i][j] = true;
+            }
+        }
 
-        return new Coordinate(
-            monsterPosition.getCol() + direction.getCol(),
-            monsterPosition.getRow() + direction.getRow()
-        );
+        distances[monsterY][monsterX] = 0;
+        visitedFrom[monsterY][monsterX] = new Coordinate(monsterX,monsterY);
+
+        while (containsFalse(visited)){ //on mettra les murs comme visited aussi, tant que tout n'a pas été visité on continue
+            int minDistance = INFINITY;
+            int currentX = 0;
+            int currentY = 0;
+            for (int i = 0; i<mazeHeight; i++){
+                for (int j = 0; j<mazeWidth; j++){
+                    if (distances[i][j] < minDistance && !visited[i][j]) { //la prochaine cellule qu'on utilisera sera celle avec la distance minimale mais qui n'a pas encore été visitée
+                        minDistance = distances[i][j]; 
+                        currentY = i;
+                        currentX = j;
+                    }
+                }
+            }
+
+            visited[currentY][currentX] = true;
+
+            //en haut
+            if (isInBounds(currentX,currentY-1)){
+                if (isWallAt(currentX,currentY-1)) visited[currentY-1][currentX] = true;
+                else{
+                    if (distances[currentY-1][currentX] > minDistance+1){
+                        distances[currentY-1][currentX] = minDistance+1;
+                        visitedFrom[currentY-1][currentX] = new Coordinate(currentX,currentY);
+                    }
+                }
+            }
+
+            //à droite
+            if (isInBounds(currentX+1,currentY)){
+                if (isWallAt(currentX+1,currentY)) visited[currentY][currentX+1] = true;
+                else{
+                    if (distances[currentY][currentX+1] > minDistance+1){
+                        distances[currentY][currentX+1] = minDistance+1;
+                        visitedFrom[currentY][currentX+1] = new Coordinate(currentX,currentY);
+                    }
+                }
+            }
+
+            //en bas
+            if (isInBounds(currentX,currentY+1)){
+                if (isWallAt(currentX,currentY+1)) visited[currentY+1][currentX] = true;
+                else{
+                    if (distances[currentY+1][currentX] > minDistance+1){
+                        distances[currentY+1][currentX] = minDistance+1;
+                        visitedFrom[currentY+1][currentX] = new Coordinate(currentX,currentY);
+                    }
+                }
+            }
+
+            //à gauche
+            if (isInBounds(currentX-1,currentY)){
+                if (isWallAt(currentX-1,currentY)) visited[currentY][currentX-1] = true;
+                else{
+                    if (distances[currentY][currentX-1] > minDistance+1){
+                        distances[currentY][currentX-1] = minDistance+1;
+                        visitedFrom[currentY][currentX-1] = new Coordinate(currentX,currentY);
+                    }
+                }    
+            }
+        }
+        System.out.println("distance jusque la sortie " + distances[exitY][exitX]);
+        System.out.println("chemin emprunté : ");
+        int x = exitX;
+        int y = exitY;
+        ArrayList<ICoordinate> listeChemin = new ArrayList<>();
+        listeChemin.add(new Coordinate(exitX,exitY));
+        while (x != monsterX && y != monsterY){
+            System.out.println("x:" + x + " y:" + y);
+            int newX = visitedFrom[y][x].getCol();
+            int newY = visitedFrom[y][x].getRow();
+            if (isDiagonal(x, y, newX, newY)) {
+                listeChemin.add(new Coordinate(x, newY)); // going vertically first
+            }
+            x = newX;
+            y = newY;
+            listeChemin.add(new Coordinate(x,y));
+        }
+        return listeChemin.get(listeChemin.size()-1);
+
+    }
+
+    public boolean isDiagonal(int x, int y, int newX, int newY) {
+        return Math.abs(x - newX) == 1 && Math.abs(y - newY) == 1;
+    }
+
+    public boolean isInBounds(int x, int y){
+        if (x<0 || y<0 || x>=mazeWidth || y>=mazeHeight) return false;
+        return true;
     }
 
     public boolean isWallAt(int x, int y) {
@@ -43,16 +150,24 @@ public class MonsterStrategy implements IMonsterStrategy {
     }
 
 
-    @Override
-    public void initialize(boolean[][] arg0) {
-        this.maze = arg0;
-        this.mazeWidth = arg0[0].length;
-        this.mazeHeight = arg0.length;
+    public void initialize(GameModel game) {
+        this.maze = game.getMaze();
+        this.mazeWidth = maze[0].length;
+        this.mazeHeight = maze.length;
+        this.exitX = game.getExit().getCol();
+        this.exitY = game.getExit().getRow();
     }
 
     @Override
     public void update(ICellEvent arg0) {
-        monsterPosition = arg0.getCoord();
+        this.monsterX = arg0.getCoord().getCol();
+        this.monsterY = arg0.getCoord().getRow();
+    }
+
+    @Override
+    public void initialize(boolean[][] arg0) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
     }
 
 }
