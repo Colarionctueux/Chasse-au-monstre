@@ -1,9 +1,12 @@
 package fr.univlille.models;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 import fr.univlille.Coordinate;
 import fr.univlille.GameMode;
@@ -216,6 +219,55 @@ public class GameModel extends Subject {
         while (exit.equals(getMonster().getPosition())) {
             exit = randomPosition();
         }
+    }
+
+    public void predefiniMaze(String path) {
+        try{
+            Scanner scanner = new Scanner(new File(path));
+            int lignes = 0;
+            int colonnes = 0;
+
+            while(scanner.hasNextLine()) {
+                lignes ++;
+                String ligne = scanner.nextLine();
+                String[] valeurs = ligne.split(",");
+                colonnes = valeurs.length;
+            }
+            scanner = new Scanner(new File(path));
+            maze = new boolean[lignes][colonnes];
+
+            for(int i = 0; i< lignes; i++){
+                String ligne = scanner.nextLine();
+                String[] valeurs = ligne.split(","); 
+
+                for(int j = 0; j<colonnes; j++){
+                    if(Integer.parseInt(valeurs[j]) == 2){
+                        this.monster = new MonsterModel(this, new Coordinate(i, j));
+                        maze[i][j] = false;
+                    }
+                    else if(Integer.parseInt(valeurs[j]) == 3){
+                        this.exit =  new Coordinate(i, j);
+                        maze[i][j] = false;
+                    }
+                    else if(Integer.parseInt(valeurs[j]) == 0){
+                        maze[i][j] = true;
+                    }
+                    else{
+                        maze[i][j] = false;
+                    }
+                }
+            }
+            scanner.close();
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
+
+
+        this.hunter = new HunterModel(this);
+        
+
+        this.turn = 1;
+        this.history.clear();
     }
 
     public List<ICellEvent> getHistory() {

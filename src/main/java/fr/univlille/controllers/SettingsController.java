@@ -17,6 +17,8 @@ public class SettingsController {
 
     @FXML
     public CheckBox fogOfWarCheckBox;
+    @FXML
+    public CheckBox predefCheckBox;
 
     @FXML
     public Spinner<Integer> fogOfWarSpinner;
@@ -93,6 +95,10 @@ public class SettingsController {
         parameters.setWallsPercentage(wallPercentageSpinner.getValue() / 100.0);
 
         parameters.setAiPlayerIsHunter(playerRoleCheckBox.isSelected());
+
+        parameters.setPredefiniMaze(predefCheckBox.isSelected());
+
+
 
         App.getApp().startGame(parameters);
     }

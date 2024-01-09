@@ -33,6 +33,8 @@ public class GameParameters {
 
     private GameMode gameMode;
 
+    private boolean predefini;
+
     public GameMode getGameMode() {
         return gameMode;
     }
@@ -120,6 +122,14 @@ public class GameParameters {
 
     public void setFogOfWarRadius(int fogOfWarRadius) {
         this.fogOfWarRadius = fogOfWarRadius;
+    }
+
+    public void setPredefiniMaze(boolean predefini){
+        this.predefini = predefini;
+    }
+
+    public boolean getPredefiniMaze(){
+        return this.predefini;
     }
 
     /**
