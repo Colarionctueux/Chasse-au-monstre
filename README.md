@@ -25,7 +25,7 @@ Il est possible de jouer au jeu de 3 manières différentes, contre une IA, à
 2 joueurs (même pc) et à 2 joueurs sur deux machines différentes d'un
 **même réseau**.
 
-Avant le début de la partie, il est possible de configurer les paramètres, tel
+Avant le début de la partie, il est possible de configurer les paramètres, tels
 que la taille du labyrinthe, le pourcentage d'obstacles, un brouillard de guerre
 (expliqué plus tard) et le nombre de munitions/powerups du monstre et du
 chasseur.
@@ -44,26 +44,26 @@ contient.
 - En plus des mécaniques de bases, nous avons pris le temps d'ajouter
 des mécaniques supplémentaires pour rendre le jeu plus intéressant.
 Les deux premières mécaniques (Grenades et SuperJump) sont des compétences
-à usage unique que le monstre ou le chasseur possèdent. Elles ne régèrenent
+à usage unique que le monstre ou le chasseur possèdent. Elles ne régénèrent
 pas, et sont paramétrables au début de la partie.
 
 #### Grenades
 
-- Les grenades sont l'arme addiotionnelle du chasseur, lui permettant de tirer dans un rayon de 3x3. C'est très pratique pour découvrir une zone pour savoir si le monstre est passé par la. 
+- Les grenades sont l'arme additionnelle du chasseur, lui permettant de tirer dans un rayon de 3x3. C'est très pratique pour découvrir une zone pour savoir si le monstre est passé par là. 
 
 > Note: Suite à des contraintes de temps, l'IA du chasseur ne peut pas utiliser les grenades.
 
 #### SuperJump
 
-- Les SuperJump sont l'une des compétences du monstre. Une fois activé, elle permet pendant un tour de sauter d'une distance de 3 au maximum. Cela permet de sauter au dessus des arbres, très pratique pour prendre un raccourci à travers le labyrinthe.
+- Les SuperJump sont l'une des compétences du monstre. Une fois activée, elle permet pendant un tour de sauter d'une distance de 3 au maximum. Cela permet de sauter au-dessus des arbres, très pratique pour prendre un raccourci à travers le labyrinthe.
 
 > Note: Suite à des contraintes de temps, l'IA du monstre ne peut pas utiliser les SuperJump.
 
 #### Brouillard de guerre
 
-- Le brouillard de guerre est une mécanique qui montre uniquement les cases à laquelle le monstre est proche. Le rayon de ce paramètre est personalisable dans les paramètres au début de la partie, et affecte plus ou moins le monstre. Les cases que le joueur à déjà parcourut sont marqués comme découvert, et resteront visibles à l'écran, même quand le monstre s'en éloigne.
+- Le brouillard de guerre est une mécanique qui montre uniquement les cases proches du monstre. Le rayon de ce paramètre est personnalisable dans les paramètres au début de la partie, et affecte plus ou moins le monstre. Les cases que le joueur a déjà parcourues sont marquées comme découvertes, et resteront visibles à l'écran, même quand le monstre s'en éloigne.
 
-> Note: Suite à des contraintes de temps, l'IA du monstre n'est pas affecté par le brouillard de guerre, par conséquent elle n'en prendra pas compte lors de la calcul de son algorithme Djikstra.
+> Note: Suite à des contraintes de temps, l'IA du monstre n'est pas affectée par le brouillard de guerre, par conséquent elle n'en prendra pas compte lors de la calcul de son algorithme Dijkstra.
 
 ### Multijoueur en ligne
 
@@ -75,7 +75,7 @@ du multijoueur est disponible dans le dossier ``multiplayer``.
 
 > Le multijoueur est par défaut disponible qu'en LAN. Néanmoins, il est
 totalement possible de jouer en ligne à travers deux personnes d'un réseau
-distant, en utilisaunt un réseau privé virtuel. (L'un des logiciels connu
+distant, en utilisant un réseau privé virtuel. (L'un des logiciels connu
 s'appelle [Hamachi](https://vpn.net/)).
 
 ### Labyrinthe personalisée
@@ -86,9 +86,9 @@ Il est possible d'utiliser un labyrinthe fait par l'utilisateur à partir d'un f
 - ``2`` représente la position du monstre de départ
 - ``3`` représente la sortie
 
-## Éxecution (en utilisant le fichier .jar)
+## Exécution (en utilisant le fichier .jar)
 
-- Recupérer le fichier H1_SAE3A.jar, puis executer le en utilisant la commande:
+- Récupérer le fichier H1_SAE3A.jar, puis l'exécuter en utilisant la commande:
 
 ```bash
 java --module-path "{chemin absolu vers les librairies JavaFX}" --add-modules javafx.controls,javafx.fxml -cp ".\H1_SAE3A.jar;lib\*" fr.univlille.App
@@ -100,7 +100,7 @@ java --module-path "{chemin absolu vers les librairies JavaFX}" --add-modules ja
 - Génération d'un labyrinthe à l'aide d'un algorithme (Recursive Backtracing)
 - Utilisation d'un labyrinthe prédéfini
 - Affichage de l'historique de déplacement du monstre pour le chasseur
-- Affichage de l'historique de de tir du chasseur pour le monstre
+- Affichage de l'historique de tir du chasseur pour le monstre
 - Placement aléatoires du monstre et de la sortie
 - Condition de victoire monstre/chasseur
 - Règles du jeu personnalisables
@@ -159,6 +159,6 @@ java --module-path "{chemin absolu vers les librairies JavaFX}" --add-modules ja
 | Rayane   | Correction bug, ajout fonctionnalité labyrinthe prédéfini |
 | Aymeri   | Clean code, création jar, écriture rapport dev efficace   |
 | Thomas   | Mode multijoueur fini et fonctionnel                      |
-| Manon    | Finalisation de l'ia, écriture rapport dev efficace       |
+| Manon    | Finalisation de l'IA, écriture rapport dev efficace       |
 | Nicolas  | Finalisation aspect visuel                                |
 
