@@ -8,9 +8,7 @@ import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.models.GameModel;
 
 public class MonsterStrategy implements IMonsterStrategy {
-    
-    ArrayList<ICoordinate> path;
-
+ 
     private boolean[][] maze;
 
     private int mazeWidth;
@@ -35,12 +33,6 @@ public class MonsterStrategy implements IMonsterStrategy {
 
     @Override
     public ICoordinate play() {
-        ICoordinate c = path.get(path.size()-1);
-        path.remove(path.size()-1);
-        return c;
-    }
-
-    public ArrayList<ICoordinate> dijkstra(){
         int[][] distances = new int[mazeHeight][mazeWidth];
         boolean[][] visited = new boolean[mazeHeight][mazeWidth];
         ICoordinate[][] visitedFrom = new ICoordinate[mazeHeight][mazeWidth];
@@ -78,8 +70,7 @@ public class MonsterStrategy implements IMonsterStrategy {
 
             //en haut
             if (isInBounds(currentX,currentY-1)){
-                if (isWallAt(currentX,currentY-1)) visited[currentY-1][currentX] = true;
-                else{
+                if (!isWallAt(currentX,currentY-1)){
                     if (distances[currentY-1][currentX] > minDistance+1){
                         distances[currentY-1][currentX] = minDistance+1;
                         visitedFrom[currentY-1][currentX] = new Coordinate(currentX,currentY);
@@ -89,8 +80,7 @@ public class MonsterStrategy implements IMonsterStrategy {
 
             //à droite
             if (isInBounds(currentX+1,currentY)){
-                if (isWallAt(currentX+1,currentY)) visited[currentY][currentX+1] = true;
-                else{
+                if (!isWallAt(currentX+1,currentY)){
                     if (distances[currentY][currentX+1] > minDistance+1){
                         distances[currentY][currentX+1] = minDistance+1;
                         visitedFrom[currentY][currentX+1] = new Coordinate(currentX,currentY);
@@ -100,8 +90,7 @@ public class MonsterStrategy implements IMonsterStrategy {
 
             //en bas
             if (isInBounds(currentX,currentY+1)){
-                if (isWallAt(currentX,currentY+1)) visited[currentY+1][currentX] = true;
-                else{
+                if (!isWallAt(currentX,currentY+1)){
                     if (distances[currentY+1][currentX] > minDistance+1){
                         distances[currentY+1][currentX] = minDistance+1;
                         visitedFrom[currentY+1][currentX] = new Coordinate(currentX,currentY);
@@ -111,8 +100,7 @@ public class MonsterStrategy implements IMonsterStrategy {
 
             //à gauche
             if (isInBounds(currentX-1,currentY)){
-                if (isWallAt(currentX-1,currentY)) visited[currentY][currentX-1] = true;
-                else{
+                if (!isWallAt(currentX-1,currentY)){
                     if (distances[currentY][currentX-1] > minDistance+1){
                         distances[currentY][currentX-1] = minDistance+1;
                         visitedFrom[currentY][currentX-1] = new Coordinate(currentX,currentY);
@@ -124,7 +112,7 @@ public class MonsterStrategy implements IMonsterStrategy {
         int y = exitY;
         ArrayList<ICoordinate> listeChemin = new ArrayList<>();
         listeChemin.add(new Coordinate(exitX,exitY));
-        while (x != monsterX && y != monsterY){
+        while (x != monsterX || y != monsterY){
             int newX = visitedFrom[y][x].getCol();
             int newY = visitedFrom[y][x].getRow();
             if (isDiagonal(x, y, newX, newY)) {
@@ -134,8 +122,7 @@ public class MonsterStrategy implements IMonsterStrategy {
             y = newY;
             listeChemin.add(new Coordinate(x,y));
         }
-
-        return listeChemin;
+        return listeChemin.get(listeChemin.size()-2);
     }
 
     public boolean isDiagonal(int x, int y, int newX, int newY) {
@@ -155,15 +142,11 @@ public class MonsterStrategy implements IMonsterStrategy {
     }
 
 
-    public void initialize(GameModel game) {
-        this.maze = game.getMaze();
-        this.mazeWidth = maze[0].length;
-        this.mazeHeight = maze.length;
+    public void setMonsterVariables(GameModel game) {
         this.exitX = game.getExit().getCol();
         this.exitY = game.getExit().getRow();
         this.monsterX = game.getMonster().getPosition().getCol();
         this.monsterY = game.getMonster().getPosition().getRow();
-        this.path = dijkstra();
     }
 
     @Override
@@ -174,8 +157,9 @@ public class MonsterStrategy implements IMonsterStrategy {
 
     @Override
     public void initialize(boolean[][] arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+        this.maze = arg0;
+        this.mazeWidth = maze[0].length;
+        this.mazeHeight = maze.length;
     }
 
 }

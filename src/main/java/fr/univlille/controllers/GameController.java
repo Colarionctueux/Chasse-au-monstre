@@ -143,7 +143,8 @@ public class GameController {
             // On crée la MonsterStrategy ou la HunterStrategy en fonction du rôle que le joueur a pris.
             if (game.getParameters().isAiPlayerIsHunter()) {
                 monsterStrategy = new MonsterStrategy();
-                monsterStrategy.initialize(game);
+                monsterStrategy.initialize(game.getMaze());
+                monsterStrategy.setMonsterVariables(game);
                 playTurn(); // Comme c'est toujours le monstre qui commence, on le laisse d'abord jouer.
             } else {
                 hunterStrategy = new HunterStrategy();
