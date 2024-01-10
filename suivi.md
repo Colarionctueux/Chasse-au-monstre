@@ -42,3 +42,14 @@
 |Thomas  |implémenté les socket pour créer le lobby          |
 |Manon   |continué l'algo pour l'ia du monstre, simple       |
 |Nicolas |sous-menu, menu du lobby, menu avec l'ia etc       |
+
+
+### Du 25 décembre au 11 janvier
+
+|Personne|Travail|
+|--------|---------------------------------------------------|
+|Rayane  |Ajout fonctionnalité labyrinthe prédéfini          |
+|Aymeri  |Clean code, écriture rapport dev efficace          |
+|Thomas  |Mode multijoueur fini et fonctionnel               |
+|Manon   |Finalisation de l'ia, écriture rapport dev efficace|
+|Nicolas |Finalisation aspect visuel                         |

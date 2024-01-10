@@ -25,9 +25,10 @@ Lancer [App.java](./src/main/java/fr/univlille/App.java)
 ### Fonctionnalités actuelles :
 
 - Menu principal
-- Possibilité pour deux joueurs de jouer sur le même PC
 - Génération d'un labyrinthe à l'aide d'un algorithme (Recursive Backtracing)
+- Utilisation d'un labyrinthe prédéfini
 - Affichage de l'historique de déplacement du monstre pour le chasseur
+- Affichage de l'historique de de tir du chasseur pour le monstre
 - Placement aléatoires du monstre et de la sortie
 - Condition de victoire monstre/chasseur
 - Règles du jeu personnalisables
@@ -35,34 +36,13 @@ Lancer [App.java](./src/main/java/fr/univlille/App.java)
 - Brouillard pour le monstre au-delà de 2/3 de distance
 - Utiliser des grenades pour le chasseur
 - Utiliser un "super jump" pour le monstre
+- Possibilité de jouer contre une IA
+- Possibilité de jouer à 2 sur un même PC
 - Possibilité de jouer sur 2 PC différents à l'IUT (Multijoueur)
 
 ### Fonctionnalités futures :
 
-- Meilleure IA pour le monstre et le chasseur, pour pouvoir jouer en solo
 - Créer un JAR pour lancer le jeu
-
-### Fonctionnalités éventuelles :
-
-- Thèmes (pour les graphismes)
-- De nouvells mécaniques de gameplay
-
-### Multijoueur :
-
-À ce stade, un joueur peut héberger une partie sur sa machine locale, et un autre joueur du réseau de l'IUT (ou le même joueur mais via une instance différente du jeu) peut rejoindre la partie. Pour que la connexion se fasse, le joueur distant doit renseigner le nom de la machine hôte (exemple: acajou28).
-
-Pour tester le multijoueur en local, il suffit de lancer deux fois le jeu: une instance sera l'hôte et l'autre sera le "client". Le nom de la machine peut ne pas être correctement affiché sur l'interface car elle n'est pas prévue à ce but.
-
-Si vous avez besoin du nom de votre machine, deux solutions :
-
-```bash
-hostname
-# commande dans le terminal, sous Linux
-```
-
-Le nom de l'hôte est également affiché dans la console de debug de l'instance hôte (via un `System.out.println()`).
-
-> NOTE: en local, il est également possible d'utiliser `127.0.0.1` dans le champ de texte, lorsque l'on rejoint une partie.
 
 ### Jalon 1
 
@@ -84,3 +64,13 @@ Le nom de l'hôte est également affiché dans la console de debug de l'instance
 |Thomas|Lobby multijoueur (un joueur peut host une game et rejoindre une game)|
 |Manon|IA du monstre, clean code|
 |Nicolas|Menu en javaFX (UI), controllers|
+
+### Jalon 3
+
+|Personne|Travail|
+|--------|-------|
+|Rayane|Correction bug, ajout fonctionnalité labyrinthe prédéfini|
+|Aymeri|Clean code, écriture rapport dev efficace|
+|Thomas|Mode multijoueur fini et fonctionnel|
+|Manon|Finalisation de l'ia, écriture rapport dev efficace|
+|Nicolas|Finalisation aspect visuel|
