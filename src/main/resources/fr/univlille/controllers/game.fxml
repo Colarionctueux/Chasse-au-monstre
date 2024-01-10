@@ -25,7 +25,6 @@
             <ToggleButton fx:id="powerupButton" mnemonicParsing="false" onAction="#powerupButtonPressed" text="PowerupButton" />
             <Label fx:id="powerupEnabledLabel" prefHeight="16.0" prefWidth="40.0" text="[Actif]" textAlignment="CENTER" textFill="#007c00" />
             <Button fx:id="endTurnButton" mnemonicParsing="false" onAction="#playButtonPressed" text="Terminer le tour" />
-            <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Sauvegarder la partie" />
          </children>
       </VBox>
       <Button mnemonicParsing="false" onAction="#menuButtonPressed" text="Retourner au menu" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="16.0" />
