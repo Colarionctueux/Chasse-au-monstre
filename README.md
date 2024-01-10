@@ -1,6 +1,6 @@
-# Saé "chasse au monstre"
+# SAÉ - Chasse au Monstre
 
-Groupe H1 (S3-H):
+**Groupe H1 (S3-H)**
 
 - TOURNEUR Aymeri
 - LECLERCQ Manon
@@ -8,21 +8,93 @@ Groupe H1 (S3-H):
 - BELGUEBLI Rayane
 - GYSEMANS Thomas
 
+## Description du projet
 
-### Description du projet :
+### Présentation
 
-Ce projet est un jeu _"chasse au monstre"_, c'est-à-dire qu'on a un monstre et un chasseur. L'objectif du monstre est de s'échapper en trouvant la sortie, et celle du chasseur est de trouver et tuer le monstre. 
+Ce projet est un jeu _"chasse au monstre"_, c'est-à-dire qu'on a un monstre et
+un chasseur. L'objectif du monstre est de s'échapper en trouvant la sortie, et
+celle du chasseur est de trouver et tuer le monstre.
 
-Chaque tour, le monstre bouge et essaie de se frayer un chemin vers la sortie, et le chasseur tire sur la case où il pense que le monstre se trouve.
+Chaque tour, le monstre bouge et essaie de se frayer un chemin vers la sortie,
+et le chasseur tire sur la case où il pense que le monstre se trouve.
 
+### Comment jouer
 
-![](screenshots/image.png)
+Il est possible de jouer au jeu de 3 manières différentes, contre une IA, à
+2 joueurs (même pc) et à 2 joueurs sur deux machines différentes d'un
+**même réseau**.
 
-### Comment lancer le jeu :
+Avant le début de la partie, il est possible de configurer les paramètres, tel
+que la taille du labyrinthe, le pourcentage d'obstacles, un brouillard de guerre
+(expliqué plus tard) et le nombre de munitions/powerups du monstre et du
+chasseur.
 
-Lancer [App.java](./src/main/java/fr/univlille/App.java)
+C'est **toujours le monstre** qui commence la partie, il peut se déplacer en
+appuyant via sa souris sur une case à sa portée. Il peut se déplacer au
+maximum d'une case de distance à chaque fois, et les mouvements diagonales
+ne sont pas admis.
 
-### Fonctionnalités actuelles :
+Une fois que le monstre a joué, c'est au tour du chasseur. Il utilise sa
+souris pour appuyer sur une case pour reveler les informations qu'elles
+contient.
+
+## Mécaniques additionnelles
+
+- En plus des mécaniques de bases, nous avons pris le temps d'ajouter
+des mécaniques supplémentaires pour rendre le jeu plus intéressant.
+Les deux premières mécaniques (Grenades et SuperJump) sont des compétences
+à usage unique que le monstre ou le chasseur possèdent. Elles ne régèrenent
+pas, et sont paramétrables au début de la partie.
+
+#### Grenades
+
+- Les grenades sont l'arme addiotionnelle du chasseur, lui permettant de tirer dans un rayon de 3x3. C'est très pratique pour découvrir une zone pour savoir si le monstre est passé par la. 
+
+> Note: Suite à des contraintes de temps, l'IA du chasseur ne peut pas utiliser les grenades.
+
+#### SuperJump
+
+- Les SuperJump sont l'une des compétences du monstre. Une fois activé, elle permet pendant un tour de sauter d'une distance de 3 au maximum. Cela permet de sauter au dessus des arbres, très pratique pour prendre un raccourci à travers le labyrinthe.
+
+> Note: Suite à des contraintes de temps, l'IA du monstre ne peut pas utiliser les SuperJump.
+
+#### Brouillard de guerre
+
+- Le brouillard de guerre est une mécanique qui montre uniquement les cases à laquelle le monstre est proche. Le rayon de ce paramètre est personalisable dans les paramètres au début de la partie, et affecte plus ou moins le monstre. Les cases que le joueur à déjà parcourut sont marqués comme découvert, et resteront visibles à l'écran, même quand le monstre s'en éloigne.
+
+> Note: Suite à des contraintes de temps, l'IA du monstre n'est pas affecté par le brouillard de guerre, par conséquent elle n'en prendra pas compte lors de la calcul de son algorithme Djikstra.
+
+### Multijoueur en ligne
+
+- Thomas Gysemans s'est chargé intégralement du mode multijoueur en ligne,
+permettant à deux joueurs sur deux machines différentes de jouer. Le code
+du multijoueur est disponible dans le dossier ``multiplayer``.
+
+- Le multijoueur utilise des sockets pour transférer des données.
+
+> Le multijoueur est par défaut disponible qu'en LAN. Néanmoins, il est
+totalement possible de jouer en ligne à travers deux personnes d'un réseau
+distant, en utilisaunt un réseau privé virtuel. (L'un des logiciels connu
+s'appelle [Hamachi](https://vpn.net/)).
+
+### Labyrinthe personalisée
+
+Il est possible d'utiliser un labyrinthe fait par l'utilisateur à partir d'un fichier CSV. Le csv du labyrinthe est accessible sous ``src\main\resources\maze\maze.csv``.
+- ``0`` représente un mur
+- ``1`` représente du vide
+- ``2`` représente la position du monstre de départ
+- ``3`` représente la sortie
+
+## Éxecution (en utilisant le fichier .jar)
+
+- Recupérer le fichier H1_SAE3A.jar, puis executer le en utilisant la commande:
+
+```bash
+java --module-path "{chemin absolu vers les librairies JavaFX}" --add-modules javafx.controls,javafx.fxml -cp ".\H1_SAE3A.jar;lib\*" fr.univlille.App
+```
+
+## Fonctionnalités actuelles
 
 - Menu principal
 - Génération d'un labyrinthe à l'aide d'un algorithme (Recursive Backtracing)
@@ -38,39 +110,55 @@ Lancer [App.java](./src/main/java/fr/univlille/App.java)
 - Utiliser un "super jump" pour le monstre
 - Possibilité de jouer contre une IA
 - Possibilité de jouer à 2 sur un même PC
-- Possibilité de jouer sur 2 PC différents à l'IUT (Multijoueur)
+- Possibilité de jouer sur 2 PC différents à l'IUT (Multijoueur LAN)
+- Utilisation d'un jar pour lancer le jeu
 
-### Fonctionnalités futures :
+## Images
 
-- Créer un JAR pour lancer le jeu
+- Menu du jeu
+![Menu du jeu](screenshots/menu_jeu.png)
 
-### Jalon 1
-
-|Personne|Travail|
-|--------|-------|
-|Rayane|Implémenté les méthodes du JAR|
-|Aymeri|IHM|
-|Thomas|Commentaires, javadoc, review du code|
-|Manon|Tests|
-|Nicolas|Devait aider pour le javafx mais soucis pour le faire marcher|
+- Lobby multijoueur
+![Lobby multijoueur](screenshots/lobby_multijoueur.jpg)
 
 
-### Jalon 2
+- Paramètres de la partie
+![Paramètres de la partie](screenshots/parametres.png)
 
-|Personne|Travail|
-|--------|-------|
-|Rayane|Ajout grenade pour chasseur, superjump pour monstre, refactoring|
-|Aymeri|Clean code, peaufinage, brouillard de guerre, algorithme labyrinthe, paramétrage de la partie|
-|Thomas|Lobby multijoueur (un joueur peut host une game et rejoindre une game)|
-|Manon|IA du monstre, clean code|
-|Nicolas|Menu en javaFX (UI), controllers|
+- Gameplay jeu monstre
+![Gameplay jeu monstre](screenshots/jeu_monstre.png)
 
-### Jalon 3
+- Brouillard de guerre
+![Brouillard de guerre](screenshots/brouillard_de_guerre.png)
 
-|Personne|Travail|
-|--------|-------|
-|Rayane|Correction bug, ajout fonctionnalité labyrinthe prédéfini|
-|Aymeri|Clean code, écriture rapport dev efficace|
-|Thomas|Mode multijoueur fini et fonctionnel|
-|Manon|Finalisation de l'ia, écriture rapport dev efficace|
-|Nicolas|Finalisation aspect visuel|
+## Jalons
+### Jalon n°1
+
+| Personne | Travail                                                       |
+| -------- | ------------------------------------------------------------- |
+| Rayane   | Implémenté les méthodes du JAR                                |
+| Aymeri   | IHM                                                           |
+| Thomas   | Commentaires, javadoc, review du code                         |
+| Manon    | Tests                                                         |
+| Nicolas  | Devait aider pour le javafx mais soucis pour le faire marcher |
+
+### Jalon n°2
+
+| Personne | Travail                                                                                       |
+| -------- | --------------------------------------------------------------------------------------------- |
+| Rayane   | Ajout grenade pour chasseur, superjump pour monstre, refactoring                              |
+| Aymeri   | Clean code, peaufinage, brouillard de guerre, algorithme labyrinthe, paramétrage de la partie |
+| Thomas   | Lobby multijoueur (un joueur peut host une game et rejoindre une game)                        |
+| Manon    | IA du monstre, clean code                                                                     |
+| Nicolas  | Menu en javaFX (UI), controllers                                                              |
+
+### Jalon n°3
+
+| Personne | Travail                                                   |
+| -------- | --------------------------------------------------------- |
+| Rayane   | Correction bug, ajout fonctionnalité labyrinthe prédéfini |
+| Aymeri   | Clean code, création jar, écriture rapport dev efficace   |
+| Thomas   | Mode multijoueur fini et fonctionnel                      |
+| Manon    | Finalisation de l'ia, écriture rapport dev efficace       |
+| Nicolas  | Finalisation aspect visuel                                |
+
