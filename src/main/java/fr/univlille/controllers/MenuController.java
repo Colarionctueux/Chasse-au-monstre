@@ -29,4 +29,16 @@ public class MenuController extends AnchorPane {
         app = App.getApp();
         app.changeScene("multiMenu");
     }
+    
+    @FXML
+    public void creditsButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("credits");
+    }
+    
+    @FXML
+    public void reglesButtonPressed() throws IOException {
+        app = App.getApp();
+        app.changeScene("regles");
+    }
 }
