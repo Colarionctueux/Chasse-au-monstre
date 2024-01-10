@@ -46,11 +46,11 @@ public class HunterView {
         ICoordinate dimensions = gameModel.getMazeDimensions();
         gc.drawImage(
             GameView.spritesheet, 192, 192, 64, 64, 0, 0,
-            (double) dimensions.getRow() * GameView.TILE_SIZE,
-            (double) dimensions.getCol() * GameView.TILE_SIZE
+            (double) dimensions.getCol() * GameView.TILE_SIZE,
+            (double) dimensions.getRow() * GameView.TILE_SIZE
         );
-        for (int y = 0; y < dimensions.getRow(); y++) {
-            for (int x = 0; x < dimensions.getCol(); x++) {
+        for (int x = 0; x < dimensions.getCol(); x++) {
+            for (int y = 0; y < dimensions.getRow(); y++) {
                 if (x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1) {
                     ViewUtils.drawSimpleTexture(gc, 192, 128, x, y);
                 }
