@@ -120,14 +120,11 @@ public class MonsterStrategy implements IMonsterStrategy {
                 }    
             }
         }
-        System.out.println("distance jusque la sortie " + distances[exitY][exitX]);
-        System.out.println("chemin emprunté : ");
         int x = exitX;
         int y = exitY;
         ArrayList<ICoordinate> listeChemin = new ArrayList<>();
         listeChemin.add(new Coordinate(exitX,exitY));
         while (x != monsterX && y != monsterY){
-            System.out.println("x:" + x + " y:" + y);
             int newX = visitedFrom[y][x].getCol();
             int newY = visitedFrom[y][x].getRow();
             if (isDiagonal(x, y, newX, newY)) {
