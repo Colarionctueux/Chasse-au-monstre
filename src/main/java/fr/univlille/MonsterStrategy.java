@@ -8,7 +8,9 @@ import fr.univlille.iutinfo.cam.player.perception.ICoordinate;
 import fr.univlille.models.GameModel;
 
 public class MonsterStrategy implements IMonsterStrategy {
- 
+    
+    ArrayList<ICoordinate> path;
+
     private boolean[][] maze;
 
     private int mazeWidth;
@@ -33,6 +35,12 @@ public class MonsterStrategy implements IMonsterStrategy {
 
     @Override
     public ICoordinate play() {
+        ICoordinate c = path.get(path.size()-1);
+        path.remove(path.size()-1);
+        return c;
+    }
+
+    public ArrayList<ICoordinate> dijkstra(){
         int[][] distances = new int[mazeHeight][mazeWidth];
         boolean[][] visited = new boolean[mazeHeight][mazeWidth];
         ICoordinate[][] visitedFrom = new ICoordinate[mazeHeight][mazeWidth];
@@ -129,8 +137,8 @@ public class MonsterStrategy implements IMonsterStrategy {
             y = newY;
             listeChemin.add(new Coordinate(x,y));
         }
-        return listeChemin.get(listeChemin.size()-1);
 
+        return listeChemin;
     }
 
     public boolean isDiagonal(int x, int y, int newX, int newY) {
@@ -156,6 +164,9 @@ public class MonsterStrategy implements IMonsterStrategy {
         this.mazeHeight = maze.length;
         this.exitX = game.getExit().getCol();
         this.exitY = game.getExit().getRow();
+        this.monsterX = game.getMonster().getPosition().getCol();
+        this.monsterY = game.getMonster().getPosition().getRow();
+        this.path = dijkstra();
     }
 
     @Override

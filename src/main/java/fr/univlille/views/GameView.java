@@ -216,11 +216,12 @@ public class GameView extends Canvas implements Observer {
      * appellée à chaque mouvement de souris ou à chaque action.
      */
     public void draw() {
-        if (isHunterTurn()) {
-            hunterView.draw();
-        } else {
-            monsterView.draw();
-        }
+        // if (isHunterTurn()) {
+        //     hunterView.draw();
+        // } else {
+        //     monsterView.draw();
+        // }
+        monsterView.draw();
     }
 
     public void play() {
