@@ -52,7 +52,7 @@ public class Maze {
         }
     }
 
-    private boolean isValidCell(int x, int y) {
+    public boolean isValidCell(int x, int y) {
         return x >= 0 && x < tailleX && y >= 0 && y < tailleY;
     }
 
