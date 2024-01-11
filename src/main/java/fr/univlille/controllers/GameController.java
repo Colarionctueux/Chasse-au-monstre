@@ -115,8 +115,8 @@ public class GameController {
 
         game = new GameModel();
         game.setParameters(App.getApp().getGameParameters());
-        if(game.getParameters().getPredefiniMaze() == true){
-            game.predefiniMaze("src/main/resources/maze/maze.csv");
+        if(game.getParameters().getPredefinedMaze() == true){
+            game.predefinedMaze("src/main/resources/maze/maze.csv");
         }
         else{
         game.generateMaze(game.getParameters());

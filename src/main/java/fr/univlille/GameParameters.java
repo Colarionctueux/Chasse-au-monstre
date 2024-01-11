@@ -33,7 +33,7 @@ public class GameParameters {
 
     private GameMode gameMode;
 
-    private boolean predefini;
+    private boolean predefined;
 
     public GameMode getGameMode() {
         return gameMode;
@@ -124,12 +124,12 @@ public class GameParameters {
         this.fogOfWarRadius = fogOfWarRadius;
     }
 
-    public void setPredefiniMaze(boolean predefini){
-        this.predefini = predefini;
+    public void setPredefinedMaze(boolean predefined){
+        this.predefined = predefined;
     }
 
-    public boolean getPredefiniMaze(){
-        return this.predefini;
+    public boolean getPredefinedMaze(){
+        return this.predefined;
     }
 
     /**

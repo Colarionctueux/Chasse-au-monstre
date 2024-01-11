@@ -96,7 +96,7 @@ public class SettingsController {
 
         parameters.setAiPlayerIsHunter(playerRoleCheckBox.isSelected());
 
-        parameters.setPredefiniMaze(predefCheckBox.isSelected());
+        parameters.setPredefinedMaze(predefCheckBox.isSelected());
 
 
 

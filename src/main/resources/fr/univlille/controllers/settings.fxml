@@ -54,7 +54,7 @@
                   <Label text="Pourcentage de mur" GridPane.rowIndex="5" />
                   <Spinner fx:id="wallPercentageSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                   <Spinner fx:id="fogOfWarSpinner" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <CheckBox fx:id="predefCheckBox" mnemonicParsing="false" prefHeight="18.0" prefWidth="170.0" text="Labyrinthe préféfini" GridPane.rowIndex="6" />
+                  <CheckBox fx:id="predefCheckBox" mnemonicParsing="false" prefHeight="18.0" prefWidth="170.0" text="Labyrinthe prédéfini" GridPane.rowIndex="6" />
                </children>
             </GridPane>
             <Separator prefWidth="200.0" />

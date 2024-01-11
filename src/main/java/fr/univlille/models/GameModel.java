@@ -255,7 +255,7 @@ public class GameModel extends Subject {
         }
     }
 
-    public void predefiniMaze(String path) {
+    public void predefinedMaze(String path) {
         try{
             Scanner scanner = new Scanner(new File(path));
             int lignes = 0;
