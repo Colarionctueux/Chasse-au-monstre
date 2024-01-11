@@ -245,7 +245,6 @@ public class GameModel extends Subject {
         exit = randomPosition(monsterCoord, minDist);
         
         int iteration = 0;
-        System.out.println(minDist);
         while (iteration < 100 || exit == null) {
             exit = randomPosition(monsterCoord, minDist);
             iteration++;
