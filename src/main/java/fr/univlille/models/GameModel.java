@@ -196,6 +196,26 @@ public class GameModel extends Subject {
 
         return availableCoordinates.get(random.nextInt(availableCoordinates.size()));
     }
+    
+    /**
+     * Fait comme la méthode ci-dessous, mais permet en plus
+     * de définir une cible et une distance minimale
+     * le script s'assurera que la position n'est pas dans la zone de la cible.
+     * 
+     * @return A random position in the maze.
+     */
+    public ICoordinate randomPosition(ICoordinate target, int minDist) {
+        ArrayList<Coordinate> availableCoordinates = new ArrayList<>();
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if (!isWallAt(x, y) && Coordinate.distance(new Coordinate(x, y), target) >= minDist) {
+                    availableCoordinates.add(new Coordinate(x, y));
+                }
+            }
+        }
+
+        return availableCoordinates.get(random.nextInt(availableCoordinates.size()));
+    }
 
     /**
      * Generates the maze.
@@ -210,13 +230,27 @@ public class GameModel extends Subject {
         maze = laby.createMaze(parameters.getWallsPercentage(), this.random);
 
         this.hunter = new HunterModel(this);
-        this.monster = new MonsterModel(this, randomPosition());
+        ICoordinate monsterPosition = randomPosition();
+        this.monster = new MonsterModel(this, monsterPosition);
 
         this.turn = 1;
         this.history.clear();
 
-        exit = randomPosition();
-        while (exit.equals(getMonster().getPosition())) {
+        
+        setRandomExitPosition(this.monster.getPosition());
+    }
+    
+    private void setRandomExitPosition(ICoordinate monsterCoord) {
+        int minDist = (getWidth() + getHeight()) / 3;
+        exit = randomPosition(monsterCoord, minDist);
+        
+        int iteration = 0;
+        System.out.println(minDist);
+        while (iteration < 100 || exit == null) {
+            exit = randomPosition(monsterCoord, minDist);
+            iteration++;
+        }
+        if(iteration == 100) {
             exit = randomPosition();
         }
     }
