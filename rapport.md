@@ -122,7 +122,9 @@ Pour l'IA du monstre, j'ai implémenté l'algorithme de Dijkstra, qui permet de 
 J'ai choisi cet algorithme pour plusieurs raisons :
 
 - Dijkstra est préférable à BFS dans cette situation car nous recherchons le chemin le plus court, préférable à Bellman-Ford car nous ne gérons pas de coûts négatifs, et je ne suis pas familière pas les autres donc j'ai limité ma recherche d'algorithme optimal à "Dijsktra ou A* ?".
+
 - J'ai déjà implémenté Dijkstra dans le passé, notamment sur un projet au lycée lors de la découverte de graphes en NSI, donc je connais déjà le fonctionnement même si c'était en Python à l'époque.
+
 - Nous avons choisi d'implémenter un labyrinthe de 19x19 au maximum car sinon c'est impossible pour le chasseur (comme dit ci-dessus), donc la performance qu'apporterait A* par rapport à Dijkstra ne vaudrait pas la peine d'être implémentée car on a un labyrinthe petit. À cause de cela, j'ai préféré privilégier une solution que je suis sûre de pouvoir implémenter (Dijkstra) plutôt qu'implémenter A* et me tromper sur les heuristiques, par contrainte de temps à cause des nombreux problèmes dus à JavaFX sur mon ordinateur notamment.
 
 ### Classe
