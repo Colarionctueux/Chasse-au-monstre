@@ -23,6 +23,14 @@ L'algorithme du labyrinthe se trouve dans la classe `src\main\java\fr\univlille\
 
 - L'algorithme est un algorithme recursif. À chaque appel, il va regarder dans les quatre cases autour de lui. Si les cases ne sont pas exploré, alors il va appeler la méthode dans cette case, etc... Au final, toutes les cases du labyrinthe seront explorés, et aucune case sera innacessible. Il n'existe qu'un seul et unique chemin de l'entrée à la sortie.
 
+- Dans `Maze.java`, nous utilisons également une seed pour génerer le labyrinthe. Notre jeu ayant du multijoueur en ligne, cela permet aux deux utilisateurs de partager la même carte. Dans notre jeu, une mécanique s'appellant le "SuperJump" permet au monstre de sauter par dessus un arbre pour faciliter la navigation dans le labyrinthe.
+
+- Nous utilisons comme structure de données un tableau de booléan de taille X et Y, représentant le labyrinthe. true signifie un mur, et false une case vide.
+
+### Efficacité
+
+L'algorithme étant recursif, il est assez difficile d'estimer la complexité de l'algorithme. Dans le pire des cas, la complexité sera de l'ordre O(N²) où N est le nombre totale de cellule. Cela se produit quand les mêmes cases sont explorés plusieurs fois. Dans le meilleur des cas, la complexité est de O(N). En situation réelle, on est plus proche de O(N) que de O(N²). Tout cela dépend de plusieurs paramètres, comme la position de départ, où encore en fonction des directions qui sont choisis aléatoirement.
+
 ### Explication de l'algorithme
 
 - Voici l'algorithme en pseudo-code (le code dans la classe Java est très similaire):
@@ -54,7 +62,7 @@ fonction recursiveBacktrack(currentX, currentY):
 fin fonction
 ```
 
-- Dans `Maze.java`, nous utilisons également une seed pour génerer le labyrinthe. Notre jeu ayant du multijoueur en ligne, cela permet aux deux utilisateurs de partager la même carte. Dans notre jeu, une mécanique s'appellant le "SuperJump" permet au monstre de sauter par dessus un arbre pour faciliter la navigation dans le labyrinthe.
+### Illustration
 
 - Voici une animation illustrant cette algorithme. Dans l'exemple, les murs sont des simples traits, tandis que dans notre projet les murs sont des cases entières.
 
